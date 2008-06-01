@@ -1,0 +1,111 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:five="http://namespaces.zope.org/five"
+    i18n_domain="plone.supermodel">
+
+    <!-- Field handlers for all of zope.schema -->
+    
+    <utility
+        component=".fields.BytesHandler"
+        name="zope.schema.Bytes"
+        />
+    <utility
+        component=".fields.ASCIIHandler"
+        name="zope.schema.ASCII"
+        />
+    <utility
+        component=".fields.BytesLineHandler"
+        name="zope.schema.BytesLine"
+        />
+    <utility
+        component=".fields.ASCIILineHandler"
+        name="zope.schema.ASCIILine"
+        />
+    <utility
+        component=".fields.TextHandler"
+        name="zope.schema.Text"
+        />
+    <utility
+        component=".fields.TextLineHandler"
+        name="zope.schema.TextLine"
+        />
+    <utility
+        component=".fields.BoolHandler"
+        name="zope.schema.Bool"
+        />
+    <utility
+        component=".fields.IntHandler"
+        name="zope.schema.Int"
+        />
+    <utility
+        component=".fields.FloatHandler"
+        name="zope.schema.Float"
+        />
+    <utility
+        component=".fields.TupleHandler"
+        name="zope.schema.Tule"
+        />
+    <utility
+        component=".fields.ListHandler"
+        name="zope.schema.List"
+        />
+    <utility
+        component=".fields.SetHandler"
+        name="zope.schema.Set"
+        />
+    <utility
+        component=".fields.FrozenSetHandler"
+        name="zope.schema.FrozenSet"
+        />
+    <utility
+        component=".fields.PasswordHandler"
+        name="zope.schema.Password"
+        />
+    <utility
+        component=".fields.DictHandler"
+        name="zope.schema.Dict"
+        />
+    <utility
+        component=".fields.DatetimeHandler"
+        name="zope.schema.Datetime"
+        />
+    <utility
+        component=".fields.DateHandler"
+        name="zope.schema.Date"
+        />
+    <utility
+        component=".fields.TimedeltaHandler"
+        name="zope.schema.Timedelta"
+        />
+    <utility
+        component=".fields.SourceTextHandler"
+        name="zope.schema.SourceText"
+        />
+    <utility
+        component=".fields.ObjectHandler"
+        name="zope.schema.Object"
+        />
+    <utility
+        component=".fields.URIHandler"
+        name="zope.schema.URI"
+        />
+    <utility
+        component=".fields.IdHandler"
+        name="zope.schema.Id"
+        />
+    <utility
+        component=".fields.DottedNameHandler"
+        name="zope.schema.DottedName"
+        />
+    <utility
+        component=".fields.InterfaceFieldHandler"
+        name="zope.schema.InterfaceField"
+        />
+    
+    <!-- Field name extractors -->
+    <adapter factory=".serializer.DefaultFieldNameExtractor" />
+    
+    <!-- Parsing policy -->
+    <utility factory=".parser.DefaultSchemaPolicy" />
+
+</configure>
