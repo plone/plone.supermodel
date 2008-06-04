@@ -3,7 +3,9 @@ plone.supermodel: content schemata loaded from XML
 ==================================================
 
 This package allows content schemata to be read and written as XML. It has a 
-standard importer and serialiser for interfaces that contain zope.schema fields. The format is general enough to be able to handle future fields easily, so long as they are properly specified through interfaces.
+standard importer and serialiser for interfaces that contain zope.schema
+fields. The format is general enough to be able to handle future fields
+easily, so long as they are properly specified through interfaces.
 
 Parsing and serializing simple schemata
 ---------------------------------------
@@ -48,21 +50,20 @@ Next, let's define a sample model with a single, unnamed schema.
     ... </model>
     ... """
 
-We can parse this file using a utility function in the 'parser' module.
+We can parse this model using the long_string() function:
 
-    >>> from plone.supermodel.parser import parse
-    >>> from StringIO import StringIO
-    >>> spec = parse(StringIO(schema))
+    >>> from plone.supermodel import load_string
+    >>> model = load_string(schema)
 
 This will load one schema, with the default name u"":
 
-    >>> spec['schemata'].keys()
+    >>> model['schemata'].keys()
     [u'']
     
 We can inspect this schema and see that it contains zope.schema fields with
 attributes corresponding to the values set in XML.
 
-    >>> schema = spec['schemata'][u""]
+    >>> schema = model['schemata'][u""]
     >>> from zope.schema import getFieldsInOrder
     >>> [field for field, _ in getFieldsInOrder(schema)]
     ['title', 'description']
@@ -81,10 +82,10 @@ attributes corresponding to the values set in XML.
     >>> schema['description'].min_length
     10
 
-Similarly, we can serialize a spec to an XML representation:
+Similarly, we can serialize a model to an XML representation:
 
-    >>> from plone.supermodel import serialize_spec
-    >>> print serialize_spec(spec) # doctest: +NORMALIZE_WHITESPACE
+    >>> from plone.supermodel import serialize_model
+    >>> print serialize_model(model) # doctest: +NORMALIZE_WHITESPACE
     <model>
       <schema>
         <field name="title" type="zope.schema.TextLine">
@@ -173,8 +174,8 @@ We can also use a different, named schema:
     >>> [field for field, _ in getFieldsInOrder(ITestMetadata)]
     ['created', 'creator']
     
-Of course, a schema can also be written to XML. Either, you can build a spec
-dict as per the serialize_spec() method seen above, or you can write a model
+Of course, a schema can also be written to XML. Either, you can build a model
+dict as per the serialize_model() method seen above, or you can write a model
 of just a single schema using serialize_schema():
 
     >>> from plone.supermodel import serialize_schema

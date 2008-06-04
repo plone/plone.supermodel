@@ -1,7 +1,8 @@
-from zope.interface import Interface, implements
+from zope.interface import implements
 from zope.interface.interface import InterfaceClass
 from zope.component import getUtility, queryUtility
-    
+
+from plone.supermodel.interfaces import ISchemaPolicy
 from plone.supermodel.interfaces import IFieldExportImportHandler
 
 # Prefer lxml, but fall back on ElementTree if necessary
@@ -13,45 +14,21 @@ except ImportError:
 
 # Helper adapters
 
-class ISchemaPolicy(Interface):
-    """A utility that provides some basic attributes of the generated
-    schemata. Override this to make policy decisions about where generated
-    schemata live, what bases they have and how they are named.
-    """
-
-    def module(schema_name, tree, default_module):
-        """Return the module name to use.
-        """
-        
-    def bases(schema_name, tree, default_bases):
-        """Return the bases to use.
-        """
-        
-    def name(schema_name, tree):
-        """Return the schema name to use
-        """
-
 class DefaultSchemaPolicy(object):
     implements(ISchemaPolicy)
     
-    def module(self, schema_name, tree, default_module):
-        if default_module:
-            return default_module
-        else:
-            return 'plone.supermodel.generated'
+    def module(self, schema_name, tree):
+        return 'plone.supermodel.generated'
         
-    def bases(self, schema_name, tree, default_bases):
-        if default_bases:
-            return default_bases
-        else:
-            return ()
+    def bases(self, schema_name, tree):
+        return ()
         
     def name(self, schema_name, tree):
         return schema_name
 
 # Algorithm
 
-def parse(source, module=None, bases=()):
+def parse(source, policy=u""):
     tree = ElementTree.parse(source)
     root = tree.getroot()
     
@@ -59,7 +36,7 @@ def parse(source, module=None, bases=()):
     widgets = {}
     handlers = {}
     
-    policy = getUtility(ISchemaPolicy)
+    policy_util = getUtility(ISchemaPolicy, name=policy)
     
     for schema_element in root.findall('schema'):
         schema_attributes = {}
@@ -82,9 +59,9 @@ def parse(source, module=None, bases=()):
             
             schema_attributes[field_name] = handler.read(field_element)
             
-        schemata[schema_name] = InterfaceClass(name=policy.name(schema_name, tree),
-                                               bases=policy.bases(schema_name, tree, bases),
-                                               __module__=policy.module(schema_name, tree, module),
+        schemata[schema_name] = InterfaceClass(name=policy_util.name(schema_name, tree),
+                                               bases=policy_util.bases(schema_name, tree),
+                                               __module__=policy_util.module(schema_name, tree),
                                                attrs=schema_attributes)
     
     # TODO: build widgets

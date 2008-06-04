@@ -13,29 +13,28 @@ class IXMLToSchema(Interface):
     To get more detailed information, including hints for setting up form
     widgets, use the full version:
     
-        spec = spec('schema.xml')
+        model = load_file('schema.xml')
     """
     
-    def xml_schema(filename, schema=u""):
+    def xml_schema(filename, schema=u"", policy=u""):
         """Given a filename relative to the current module, return an
         interface representing the schema contained in that file. If there
         are multiple <schema /> blocks, return the unnamed one, unless 
         a name is supplied, in which case the 'name' attribute of the schema
         will be matched to the schema name.
         
+        The policy argument can be used to pick a different parsing policy.
+        Policies must be registered as named utilities providing
+        ISchemaPolicy.
+        
         Raises a KeyError if the schema cannot be found.
         Raises an IOError if the file cannot be opened.
         """
     
-    
-    def serialize_schema(schema, name=u""):
-        """Return an XML string representing the given schema interface. This
-        is a convenience method around the serialize_spec() method, below.
-        """
-    
-    def spec(filename):
-        """Return a model definition as contained in the given XML file, which
-        is read relative to the current module.
+    def load_file(filename, reload=False, policy=u""):
+        """Return a model definition as contained in the given XML file, 
+        which is read relative to the current module (unless it is an 
+        absolute path).
         
         The return value is a dict with keys:
         
@@ -44,11 +43,42 @@ class IXMLToSchema(Interface):
          - widgets -- a dict with keys of schema names and values of dicts,
             which in turn use field names as keys and contain widget hints
             as values
+            
+        If reload is True, reload a schema even if it's cached. If policy
+        is given, it can be used to select a custom schema parsing policy.
+        Policies must be registered as named utilities providing
+        ISchemaPolicy.
+        """
+    
+    def load_string(model, policy=u""):
+        """Load a model from a string rather than a file.
+        """
+    
+    def serialize_schema(schema, name=u""):
+        """Return an XML string representing the given schema interface. This
+        is a convenience method around the serialize_model() method, below.
+        """
+    def serialize_model(model):
+        """Return an XML string representing the given model, as returned by
+        the load_file() or load_string() method.
+        """
+
+class ISchemaPolicy(Interface):
+    """A utility that provides some basic attributes of the generated
+    schemata. Provide a custom one to make policy decisions about where
+    generated schemata live, what bases they have and how they are named.
+    """
+
+    def module(schema_name, tree):
+        """Return the module name to use.
         """
         
-    def serialize_spec(spec):
-        """Return an XML string representing the given spec, as returned by
-        the spec() method.
+    def bases(schema_name, tree):
+        """Return the bases to use.
+        """
+        
+    def name(schema_name, tree):
+        """Return the schema name to use
         """
         
 class IFieldExportImportHandler(Interface):

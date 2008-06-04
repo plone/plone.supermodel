@@ -71,12 +71,12 @@ class DefaultFieldNameExtractor(object):
 
 # Algorithm
 
-def serialize(spec):
+def serialize(model):
     handlers = {}
 
-    model = ElementTree.Element('model')
+    xml = ElementTree.Element('model')
     
-    for schema_name, schema in spec['schemata'].items():
+    for schema_name, schema in model['schemata'].items():
         schema_element = ElementTree.Element('schema')
         if schema_name:
             schema_element.set('name', schema_name)
@@ -92,10 +92,10 @@ def serialize(spec):
             field_element = handler.write(field, field_name, field_type)
             if field_element is not None:
                 schema_element.append(field_element)
-        model.append(schema_element)
+        xml.append(schema_element)
 
     # TODO: write widgets
     
-    return pretty_xml(model)
+    return pretty_xml(xml)
 
 __all__ = ('serialize',)
