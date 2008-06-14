@@ -1,11 +1,14 @@
 from zope.interface import Interface, implements
-from zope.component import adapts
+from zope.component import adapts, getUtilitiesFor
 
 from zope.schema.interfaces import IField
 from zope.schema import getFieldsInOrder
 
 from zope.component import queryUtility
+
 from plone.supermodel.interfaces import IFieldExportImportHandler
+from plone.supermodel.interfaces import ISchemaMetadataHandler
+from plone.supermodel.interfaces import IFieldMetadataHandler
 
 # Prefer lxml, but fall back on ElementTree if necessary
 
@@ -72,11 +75,16 @@ class DefaultFieldNameExtractor(object):
 # Algorithm
 
 def serialize(model):
+    
     handlers = {}
+    schema_metadata_handlers = tuple(getUtilitiesFor(ISchemaMetadataHandler))
+    field_metadata_handlers = tuple(getUtilitiesFor(IFieldMetadataHandler))
 
     xml = ElementTree.Element('model')
     
     for schema_name, schema in model['schemata'].items():
+        metadata_for_schema = model.get('metadata', {}).get(schema_name, {})
+        
         schema_element = ElementTree.Element('schema')
         if schema_name:
             schema_element.set('name', schema_name)
@@ -92,9 +100,18 @@ def serialize(model):
             field_element = handler.write(field, field_name, field_type)
             if field_element is not None:
                 schema_element.append(field_element)
+                
+                for handler_name, metadata_handler in field_metadata_handlers:
+                    metadata_dict = metadata_for_schema.get(handler_name, {})
+                    metadata_handler.write(field_element, field, metadata_dict)
+        
+        for handler_name, metadata_handler in schema_metadata_handlers:
+            metadata_dict = metadata_for_schema.get(handler_name, {})
+            metadata_handler.write(schema_element, schema, metadata_dict)
+        
         xml.append(schema_element)
 
-    # TODO: write widgets
+    # TODO: let metadata handlers write metadata
     
     return pretty_xml(xml)
 

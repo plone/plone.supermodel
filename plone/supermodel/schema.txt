@@ -207,3 +207,111 @@ of just a single schema using serialize_schema():
 Finally, let's clean up the temporary directory.
 
     >>> shutil.rmtree(tmpdir)
+
+Creating custom metadata handlers
+---------------------------------
+
+The plone.supermodel format is extensible with custom utilities that can
+write to a "metadata" dictionary. Such utilities may for example read
+information captured in attributes in particular namespaces.
+
+Let's imagine we wanted to make it possible to override form layout on a
+per-schema level, and override widgets on a per-field level. For this, we
+may expect to be able to parse a format like this:
+
+    >>> schema = """\
+    ... <?xml version="1.0" encoding="UTF-8"?>
+    ... <model xmlns:ui="http://namespaces.acme.com/ui">
+    ...     <schema ui:layout="horizontal">
+    ...         <field type="zope.schema.TextLine" name="title"
+    ...             ui:widget="largetype">
+    ...             <title>Title</title>
+    ...             <required>True</required>
+    ...         </field>
+    ...         <field type="zope.schema.Text" name="description">
+    ...             <title>Description</title>
+    ...             <description>A short summary</description>
+    ...             <required>False</required>
+    ...             <min_length>10</min_length>
+    ...         </field>
+    ...     </schema>
+    ... </model>
+    ... """
+
+We can register schema and field metadata handlers as named utilities.
+Metadata handlers should be able to reciprocally read and write metadata.
+
+    >>> from zope.interface import implements
+    >>> from zope.component import provideUtility
+
+    >>> from plone.supermodel.interfaces import ISchemaMetadataHandler
+    >>> class FormLayoutMetadata(object):
+    ...     implements(ISchemaMetadataHandler)
+    ...     
+    ...     def read(self, schema_node, schema, schema_metadata):
+    ...         layout = schema_node.get('{http://namespaces.acme.com/ui}layout')
+    ...         if layout:
+    ...             schema_metadata['layout'] = layout
+    ...             
+    ...     def write(self, schema_node, schema, schema_metadata):
+    ...         layout = schema_metadata.get('layout', None)
+    ...         if layout:
+    ...             schema_node.set('{http://namespaces.acme.com/ui}layout', layout)
+    ...             
+    >>> provideUtility(component=FormLayoutMetadata(), name='acme.ui.schema')
+
+    >>> from plone.supermodel.interfaces import IFieldMetadataHandler
+    >>> class FieldWidgetMetadata(object):
+    ...     implements(IFieldMetadataHandler)
+    ...     
+    ...     def read(self, field_node, field, schema_metadata):
+    ...         widget = field_node.get('{http://namespaces.acme.com/ui}widget')
+    ...         if widget:
+    ...             name = field.__name__
+    ...             schema_metadata.setdefault(name, {})['widget'] = widget
+    ...
+    ...     def write(self, field_node, field, schema_metadata):
+    ...         name = field.__name__
+    ...         widget = schema_metadata.get(name, {}).get('widget', {})
+    ...         if widget:
+    ...             field_node.set('{http://namespaces.acme.com/ui}widget', widget)
+    >>> provideUtility(component=FieldWidgetMetadata(), name='acme.ui.fields')
+
+When this model is loaded, the 'metadata' part will contain keys 
+'acme.ui.schema' and 'acme.ui.fields', where the metadata above will be stored.
+
+    >>> model = load_string(schema)
+
+The keys in the 'metadata' dict are schema names:
+
+    >>> model['metadata'].keys()
+    [u'']
+
+Under each schema, we will find one key for each named utility. Since we
+registered both the schema and the field utilities under the same name, they
+share a key.
+
+    >>> sorted(model['metadata'][u""].keys())
+    [u'acme.ui.fields', u'acme.ui.schema']
+
+    >>> model['metadata'][u""][u'acme.ui.schema']
+    {'layout': 'horizontal'}
+
+    >>> model['metadata'][u""][u'acme.ui.fields']
+    {'title': {'widget': 'largetype'}}
+
+Of course, we can also serialize the schema back to XML:
+
+    >>> print serialize_model(model) # doctest: +NORMALIZE_WHITESPACE
+    <model>
+      <schema ns0:layout="horizontal" xmlns:ns0="http://namespaces.acme.com/ui">
+        <field name="title" type="zope.schema.TextLine" ns0:widget="largetype">
+          <title>Title</title>
+        </field><field name="description" type="zope.schema.Text">
+          <min_length>10</min_length>
+          <description>A short summary</description>
+          <title>Description</title>
+          <required>False</required>
+        </field>
+      </schema>
+    </model>

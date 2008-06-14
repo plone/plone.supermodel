@@ -1,9 +1,12 @@
 from zope.interface import implements
 from zope.interface.interface import InterfaceClass
-from zope.component import getUtility, queryUtility
+from zope.component import getUtility, queryUtility, getUtilitiesFor
 
 from plone.supermodel.interfaces import ISchemaPolicy
 from plone.supermodel.interfaces import IFieldExportImportHandler
+
+from plone.supermodel.interfaces import ISchemaMetadataHandler
+from plone.supermodel.interfaces import IFieldMetadataHandler
 
 # Prefer lxml, but fall back on ElementTree if necessary
 
@@ -33,18 +36,25 @@ def parse(source, policy=u""):
     root = tree.getroot()
     
     schemata = {}
-    widgets = {}
+    metadata = {}
+    
     handlers = {}
+    schema_metadata_handlers = tuple(getUtilitiesFor(ISchemaMetadataHandler))
+    field_metadata_handlers = tuple(getUtilitiesFor(IFieldMetadataHandler))
     
     policy_util = getUtility(ISchemaPolicy, name=policy)
     
     for schema_element in root.findall('schema'):
         schema_attributes = {}
+        schema_metadata = {}
+        
         schema_name = schema_element.get('name')
         if schema_name is None:
             schema_name = u""
         
         for field_element in schema_element.findall('field'):
+            
+            # Parse field attributes
             field_name = field_element.get('name')
             field_type = field_element.get('type')
             
@@ -57,16 +67,27 @@ def parse(source, policy=u""):
                 if handler is None:
                     raise ValueError("Field type %s specified for field %s is not supported" % (field_type, field_name,))
             
-            schema_attributes[field_name] = handler.read(field_element)
+            field = handler.read(field_element)
+            schema_attributes[field_name] = field
             
-        schemata[schema_name] = InterfaceClass(name=policy_util.name(schema_name, tree),
-                                               bases=policy_util.bases(schema_name, tree),
-                                               __module__=policy_util.module(schema_name, tree),
-                                               attrs=schema_attributes)
-    
-    # TODO: build widgets
+            # Let metadata handlers write metadata
+            for handler_name, metadata_handler in field_metadata_handlers:
+                metadata_dict = schema_metadata.setdefault(handler_name, {})
+                metadata_handler.read(field_element, field, metadata_dict)
+            
+        schema = InterfaceClass(name=policy_util.name(schema_name, tree),
+                                bases=policy_util.bases(schema_name, tree),
+                                __module__=policy_util.module(schema_name, tree),
+                                attrs=schema_attributes)
+        schemata[schema_name] = schema
+        
+        for handler_name, metadata_handler in schema_metadata_handlers:
+            metadata_dict = schema_metadata.setdefault(handler_name, {})
+            metadata_handler.read(schema_element, schema, metadata_dict)
+        
+        metadata[schema_name] = schema_metadata
     
     return dict(schemata=schemata,
-                widget=widgets)
+                metadata=metadata)
 
 __all__ = ('parse',)

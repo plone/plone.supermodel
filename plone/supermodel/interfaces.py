@@ -10,8 +10,8 @@ class IXMLToSchema(Interface):
         class IMyType( xml_schema('schema.xml') ):
             pass
         
-    To get more detailed information, including hints for setting up form
-    widgets, use the full version:
+    To get more detailed information, including metadata that is read and
+    populated by third party plugins, use:
     
         model = load_file('schema.xml')
     """
@@ -40,9 +40,9 @@ class IXMLToSchema(Interface):
         
          - schemata -- a dict with keys of schema names and values of schema
             interfaces; one of the keys will be u"" (the default schema)
-         - widgets -- a dict with keys of schema names and values of dicts,
-            which in turn use field names as keys and contain widget hints
-            as values
+         - metadata -- a dict with keys of schema names and values of dicts,
+            which contain metadata that is populated by third party 
+            components. One intended use case is to provide widget hints.
             
         If reload is True, reload a schema even if it's cached. If policy
         is given, it can be used to select a custom schema parsing policy.
@@ -93,4 +93,42 @@ class IFieldExportImportHandler(Interface):
         
     def write(field, field_name, field_type):
         """Create and return a new node representing the given field
+        """
+        
+class ISchemaMetadataHandler(Interface):
+    """A third party application can register named utilities providing this
+    interface. For each schema that is parsed in a model, the read() method
+    will be called.
+    """
+    
+    def read(schema_node, schema, schema_metadata):
+        """Called once the schema in the given <schema /> node has been
+        read. schema is the schema interface that was read. schema_metadata 
+        is a dict that can be written to, containing the current set of 
+        metadata for this schema, specific to this handler.
+        """
+
+    def write(schema_node, schema, schema_metadata):
+        """Write the metadata contained in the schema_metadata, which pertains
+        to the given schema, to the schema_node. The node will already exist
+        and be populated with standard data.
+        """
+
+class IFieldMetadataHandler(Interface):
+    """A third party application can register named utilities providing this
+    interface. For each field that is parsed in a schema, the read() method
+    will be called.
+    """
+    
+    def read(field_node, field, schema_metadata):
+        """Called once the field in the given <field /> node has been
+        read. field is the field instance that was read. schema_metadata 
+        is a dict that can be written to, containing the current set of 
+        metadata for this schema, specific to this handler.
+        """
+    
+    def write(field_node, field, schema_metadata):
+        """Write the metadata contained in the schema_metadata, which pertains
+        to the given field, to the field_node. The node will already exist
+        and be populated with standard data.
         """
