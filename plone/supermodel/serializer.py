@@ -10,37 +10,24 @@ from plone.supermodel.interfaces import IFieldExportImportHandler
 from plone.supermodel.interfaces import ISchemaMetadataHandler
 from plone.supermodel.interfaces import IFieldMetadataHandler
 
-# Prefer lxml, but fall back on ElementTree if necessary
+from elementtree import ElementTree
 
-try:
-    
-    from lxml import etree as ElementTree
-    
-    def pretty_xml(tree):
-        return ElementTree.tostring(tree, pretty_print=True)
-    
-except ImportError:
-    
-    from elementtree import ElementTree
+def indent(elem, level=0):
+    i = "\n" + level * "  "
+    if len(elem):
+        if not elem.text or not elem.text.strip():
+            elem.text = i + "  "
+        for elem in elem:
+            indent(elem, level+1)
+        if not elem.tail or not elem.tail.strip():
+            elem.tail = i
+    else:
+        if level and (not elem.tail or not elem.tail.strip()):
+            elem.tail = i
 
-    def indent(elem, level=0):
-        i = "\n" + level * "  "
-        if len(elem):
-            if not elem.text or not elem.text.strip():
-                elem.text = i + "  "
-            for elem in elem:
-                indent(elem, level+1)
-            if not elem.tail or not elem.tail.strip():
-                elem.tail = i
-        else:
-            if level and (not elem.tail or not elem.tail.strip()):
-                elem.tail = i
-    
-    def pretty_xml(tree):
-        indent(tree)
-        return ElementTree.tostring(tree)
-
-# Helper adapters
+def pretty_xml(tree):
+    indent(tree)
+    return ElementTree.tostring(tree)
 
 class IFieldNameExtractor(Interface):
     """Adapter to determine the canonical name of a field
@@ -82,6 +69,18 @@ def serialize(model):
 
     xml = ElementTree.Element('model')
     
+    # Let utilities indicate which namespace they prefer.
+
+    # XXX: This is manipulating a global - it's probably safe, though,
+    # since we only add new items, and only add them if they don't conflict
+    used_prefixes = set(ElementTree._namespace_map.values())
+    for name, handler in schema_metadata_handlers + field_metadata_handlers:
+        namespace, prefix = handler.namespace, handler.prefix
+        if namespace is not None and prefix is not None \
+                and prefix not in used_prefixes and namespace not in ElementTree._namespace_map:
+            used_prefixes.add(prefix)
+            ElementTree._namespace_map[namespace] = prefix
+    
     for schema_name, schema in model['schemata'].items():
         metadata_for_schema = model.get('metadata', {}).get(schema_name, {})
         
@@ -111,8 +110,6 @@ def serialize(model):
         
         xml.append(schema_element)
 
-    # TODO: let metadata handlers write metadata
-    
     return pretty_xml(xml)
 
 __all__ = ('serialize',)

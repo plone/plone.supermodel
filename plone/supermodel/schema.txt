@@ -248,15 +248,18 @@ Metadata handlers should be able to reciprocally read and write metadata.
     >>> class FormLayoutMetadata(object):
     ...     implements(ISchemaMetadataHandler)
     ...     
+    ...     namespace = "http://namespaces.acme.com/ui"
+    ...     prefix = "ui"
+    ...     
     ...     def read(self, schema_node, schema, schema_metadata):
-    ...         layout = schema_node.get('{http://namespaces.acme.com/ui}layout')
+    ...         layout = schema_node.get('{%s}layout' % self.namespace)
     ...         if layout:
     ...             schema_metadata['layout'] = layout
     ...             
     ...     def write(self, schema_node, schema, schema_metadata):
     ...         layout = schema_metadata.get('layout', None)
     ...         if layout:
-    ...             schema_node.set('{http://namespaces.acme.com/ui}layout', layout)
+    ...             schema_node.set('{%s}layout' % self.namespace, layout)
     ...             
     >>> provideUtility(component=FormLayoutMetadata(), name='acme.ui.schema')
 
@@ -264,8 +267,11 @@ Metadata handlers should be able to reciprocally read and write metadata.
     >>> class FieldWidgetMetadata(object):
     ...     implements(IFieldMetadataHandler)
     ...     
+    ...     namespace = "http://namespaces.acme.com/ui"
+    ...     prefix = "ui"
+    ...         
     ...     def read(self, field_node, field, schema_metadata):
-    ...         widget = field_node.get('{http://namespaces.acme.com/ui}widget')
+    ...         widget = field_node.get('{%s}widget' % self.namespace)
     ...         if widget:
     ...             name = field.__name__
     ...             schema_metadata.setdefault(name, {})['widget'] = widget
@@ -274,7 +280,7 @@ Metadata handlers should be able to reciprocally read and write metadata.
     ...         name = field.__name__
     ...         widget = schema_metadata.get(name, {}).get('widget', {})
     ...         if widget:
-    ...             field_node.set('{http://namespaces.acme.com/ui}widget', widget)
+    ...             field_node.set('{%s}widget' % self.namespace, widget)
     >>> provideUtility(component=FieldWidgetMetadata(), name='acme.ui.fields')
 
 When this model is loaded, the 'metadata' part will contain keys 
@@ -300,12 +306,13 @@ share a key.
     >>> model['metadata'][u""][u'acme.ui.fields']
     {'title': {'widget': 'largetype'}}
 
-Of course, we can also serialize the schema back to XML:
+Of course, we can also serialize the schema back to XML. Here, the 'prefix'
+set in the utility (if any) will be used by default.
 
     >>> print serialize_model(model) # doctest: +NORMALIZE_WHITESPACE
     <model>
-      <schema ns0:layout="horizontal" xmlns:ns0="http://namespaces.acme.com/ui">
-        <field name="title" type="zope.schema.TextLine" ns0:widget="largetype">
+      <schema ui:layout="horizontal" xmlns:ui="http://namespaces.acme.com/ui">
+        <field name="title" type="zope.schema.TextLine" ui:widget="largetype">
           <title>Title</title>
         </field><field name="description" type="zope.schema.Text">
           <min_length>10</min_length>

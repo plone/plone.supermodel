@@ -1,7 +1,4 @@
-try:
-    from lxml import etree as ElementTree
-except ImportError:
-    from elementtree import ElementTree
+from elementtree import ElementTree
     
 from zope.interface import implements
 from zope.interface import implementedBy
@@ -68,7 +65,7 @@ class BaseHandler(object):
         a type described by the given Field object.
         """
         
-        # XXX: If we had the target field already, we would do this in order
+        # NOTE: If we had the target field already, we would do this in order
         #   to later be able to validate and set values.
         # attribute_field = attribute_field.bind(context)
         
@@ -92,7 +89,7 @@ class BaseHandler(object):
             value = element.text
             value = self.from_unicode(attribute_field, value)
           
-        # XXX: If we had the target field already, we could do this, where
+        # NOTE: If we had the target field already, we could do this, where
         #   'context' would be the field we're building and 'field' would be
         #   the field that describes this parameter.
         # attribute_field.validate(value)
@@ -129,7 +126,7 @@ class BaseHandler(object):
         
         # XXX: Seems ElementTree uses str unless it finds some non-ASCII;
         # we want to make everything unicode
-        if not isinstance(value, unicode):
+        if isinstance(value, str):
             value = unicode(value)
         
         # XXX: Bool incorrectly omits to declare that it implements

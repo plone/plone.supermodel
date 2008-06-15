@@ -8,12 +8,7 @@ from plone.supermodel.interfaces import IFieldExportImportHandler
 from plone.supermodel.interfaces import ISchemaMetadataHandler
 from plone.supermodel.interfaces import IFieldMetadataHandler
 
-# Prefer lxml, but fall back on ElementTree if necessary
-
-try:
-    from lxml import etree as ElementTree
-except ImportError:
-    from elementtree import ElementTree
+from elementtree import ElementTree
 
 # Helper adapters
 

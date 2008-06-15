@@ -101,6 +101,9 @@ class ISchemaMetadataHandler(Interface):
     will be called.
     """
     
+    namespace = schema.URI(title=u"XML namespace used by this handler", required=False)
+    prefix = schema.ASCII(title=u"Preferred XML schema namespace for serialisation", required=False)
+    
     def read(schema_node, schema, schema_metadata):
         """Called once the schema in the given <schema /> node has been
         read. schema is the schema interface that was read. schema_metadata 
@@ -119,6 +122,9 @@ class IFieldMetadataHandler(Interface):
     interface. For each field that is parsed in a schema, the read() method
     will be called.
     """
+    
+    namespace = schema.URI(title=u"XML namespace used by this handler", required=False)
+    prefix = schema.ASCII(title=u"Preferred XML schema namespace for serialisation", required=False)
     
     def read(field_node, field, schema_metadata):
         """Called once the field in the given <field /> node has been
