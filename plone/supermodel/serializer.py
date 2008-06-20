@@ -10,6 +10,9 @@ from plone.supermodel.interfaces import IFieldExportImportHandler
 from plone.supermodel.interfaces import ISchemaMetadataHandler
 from plone.supermodel.interfaces import IFieldMetadataHandler
 
+from plone.supermodel.interfaces import XML_NAMESPACE
+from plone.supermodel.utils import ns
+
 from elementtree import ElementTree
 
 def indent(elem, level=0):
@@ -68,11 +71,13 @@ def serialize(model):
     field_metadata_handlers = tuple(getUtilitiesFor(IFieldMetadataHandler))
 
     xml = ElementTree.Element('model')
+    xml.set('xmlns', XML_NAMESPACE)
     
     # Let utilities indicate which namespace they prefer.
 
     # XXX: This is manipulating a global - it's probably safe, though,
     # since we only add new items, and only add them if they don't conflict
+    
     used_prefixes = set(ElementTree._namespace_map.values())
     for name, handler in schema_metadata_handlers + field_metadata_handlers:
         namespace, prefix = handler.namespace, handler.prefix
@@ -81,8 +86,10 @@ def serialize(model):
             used_prefixes.add(prefix)
             ElementTree._namespace_map[namespace] = prefix
     
-    for schema_name, schema in model['schemata'].items():
-        metadata_for_schema = model.get('metadata', {}).get(schema_name, {})
+    for schema_name, schema_info in model.schemata.items():
+        
+        schema = schema_info.schema
+        metadata_for_schema = schema_info.metadata
         
         schema_element = ElementTree.Element('schema')
         if schema_name:

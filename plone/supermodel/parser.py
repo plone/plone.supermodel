@@ -8,6 +8,10 @@ from plone.supermodel.interfaces import IFieldExportImportHandler
 from plone.supermodel.interfaces import ISchemaMetadataHandler
 from plone.supermodel.interfaces import IFieldMetadataHandler
 
+from plone.supermodel.utils import ns
+
+from plone.supermodel.model import Model, SchemaInfo
+
 from elementtree import ElementTree
 
 # Helper adapters
@@ -30,8 +34,7 @@ def parse(source, policy=u""):
     tree = ElementTree.parse(source)
     root = tree.getroot()
     
-    schemata = {}
-    metadata = {}
+    model = Model()
     
     handlers = {}
     schema_metadata_handlers = tuple(getUtilitiesFor(ISchemaMetadataHandler))
@@ -39,7 +42,7 @@ def parse(source, policy=u""):
     
     policy_util = getUtility(ISchemaPolicy, name=policy)
     
-    for schema_element in root.findall('schema'):
+    for schema_element in root.findall(ns('schema')):
         schema_attributes = {}
         schema_metadata = {}
         
@@ -47,7 +50,7 @@ def parse(source, policy=u""):
         if schema_name is None:
             schema_name = u""
         
-        for field_element in schema_element.findall('field'):
+        for field_element in schema_element.findall(ns('field')):
             
             # Parse field attributes
             field_name = field_element.get('name')
@@ -74,15 +77,13 @@ def parse(source, policy=u""):
                                 bases=policy_util.bases(schema_name, tree),
                                 __module__=policy_util.module(schema_name, tree),
                                 attrs=schema_attributes)
-        schemata[schema_name] = schema
         
         for handler_name, metadata_handler in schema_metadata_handlers:
             metadata_dict = schema_metadata.setdefault(handler_name, {})
             metadata_handler.read(schema_element, schema, metadata_dict)
         
-        metadata[schema_name] = schema_metadata
+        model.schemata[schema_name] = SchemaInfo(schema, schema_metadata)
     
-    return dict(schemata=schemata,
-                metadata=metadata)
+    return model
 
 __all__ = ('parse',)

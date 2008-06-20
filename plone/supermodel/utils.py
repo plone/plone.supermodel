@@ -1,5 +1,21 @@
 import os.path
 import sys
+import re
+
+from plone.supermodel.interfaces import XML_NAMESPACE
+
+no_ns_re = re.compile('^{\S+}')
+
+def ns(name, prefix=XML_NAMESPACE):
+    """Return the element or attribute name with the given prefix
+    """
+    
+    return u"{%s}%s" % (prefix, name)
+
+def no_ns(name):
+    """Return the tag with no namespace
+    """
+    return no_ns_re.sub('', name)
 
 def relative_to_calling_package(filename, calling_frame=2):
     """If the filename is not an absolute path, make it into an absolute path

@@ -8,6 +8,8 @@ import zope.schema
 
 from plone.supermodel.interfaces import IFieldExportImportHandler
 
+from plone.supermodel.utils import ns, no_ns
+
 class BaseHandler(object):
     """Base class for import/export handlers.
     
@@ -36,7 +38,7 @@ class BaseHandler(object):
         """
         attributes = {}
         for attribute_element in element:
-            attribute_name = attribute_element.tag
+            attribute_name = no_ns(attribute_element.tag)
             attribute_field = self.field_attributes.get(attribute_name, None)
             if attribute_field is not None:
                 attributes[attribute_name] = self.read_attribute(attribute_element, attribute_field)

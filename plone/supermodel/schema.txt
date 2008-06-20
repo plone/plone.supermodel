@@ -34,7 +34,7 @@ Next, let's define a sample model with a single, unnamed schema.
 
     >>> schema = """\
     ... <?xml version="1.0" encoding="UTF-8"?>
-    ... <model>
+    ... <model xmlns="http://namespaces.plone.org/supermodel/schema">
     ...     <schema>
     ...         <field type="zope.schema.TextLine" name="title">
     ...             <title>Title</title>
@@ -57,13 +57,13 @@ We can parse this model using the long_string() function:
 
 This will load one schema, with the default name u"":
 
-    >>> model['schemata'].keys()
+    >>> model.schemata.keys()
     [u'']
     
 We can inspect this schema and see that it contains zope.schema fields with
 attributes corresponding to the values set in XML.
 
-    >>> schema = model['schemata'][u""]
+    >>> schema = model.schema # shortcut to model.schemata[u""]
     >>> from zope.schema import getFieldsInOrder
     >>> [field for field, _ in getFieldsInOrder(schema)]
     ['title', 'description']
@@ -86,7 +86,7 @@ Similarly, we can serialize a model to an XML representation:
 
     >>> from plone.supermodel import serialize_model
     >>> print serialize_model(model) # doctest: +NORMALIZE_WHITESPACE
-    <model>
+    <model xmlns="http://namespaces.plone.org/supermodel/schema">
       <schema>
         <field name="title" type="zope.schema.TextLine">
           <title>Title</title>
@@ -108,7 +108,7 @@ use two schemata in one file.
 
     >>> schema = """\
     ... <?xml version="1.0" encoding="UTF-8"?>
-    ... <model>
+    ... <model xmlns="http://namespaces.plone.org/supermodel/schema">
     ...     <schema>
     ...         <field type="zope.schema.TextLine" name="title">
     ...             <title>Title</title>
@@ -180,7 +180,7 @@ of just a single schema using serialize_schema():
 
     >>> from plone.supermodel import serialize_schema
     >>> print serialize_schema(ITestContent) # doctest: +NORMALIZE_WHITESPACE
-    <model>
+    <model xmlns="http://namespaces.plone.org/supermodel/schema">
       <schema>
         <field name="title" type="zope.schema.TextLine">
           <title>Title</title>
@@ -192,7 +192,7 @@ of just a single schema using serialize_schema():
     </model>
     
     >>> print serialize_schema(ITestMetadata, name=u"metadata") # doctest: +NORMALIZE_WHITESPACE
-    <model>
+    <model xmlns="http://namespaces.plone.org/supermodel/schema">
       <schema name="metadata">
         <field name="created" type="zope.schema.Datetime">
           <required>False</required>
@@ -221,7 +221,8 @@ may expect to be able to parse a format like this:
 
     >>> schema = """\
     ... <?xml version="1.0" encoding="UTF-8"?>
-    ... <model xmlns:ui="http://namespaces.acme.com/ui">
+    ... <model xmlns="http://namespaces.plone.org/supermodel/schema"
+    ...        xmlns:ui="http://namespaces.acme.com/ui">
     ...     <schema ui:layout="horizontal">
     ...         <field type="zope.schema.TextLine" name="title"
     ...             ui:widget="largetype">
@@ -245,6 +246,8 @@ Metadata handlers should be able to reciprocally read and write metadata.
     >>> from zope.component import provideUtility
 
     >>> from plone.supermodel.interfaces import ISchemaMetadataHandler
+    >>> from plone.supermodel.utils import ns
+
     >>> class FormLayoutMetadata(object):
     ...     implements(ISchemaMetadataHandler)
     ...     
@@ -252,15 +255,15 @@ Metadata handlers should be able to reciprocally read and write metadata.
     ...     prefix = "ui"
     ...     
     ...     def read(self, schema_node, schema, schema_metadata):
-    ...         layout = schema_node.get('{%s}layout' % self.namespace)
+    ...         layout = schema_node.get(ns('layout', self.namespace))
     ...         if layout:
     ...             schema_metadata['layout'] = layout
     ...             
     ...     def write(self, schema_node, schema, schema_metadata):
     ...         layout = schema_metadata.get('layout', None)
     ...         if layout:
-    ...             schema_node.set('{%s}layout' % self.namespace, layout)
-    ...             
+    ...             schema_node.set(ns('layout', self.namespace), layout)
+
     >>> provideUtility(component=FormLayoutMetadata(), name='acme.ui.schema')
 
     >>> from plone.supermodel.interfaces import IFieldMetadataHandler
@@ -271,7 +274,7 @@ Metadata handlers should be able to reciprocally read and write metadata.
     ...     prefix = "ui"
     ...         
     ...     def read(self, field_node, field, schema_metadata):
-    ...         widget = field_node.get('{%s}widget' % self.namespace)
+    ...         widget = field_node.get(ns('widget', self.namespace))
     ...         if widget:
     ...             name = field.__name__
     ...             schema_metadata.setdefault(name, {})['widget'] = widget
@@ -280,37 +283,30 @@ Metadata handlers should be able to reciprocally read and write metadata.
     ...         name = field.__name__
     ...         widget = schema_metadata.get(name, {}).get('widget', {})
     ...         if widget:
-    ...             field_node.set('{%s}widget' % self.namespace, widget)
+    ...             field_node.set(ns('widget', self.namespace), widget)
+
     >>> provideUtility(component=FieldWidgetMetadata(), name='acme.ui.fields')
 
-When this model is loaded, the 'metadata' part will contain keys 
-'acme.ui.schema' and 'acme.ui.fields', where the metadata above will be stored.
+When this model is loaded, the 'metadata' of each schema that was parsed
+will contain keys 'acme.ui.schema' and 'acme.ui.fields', where the metadata above will be stored. The default schema's metadata is available under
+'model.metadata'.
 
     >>> model = load_string(schema)
 
-The keys in the 'metadata' dict are schema names:
-
-    >>> model['metadata'].keys()
-    [u'']
-
-Under each schema, we will find one key for each named utility. Since we
-registered both the schema and the field utilities under the same name, they
-share a key.
-
-    >>> sorted(model['metadata'][u""].keys())
+    >>> sorted(model.metadata.keys())
     [u'acme.ui.fields', u'acme.ui.schema']
 
-    >>> model['metadata'][u""][u'acme.ui.schema']
+    >>> model.metadata[u'acme.ui.schema']
     {'layout': 'horizontal'}
 
-    >>> model['metadata'][u""][u'acme.ui.fields']
+    >>> model.metadata[u'acme.ui.fields']
     {'title': {'widget': 'largetype'}}
 
 Of course, we can also serialize the schema back to XML. Here, the 'prefix'
 set in the utility (if any) will be used by default.
 
     >>> print serialize_model(model) # doctest: +NORMALIZE_WHITESPACE
-    <model>
+    <model xmlns="http://namespaces.plone.org/supermodel/schema">
       <schema ui:layout="horizontal" xmlns:ui="http://namespaces.acme.com/ui">
         <field name="title" type="zope.schema.TextLine" ui:widget="largetype">
           <title>Title</title>

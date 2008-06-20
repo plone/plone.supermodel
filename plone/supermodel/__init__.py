@@ -6,12 +6,14 @@ from plone.supermodel.interfaces import IXMLToSchema
 from plone.supermodel import parser
 from plone.supermodel import serializer
 from plone.supermodel import utils
+from plone.supermodel import model
 
 # Cache models by absolute filename
 _model_cache = {}
 
 def xml_schema(filename, schema=u"", policy=u"", _frame=2):
-    return load_file(filename, policy=policy, _frame=_frame+1)[u"schemata"][schema]
+    model = load_file(filename, policy=policy, _frame=_frame+1)
+    return model.schemata[schema].schema
 
 def load_file(filename, reload=False, policy=u"", _frame=2):
     global _model_cache
@@ -24,9 +26,8 @@ def load_string(model, policy=u""):
     return parser.parse(StringIO(model), policy=policy)
     
 def serialize_schema(schema, name=u""):
-    return serialize_model(dict(widgets={},
-                               schemata={name : schema},
-                              ))
+    return serialize_model(model.Model({name: model.SchemaInfo(schema=schema, metadata={})}))
+    
 def serialize_model(model):
     return serializer.serialize(model) 
 
