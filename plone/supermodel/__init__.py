@@ -19,7 +19,10 @@ def load_file(filename, reload=False, policy=u"", _frame=2):
     global _model_cache
     path = utils.relative_to_calling_package(filename, _frame)
     if reload or path not in _model_cache:
-        _model_cache[path] = parser.parse(path, policy=policy)    
+        model = parser.parse(path, policy=policy)
+        for schema_info in model.schemata.values():
+            schema_info.schema.setTaggedValue('plone.supermodel.filename', path)
+        _model_cache[path] = model
     return _model_cache[path]
 
 def load_string(model, policy=u""):

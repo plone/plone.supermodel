@@ -22,7 +22,6 @@ def relative_to_calling_package(filename, calling_frame=2):
     by calculating the relative path from the module that called the function
     at 'calling_frame' steps down the stack.
     """
-    
     if os.path.isabs(filename):
         return filename
     else:
