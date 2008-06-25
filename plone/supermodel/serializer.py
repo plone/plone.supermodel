@@ -86,10 +86,9 @@ def serialize(model):
             used_prefixes.add(prefix)
             ElementTree._namespace_map[namespace] = prefix
     
-    for schema_name, schema_info in model.schemata.items():
+    for schema_name, schema in model.schemata.items():
         
-        schema = schema_info.schema
-        metadata_for_schema = schema_info.metadata
+        metadata_for_schema = model.lookup_metadata(schema_name)
         
         schema_element = ElementTree.Element('schema')
         if schema_name:

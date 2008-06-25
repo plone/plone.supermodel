@@ -13,26 +13,26 @@ _model_cache = {}
 
 def xml_schema(filename, schema=u"", policy=u"", _frame=2):
     model = load_file(filename, policy=policy, _frame=_frame+1)
-    return model.schemata[schema].schema
+    return model.lookup_schema(schema)
 
 def load_file(filename, reload=False, policy=u"", _frame=2):
     global _model_cache
     path = utils.relative_to_calling_package(filename, _frame)
     if reload or path not in _model_cache:
-        model = parser.parse(path, policy=policy)
-        for schema_info in model.schemata.values():
-            schema_info.schema.setTaggedValue('plone.supermodel.filename', path)
-        _model_cache[path] = model
+        parsed_model = parser.parse(path, policy=policy)
+        for schema in parsed_model.schemata.values():
+            schema.setTaggedValue(model.FILENAME_KEY, path)
+        _model_cache[path] = parsed_model
     return _model_cache[path]
 
 def load_string(model, policy=u""):
     return parser.parse(StringIO(model), policy=policy)
     
 def serialize_schema(schema, name=u""):
-    return serialize_model(model.Model({name: model.SchemaInfo(schema=schema, metadata={})}))
+    return serialize_model(model.Model({name: schema}))
     
 def serialize_model(model):
-    return serializer.serialize(model) 
+    return serializer.serialize(model)
 
 moduleProvides(IXMLToSchema)
 

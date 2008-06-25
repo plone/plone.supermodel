@@ -25,6 +25,7 @@ setup(name='plone.supermodel',
       zip_safe=False,
       install_requires=[
           'setuptools',
+          'grokcore.component',
           # -*- Extra requirements: -*-
 
           # 'zope.component',

@@ -10,7 +10,7 @@ from plone.supermodel.interfaces import IFieldMetadataHandler
 
 from plone.supermodel.utils import ns
 
-from plone.supermodel.model import Model, SchemaInfo
+from plone.supermodel.model import Model, METADATA_KEY
 
 from elementtree import ElementTree
 
@@ -82,7 +82,8 @@ def parse(source, policy=u""):
             metadata_dict = schema_metadata.setdefault(handler_name, {})
             metadata_handler.read(schema_element, schema, metadata_dict)
         
-        model.schemata[schema_name] = SchemaInfo(schema, schema_metadata)
+        schema.setTaggedValue(METADATA_KEY, schema_metadata)
+        model.schemata[schema_name] = schema
     
     return model
 
