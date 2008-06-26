@@ -2,7 +2,10 @@ from zope.interface import implements
 
 from plone.supermodel.interfaces import IModel
 
+# Keys for tagged values on interfaces
+
 FILENAME_KEY = 'plone.supermodel.filename'
+SCHEMA_NAME_KEY = 'plone.supermodel.schemaname'
 METADATA_KEY = 'plone.supermodel.metadata'
     
 class Model(object):

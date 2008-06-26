@@ -25,12 +25,13 @@ setup(name='plone.supermodel',
       zip_safe=False,
       install_requires=[
           'setuptools',
-          'grokcore.component',
+          'zope.component',
+          'zope.interface',
+          'zope.schema',
+          'zope.deferredimport',
+          'grokcore.component',          
+          'elementtree',
           # -*- Extra requirements: -*-
-
-          # 'zope.component',
-          # 'zope.schema',
-          # 'elementtree',
       ],
       entry_points="""
       # -*- Entry points: -*-

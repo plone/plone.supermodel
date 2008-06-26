@@ -136,9 +136,9 @@ use two schemata in one file.
     ... </model>
     ... """
 
-Ordinarily, this would be in a file, probably in the same directory as the
-module containing the interface being defined. Here, we need to create a 
-temporary directory.
+Ordinarily, this would be in a file in the same directory as the module
+containing the interface being defined. Here, we need to create a temporary
+directory.
 
     >>> import tempfile, os.path, shutil
     >>> tmpdir = tempfile.mkdtemp()
@@ -149,14 +149,30 @@ temporary directory.
 
 We can define interfaces from this with a convenient syntax:
 
-    >>> from plone.supermodel import xml_schema
-    >>> class ITestContent( xml_schema(schema_filename) ):
-    ...     """Test content type schema, built from XML
-    ...     """
-
+    >>> from plone.supermodel.directives import Schema, model
+    >>> class ITestContent(Schema):
+    ...     model(schema_filename)
+    
 Note: If the schema filename is not an absolute path, it will be found 
-relative to the module where the interface is defined (or, more accurately,
-the module that's calling the xml_schema() function).
+relative to the module where the interface is defined.
+
+This class can be "grokked" to produce a proper schema interface. To do so,
+ensure that the meta.zcml file from plone.supermodel is loaded and then
+do the following in the configure.zcml file for the package where the
+interface is defined:
+
+    <configure xmlns="http://namespaces.zope.org/zope"
+               xmlns:grok="http://namespaces.zope.org/grok">
+
+        <grok:grok package="." />
+
+    </configure>
+
+For the purposes of testing, we will call the action that wires up the
+interface directly. You would normally just let the grokker do its magic.
+
+    >>> from plone.supermodel.directives import scribble_schema
+    >>> scribble_schema(ITestContent)
 
 The resulting interface now has the fields of the default (unnamed) schema:
 
@@ -164,26 +180,35 @@ The resulting interface now has the fields of the default (unnamed) schema:
     >>> [field for field, _ in getFieldsInOrder(ITestContent)]
     ['title', 'body']
 
-It also contains the filename that the schema was loaded from, as a tagged
-value in the base interface.
+It also contains the filename that the schema was loaded from and the schema 
+name as a tagged values in the base interface.
 
-    >>> [b.getTaggedValue('plone.supermodel.filename') for b in ITestContent.getBases()] # doctest: +ELLIPSIS
-    ['.../schema.xml']
+    >>> from plone.supermodel.model import FILENAME_KEY, SCHEMA_NAME_KEY
+    >>> ITestContent.getTaggedValue(FILENAME_KEY) # doctest: +ELLIPSIS
+    '.../schema.xml'
+    >>> ITestContent.getTaggedValue(SCHEMA_NAME_KEY)
+    u''
 
 We can also use a different, named schema:
 
-    >>> class ITestMetadata( xml_schema(schema_filename, schema="metadata") ):
+    >>> class ITestMetadata(Schema):
     ...     """Test metadata schema, built from XML
     ...     """
+    ...     model(schema_filename, schema=u"metadata")
+
+    >>> scribble_schema(ITestMetadata)
 
     >>> from zope.schema import getFieldsInOrder
     >>> [field for field, _ in getFieldsInOrder(ITestMetadata)]
     ['created', 'creator']
 
-This interface also has a tagged value for the filename.
+This interface also has tagged values for the filename and schema name.
 
-    >>> [b.getTaggedValue('plone.supermodel.filename') for b in ITestContent.getBases()] # doctest: +ELLIPSIS
-    ['.../schema.xml']
+    >>> ITestMetadata.getTaggedValue(FILENAME_KEY) # doctest: +ELLIPSIS
+    '.../schema.xml'
+    >>> ITestMetadata.getTaggedValue(SCHEMA_NAME_KEY)
+    u'metadata'
+    
 
 Of course, a schema can also be written to XML. Either, you can build a model
 dict as per the serialize_model() method seen above, or you can write a model

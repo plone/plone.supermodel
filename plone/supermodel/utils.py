@@ -2,6 +2,8 @@ import os.path
 import sys
 import re
 
+from zope.schema import getFieldsInOrder
+
 from plone.supermodel.interfaces import XML_NAMESPACE
 
 no_ns_re = re.compile('^{\S+}')
@@ -36,3 +38,46 @@ def relative_to_calling_package(filename, calling_frame=2):
             directory = name
         directory = os.path.abspath(directory)
         return os.path.abspath(os.path.join(directory, filename))
+
+def sync_schema(source, dest, overwrite=False):
+    """Copy attributes and tagged values from the source to the destination.
+    If overwrite is False, do not overwrite attributes or tagged values that
+    already exist or delete ones that don't exist in source.
+    """
+
+    if overwrite:    
+        to_delete = set()
+    
+        # Delete fields in dest, but not in source
+        for name, field in getFieldsInOrder(dest):
+            if name not in source:
+                to_delete.add(name)
+    
+        for name in to_delete:
+            # delattr(dest, name)
+            del dest._InterfaceClass__attrs[name]
+            if hasattr(dest, '_v_attrs'):
+                del dest._v_attrs[name]
+
+    # Add fields that are in source, but not in dest
+    
+    for name, field in getFieldsInOrder(source):
+        if overwrite or name not in dest:
+            
+            clone = field.__class__.__new__(field.__class__)
+            clone.__dict__.update(field.__dict__)
+            clone.interface = dest
+            clone.__name__ = name
+            
+            # setattr(dest, name, clone)
+            dest._InterfaceClass__attrs[name] = clone
+            if hasattr(dest, '_v_attrs'):
+                dest._v_attrs[name] = clone
+
+    # Copy tagged values
+    
+    dest_tags = set(dest.getTaggedValueTags())
+    for tag in source.getTaggedValueTags():
+        if overwrite or tag not in dest_tags:
+            value = source.getTaggedValue(tag)
+            dest.setTaggedValue(tag, value)
