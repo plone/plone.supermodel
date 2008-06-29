@@ -50,11 +50,14 @@ class SchemaGrokker(martian.InstanceGrokker):
     
     def execute(self, interface, config, **kw):
         
+        if not interface.extends(Schema):
+           return False
+        
         filename = interface.queryTaggedValue(FILENAME_KEY, None)
         schema = interface.queryTaggedValue(SCHEMA_NAME_KEY, u"")
         
         if filename is None:
-            raise GrokImportError("A Schema must have an model() diective giving a filename")
+            return False
         
         module_name = interface.__module__
         module = sys.modules[module_name]
@@ -78,6 +81,7 @@ class SchemaGrokker(martian.InstanceGrokker):
             args=(interface,),
             order=9999,
             )
+        
         return True
 
 def scribble_schema(interface,):

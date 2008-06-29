@@ -1,6 +1,10 @@
 import unittest
 import zope.app.testing.placelesssetup
 
+from zope.interface import Interface
+from plone.supermodel.directives import Schema, model
+
+import zope.component.testing
 from zope.testing import doctest
 
 from zope.interface import Interface
@@ -8,6 +12,8 @@ from zope.schema import getFieldNamesInOrder
 from zope import schema
 
 from plone.supermodel import utils
+
+from grokcore.component.testing import grok, grok_component
 
 class TestUtils(unittest.TestCase):
     
@@ -59,9 +65,33 @@ class TestUtils(unittest.TestCase):
         self.assertEquals("tag one", IDest.getTaggedValue("tag1"))
         self.assertEquals("tag two", IDest.getTaggedValue("tag2"))
 
+class TestDirectives(unittest.TestCase):
+    
+    def setUp(self):
+        grok('plone.supermodel.directives')
+        
+    def teatDown(self):
+        zope.component.testing.tearDown(self)
+    
+    def test_schema_without_model_not_grokker(self):
+        
+        class IFoo(Schema):
+            pass
+            
+        self.assertEquals(False, grok_component('IFoo', IFoo))
+
+    def test_non_schema_not_grokked(self):
+        
+        class IFoo(Interface):
+            model('dummy.xml')
+            
+        self.assertEquals(False, grok_component('IFoo', IFoo))
+
+
 def test_suite():
     return unittest.TestSuite((
         unittest.makeSuite(TestUtils),
+        unittest.makeSuite(TestDirectives),
         doctest.DocFileSuite('schema.txt',
             setUp=zope.app.testing.placelesssetup.setUp,
             tearDown=zope.app.testing.placelesssetup.tearDown),

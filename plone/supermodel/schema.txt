@@ -157,8 +157,13 @@ Note: If the schema filename is not an absolute path, it will be found
 relative to the module where the interface is defined.
 
 This class can be "grokked" to produce a proper schema interface. To do so,
-ensure that the meta.zcml file from plone.supermodel is loaded and then
-do the following in the configure.zcml file for the package where the
+you must first ensure that the meta.zcml file from plone.supermodel is loaded.
+We simulate this in the test:
+
+    >>> from grokcore.component.testing import grok, grok_component
+    >>> grok('plone.supermodel.directives')
+
+Then, add the following in the configure.zcml file for the package where the
 interface is defined:
 
     <configure xmlns="http://namespaces.zope.org/zope"
@@ -168,13 +173,14 @@ interface is defined:
 
     </configure>
 
-For the purposes of testing, we will call the action that wires up the
-interface directly. You would normally just let the grokker do its magic.
+Again, for the purposes of testing, we will simulate this with a helper 
+function from grokcore.component:
 
-    >>> from plone.supermodel.directives import scribble_schema
-    >>> scribble_schema(ITestContent)
+    >>> grok_component('ITestContent', ITestContent)
+    True
 
-The resulting interface now has the fields of the default (unnamed) schema:
+After grokking, the interface should have the fields of the default (unnamed)
+schema:
 
     >>> from zope.schema import getFieldsInOrder
     >>> [field for field, _ in getFieldsInOrder(ITestContent)]
@@ -196,7 +202,8 @@ We can also use a different, named schema:
     ...     """
     ...     model(schema_filename, schema=u"metadata")
 
-    >>> scribble_schema(ITestMetadata)
+    >>> grok_component('ITestMetadata', ITestMetadata)
+    True
 
     >>> from zope.schema import getFieldsInOrder
     >>> [field for field, _ in getFieldsInOrder(ITestMetadata)]
