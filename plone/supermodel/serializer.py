@@ -2,7 +2,7 @@ from zope.interface import Interface, implements
 from zope.component import adapts, getUtilitiesFor
 
 from zope.schema.interfaces import IField
-from zope.schema import getFieldsInOrder
+from zope.schema import getFieldNamesInOrder
 
 from zope.component import queryUtility
 
@@ -11,6 +11,8 @@ from plone.supermodel.interfaces import ISchemaMetadataHandler
 from plone.supermodel.interfaces import IFieldMetadataHandler
 
 from plone.supermodel.interfaces import XML_NAMESPACE
+
+from plone.supermodel.model import FIELDSETS_KEY
 
 from elementtree import ElementTree
 
@@ -85,26 +87,55 @@ def serialize(model):
             used_prefixes.add(prefix)
             ElementTree._namespace_map[namespace] = prefix
     
+    def write_field(field, parent_element):
+        name_extractor = IFieldNameExtractor(field)
+        field_type = name_extractor()
+        handler = handlers.get(field_type, None)
+        if handler is None:
+            handler = handlers[field_type] = queryUtility(IFieldExportImportHandler, name=field_type)
+            if handler is None:
+                raise ValueError("Field type %s specified for field %s is not supported" % (field_type, field_name,))
+        field_element = handler.write(field, field_name, field_type)
+        if field_element is not None:
+            parent_element.append(field_element)
+            
+            for handler_name, metadata_handler in field_metadata_handlers:
+                metadata_handler.write(field_element, schema, field)
+    
     for schema_name, schema in model.schemata.items():
+        
+        fieldsets = schema.queryTaggedValue(FIELDSETS_KEY, [])
+        
+        fieldset_fields = set()
+        for fieldset in fieldsets:
+            fieldset_fields.update(fieldset.fields)
+        
+        non_fieldset_fields = [name for name in getFieldNamesInOrder(schema) 
+                                if name not in fieldset_fields]
+        
         
         schema_element = ElementTree.Element('schema')
         if schema_name:
             schema_element.set('name', schema_name)
-        for field_name, field in getFieldsInOrder(schema):
-
-            name_extractor = IFieldNameExtractor(field)
-            field_type = name_extractor()
-            handler = handlers.get(field_type, None)
-            if handler is None:
-                handler = handlers[field_type] = queryUtility(IFieldExportImportHandler, name=field_type)
-                if handler is None:
-                    raise ValueError("Field type %s specified for field %s is not supported" % (field_type, field_name,))
-            field_element = handler.write(field, field_name, field_type)
-            if field_element is not None:
-                schema_element.append(field_element)
-                
-                for handler_name, metadata_handler in field_metadata_handlers:
-                    metadata_handler.write(field_element, schema, field)
+        
+        for field_name in non_fieldset_fields:
+            field = schema[field_name]
+            write_field(field, schema_element)
+        
+        for fieldset in fieldsets:
+            
+            fieldset_element = ElementTree.Element('fieldset')
+            fieldset_element.set('name', fieldset.__name__)
+            if fieldset.label:
+                fieldset_element.set('label', fieldset.label)
+            if fieldset.description:
+                fieldset_element.set('description', fieldset.description)
+            
+            for field_name in fieldset.fields:
+                field = schema[field_name]
+                write_field(field, fieldset_element)
+        
+            schema_element.append(fieldset_element)
         
         for handler_name, metadata_handler in schema_metadata_handlers:
             metadata_handler.write(schema_element, schema)

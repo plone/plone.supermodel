@@ -19,6 +19,19 @@ class IModel(Interface):
                                 value_type=zope.schema.Object(title=u"Schema interface",
                                         schema=IInterface))
 
+class IFieldset(Interface):
+    """Describes a grouping of fields in the schema
+    """
+    
+    __name__ = zope.schema.TextLine(title=u"Fieldset name")
+    
+    label = zope.schema.TextLine(title=u"Label")
+    
+    description = zope.schema.TextLine(title=u"Long description", required=False)
+    
+    fields = zope.schema.List(title=u"Field names",
+                              value_type=zope.schema.TextLine(title=u"Field name"))
+
 class IXMLToSchema(Interface):
     """Functionality to parse an XML representation of a schema and return
     an interface representation with zope.schema fields.

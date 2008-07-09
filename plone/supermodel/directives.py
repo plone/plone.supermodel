@@ -9,6 +9,9 @@ from zope.interface.interface import TAGGED_DATA
 
 from plone.supermodel.model import FILENAME_KEY
 from plone.supermodel.model import SCHEMA_NAME_KEY
+from plone.supermodel.model import FIELDSETS_KEY
+
+from plone.supermodel.model import Fieldset
 
 from plone.supermodel import load_file
 from plone.supermodel import utils
@@ -35,6 +38,20 @@ class FilenameStorage(object):
         context.setTaggedValue(FILENAME_KEY, value["filename"])
         context.setTaggedValue(SCHEMA_NAME_KEY, value["schema"])
 
+class FieldsetStorage(object):
+    """Stores the fieldset() directive value in a schema tagged value.
+    """
+
+    def set(self, locals_, directive, value):
+        tags = locals_.setdefault(TAGGED_DATA, {})
+        tags.setdefault(FIELDSETS_KEY, []).append(value)
+
+    def get(self, directive, component, default):
+        return component.queryTaggedValue(FIELDSETS_KEY, [])
+
+    def setattr(self, context, directive, value):
+        context.setTaggedValue(FIELDSETS_KEY, value)
+
 class model(martian.Directive):
     """Directive used to specify the XML model file
     """
@@ -44,9 +61,19 @@ class model(martian.Directive):
     def factory(self, filename, schema=u""):
         return dict(filename=filename, schema=schema)
 
+class fieldset(martian.Directive):
+    """Directive used to create fieldsets
+    """
+    scope = martian.CLASS
+    store = FieldsetStorage()
+    
+    def factory(self, name, label=None, description=None, fields=None):
+        return Fieldset(name, label=label, description=description, fields=fields)
+
 class SchemaGrokker(martian.InstanceGrokker):
     martian.component(Schema.__class__)
     martian.directive(model)
+    martian.directive(fieldset)
     
     def execute(self, interface, config, **kw):
         
@@ -54,33 +81,33 @@ class SchemaGrokker(martian.InstanceGrokker):
            return False
         
         filename = interface.queryTaggedValue(FILENAME_KEY, None)
-        schema = interface.queryTaggedValue(SCHEMA_NAME_KEY, u"")
         
-        if filename is None:
-            return False
+        if filename is not None:
+            
+            schema = interface.queryTaggedValue(SCHEMA_NAME_KEY, u"")
+            
+            module_name = interface.__module__
+            module = sys.modules[module_name]
         
-        module_name = interface.__module__
-        module = sys.modules[module_name]
+            directory = module_name
         
-        directory = module_name
+            if hasattr(module, '__path__'):
+                directory = module.__path__[0]
+            elif "." in module_name:
+                parent_module_name = module_name[:module_name.rfind('.')]
+                directory = sys.modules[parent_module_name].__path__[0]
         
-        if hasattr(module, '__path__'):
-            directory = module.__path__[0]
-        elif "." in module_name:
-            parent_module_name = module_name[:module_name.rfind('.')]
-            directory = sys.modules[parent_module_name].__path__[0]
+            directory = os.path.abspath(directory)
+            filename = os.path.abspath(os.path.join(directory, filename))
         
-        directory = os.path.abspath(directory)
-        filename = os.path.abspath(os.path.join(directory, filename))
+            interface.setTaggedValue(FILENAME_KEY, filename)
         
-        interface.setTaggedValue(FILENAME_KEY, filename)
-        
-        config.action(
-            discriminator=('plone.supermodel.schema', interface, filename, schema),
-            callable=scribble_schema,
-            args=(interface,),
-            order=9999,
-            )
+            config.action(
+                discriminator=('plone.supermodel.schema', interface, filename, schema),
+                callable=scribble_schema,
+                args=(interface,),
+                order=9999,
+                )
         
         return True
 

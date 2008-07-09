@@ -12,6 +12,7 @@ from zope.schema import getFieldNamesInOrder
 from zope import schema
 
 from plone.supermodel import utils
+from plone.supermodel.model import FILENAME_KEY, SCHEMA_NAME_KEY
 
 from grokcore.component.testing import grok, grok_component
 
@@ -73,12 +74,14 @@ class TestDirectives(unittest.TestCase):
     def teatDown(self):
         zope.component.testing.tearDown(self)
     
-    def test_schema_without_model_not_grokker(self):
+    def test_schema_without_model_not_grokked(self):
         
         class IFoo(Schema):
             pass
             
-        self.assertEquals(False, grok_component('IFoo', IFoo))
+        self.assertEquals(True, grok_component('IFoo', IFoo))
+        self.assertEquals(None, IFoo.queryTaggedValue(FILENAME_KEY))
+        self.assertEquals(None, IFoo.queryTaggedValue(SCHEMA_NAME_KEY))
 
     def test_non_schema_not_grokked(self):
         

@@ -10,7 +10,7 @@ from plone.supermodel.interfaces import IFieldMetadataHandler
 
 from plone.supermodel.utils import ns
 
-from plone.supermodel.model import Model
+from plone.supermodel.model import Model, Fieldset, FIELDSETS_KEY
 
 from elementtree import ElementTree
 
@@ -42,6 +42,27 @@ def parse(source, policy=u""):
     
     policy_util = getUtility(ISchemaPolicy, name=policy)
     
+    def read_field(field_element, schema_attributes, field_elements):
+        
+        # Parse field attributes
+        field_name = field_element.get('name')
+        field_type = field_element.get('type')
+    
+        if field_name is None or field_type is None:
+            raise ValueError("The attributes 'name' and 'type' are required for each <field /> element")
+    
+        handler = handlers.get(field_type, None)
+        if handler is None:
+            handler = handlers[field_type] = queryUtility(IFieldExportImportHandler, name=field_type)
+            if handler is None:
+                raise ValueError("Field type %s specified for field %s is not supported" % (field_type, field_name,))
+    
+        field = handler.read(field_element)
+        schema_attributes[field_name] = field
+        field_elements[field_name] = field_element
+        
+        return field_name
+    
     for schema_element in root.findall(ns('schema')):
         schema_attributes = {}
         schema_metadata = {}
@@ -52,29 +73,47 @@ def parse(source, policy=u""):
         
         field_elements = {}
         
+        # Read global fields
         for field_element in schema_element.findall(ns('field')):
+            read_field(field_element, schema_attributes, field_elements)
+    
+        # Read fieldsets and their fields
+        fieldsets = []
+        fieldsets_by_name = {}
+    
+        for subelement in schema_element:
             
-            # Parse field attributes
-            field_name = field_element.get('name')
-            field_type = field_element.get('type')
-            
-            if field_name is None or field_type is None:
-                raise ValueError("The attributes 'name' and 'type' are required for each <field /> element")
-            
-            handler = handlers.get(field_type, None)
-            if handler is None:
-                handler = handlers[field_type] = queryUtility(IFieldExportImportHandler, name=field_type)
-                if handler is None:
-                    raise ValueError("Field type %s specified for field %s is not supported" % (field_type, field_name,))
-            
-            field = handler.read(field_element)
-            schema_attributes[field_name] = field
-            field_elements[field_name] = field_element
-            
+            if subelement.tag == ns('field'):
+                read_field(subelement, schema_attributes, field_elements)
+            elif subelement.tag == ns('fieldset'):
+                
+                fieldset_name = subelement.get('name')
+                if fieldset_name is None:
+                    raise ValueError(u"Fieldset in schema %s has no name" % (schema_name))
+                
+                fieldset = fieldsets_by_name.get(fieldset_name, None)
+                if fieldset is None:
+                    fieldset_label = subelement.get('label')
+                    fieldset_description = subelement.get('description')
+                
+                    fieldset = fieldsets_by_name[fieldset_name] = Fieldset(fieldset_name, 
+                                    label=fieldset_label, description=fieldset_description)
+                    fieldsets_by_name[fieldset_name] = fieldset
+                    fieldsets.append(fieldset)
+                
+                for field_element in subelement.findall(ns('field')):
+                    parsed_field_name = read_field(field_element, schema_attributes, field_elements)
+                    if parsed_field_name:
+                        fieldset.fields.append(parsed_field_name)
+    
         schema = InterfaceClass(name=policy_util.name(schema_name, tree),
                                 bases=policy_util.bases(schema_name, tree),
                                 __module__=policy_util.module(schema_name, tree),
                                 attrs=schema_attributes)
+        
+        schema.setTaggedValue(FIELDSETS_KEY, fieldsets)
+        
+        # Save fieldsets
         
         # Let metadata handlers write metadata
         for handler_name, metadata_handler in field_metadata_handlers:
@@ -87,5 +126,7 @@ def parse(source, policy=u""):
         model.schemata[schema_name] = schema
     
     return model
+
+
 
 __all__ = ('parse',)

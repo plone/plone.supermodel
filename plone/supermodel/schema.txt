@@ -64,8 +64,9 @@ We can inspect this schema and see that it contains zope.schema fields with
 attributes corresponding to the values set in XML.
 
     >>> schema = model.schema # shortcut to model.schemata[u""]
-    >>> from zope.schema import getFieldsInOrder
-    >>> [field for field, _ in getFieldsInOrder(schema)]
+
+    >>> from zope.schema import getFieldNamesInOrder
+    >>> getFieldNamesInOrder(schema)
     ['title', 'description']
     
     >>> schema['title'].title
@@ -182,8 +183,7 @@ function from grokcore.component:
 After grokking, the interface should have the fields of the default (unnamed)
 schema:
 
-    >>> from zope.schema import getFieldsInOrder
-    >>> [field for field, _ in getFieldsInOrder(ITestContent)]
+    >>> getFieldNamesInOrder(ITestContent)
     ['title', 'body']
 
 It also contains the filename that the schema was loaded from and the schema 
@@ -205,8 +205,7 @@ We can also use a different, named schema:
     >>> grok_component('ITestMetadata', ITestMetadata)
     True
 
-    >>> from zope.schema import getFieldsInOrder
-    >>> [field for field, _ in getFieldsInOrder(ITestMetadata)]
+    >>> getFieldNamesInOrder(ITestMetadata)
     ['created', 'creator']
 
 This interface also has tagged values for the filename and schema name.
@@ -250,6 +249,163 @@ of just a single schema using serialize_schema():
 Finally, let's clean up the temporary directory.
 
     >>> shutil.rmtree(tmpdir)
+
+Fieldset support
+----------------
+
+It is often useful to be able to group form fields in the same schema into
+fieldsets, for example for form rendering. While plone.supermodel doesn't have
+anything to do with such rendering, it does support some markup to make it
+possible to define fieldsets. These are stored in a tagged value on the
+generated interface, which can then be used by other code.
+
+Fieldsets can be defined from and serialised to XML, using the <fieldset />
+tag to wrap a sequence of fields.
+
+    >>> schema = """\
+    ... <?xml version="1.0" encoding="UTF-8"?>
+    ... <model xmlns="http://namespaces.plone.org/supermodel/schema">
+    ...     <schema>
+    ...     
+    ...         <field type="zope.schema.TextLine" name="title">
+    ...             <title>Title</title>
+    ...             <required>True</required>
+    ...         </field>
+    ...         <field type="zope.schema.Text" name="body">
+    ...             <title>Body text</title>
+    ...             <required>True</required>
+    ...             <max_length>10000</max_length>
+    ...         </field>
+    ...         
+    ...         <fieldset name="dates" label="Dates" description="Standard dates">
+    ...             <field type="zope.schema.Date" name="publication_date">
+    ...                 <title>Publication date</title>
+    ...             </field>
+    ...         </fieldset>
+    ...         
+    ...         <field type="zope.schema.TextLine" name="author">
+    ...             <title>Author</title>
+    ...         </field>
+    ...         
+    ...         <fieldset name="dates" label="Ignored" description="Ignored">
+    ...             <field type="zope.schema.Date" name="expiry_date">
+    ...                 <title>Expiry date</title>
+    ...             </field>
+    ...             <field type="zope.schema.Date" name="notification_date">
+    ...                 <title>Notification date</title>
+    ...             </field>
+    ...         </fieldset>
+    ...     </schema>
+    ...     
+    ...     <schema name="metadata">
+    ...     
+    ...         <fieldset name="standard" label="Standard" />
+    ...         <fieldset name="dates" label="Metadata dates" />
+    ...         <fieldset name="author" label="Author info" />
+    ...         
+    ...         <fieldset name="dates">
+    ...             <field type="zope.schema.Datetime" name="created">
+    ...                 <title>Created date</title>
+    ...                 <required>False</required>
+    ...             </field>
+    ...         </fieldset>
+    ...         
+    ...         <fieldset name="standard">
+    ...             <field type="zope.schema.TextLine" name="creator">
+    ...                 <title>Creator</title>
+    ...                 <description>Name of the creator</description>
+    ...                 <required>True</required>
+    ...             </field>
+    ...         </fieldset>
+    ...     </schema>
+    ...     
+    ... </model>
+    ... """
+
+Fields outside any <fieldset /> tag are not placed in any fieldset. An
+empty <fieldset /> will be recorded as one having no fields. This is sometimes
+useful to control the order of fieldsets, if those are to be filled later.
+
+If there are two <fieldset /> blocks with the same name, fields from the second
+will be appended to the first, and the label and description will be kept
+from the first one, as appropriate.
+
+Note that fieldsets are specific to each schema, i.e. the fieldset in the
+default schema above is unrelated to the one in the metadata schema.
+
+    >>> model = load_string(schema)
+    >>> getFieldNamesInOrder(model.schema)
+    ['title', 'body', 'publication_date', 'author', 'expiry_date', 'notification_date']
+
+    >>> getFieldNamesInOrder(model.schemata['metadata'])
+    ['created', 'creator']
+    
+    >>> from plone.supermodel.model import FIELDSETS_KEY
+    >>> model.schema.getTaggedValue(FIELDSETS_KEY)
+    [<Fieldset 'dates' of publication_date, expiry_date, notification_date>]
+
+    >>> model.schemata[u"metadata"].getTaggedValue(FIELDSETS_KEY)
+    [<Fieldset 'standard' of creator>, <Fieldset 'dates' of created>, <Fieldset 'author' of >]
+
+When we serialise a schema with fieldsets, fields will be grouped by
+fieldset.
+
+    >>> print serialize_model(model) # doctest: +NORMALIZE_WHITESPACE
+    <model xmlns="http://namespaces.plone.org/supermodel/schema">
+      <schema>
+        <field name="title" type="zope.schema.TextLine">
+          <title>Title</title>
+        </field><field name="body" type="zope.schema.Text">
+          <title>Body text</title>
+          <max_length>10000</max_length>
+        </field><field name="author" type="zope.schema.TextLine">
+          <title>Author</title>
+        </field><fieldset description="Standard dates" label="Dates" name="dates">
+          <field name="publication_date" type="zope.schema.Date">
+            <title>Publication date</title>
+          </field><field name="expiry_date" type="zope.schema.Date">
+            <title>Expiry date</title>
+          </field><field name="notification_date" type="zope.schema.Date">
+            <title>Notification date</title>
+          </field>
+        </fieldset>
+      </schema><schema name="metadata">
+        <fieldset label="Standard" name="standard">
+          <field name="creator" type="zope.schema.TextLine">
+            <description>Name of the creator</description>
+            <title>Creator</title>
+          </field>
+        </fieldset><fieldset label="Metadata dates" name="dates">
+          <field name="created" type="zope.schema.Datetime">
+            <required>False</required>
+            <title>Created date</title>
+          </field>
+        </fieldset><fieldset label="Author info" name="author" />
+      </schema>
+    </model>
+
+
+Fieldsets can also be defined with directives:
+    
+    >>> import zope.schema
+    >>> from plone.supermodel.directives import fieldset
+
+    >>> class IGrouped(Schema):
+    ...     
+    ...     fieldset(u"default", label="Default", fields=['title', 'description'])
+    ...     fieldset(u"metadata", label="Metadata", fields=['date'])
+    ...     
+    ...     title = zope.schema.TextLine(title=u"Title")
+    ...     description = zope.schema.TextLine(title=u"Description")
+    ...     
+    ...     publication_date = zope.schema.Date(title=u"Publication date")
+
+    >>> grok_component("IGrouped", IGrouped)
+    True
+    
+    >>> from plone.supermodel.model import FIELDSETS_KEY
+    >>> IGrouped.getTaggedValue(FIELDSETS_KEY)
+    [<Fieldset 'default' of title, description>, <Fieldset 'metadata' of date>]
 
 Creating custom metadata handlers
 ---------------------------------
@@ -336,9 +492,6 @@ When this model is loaded, utilities above will be invoked for each schema
 and each field, respectively.
 
     >>> model = load_string(schema)
-
-    >>> sorted(model.schema.getTaggedValueTags())
-    [u'acme.layout', u'acme.widgets']
 
     >>> model.schema.getTaggedValue('acme.layout')
     'horizontal'
