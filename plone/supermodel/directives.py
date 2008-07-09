@@ -84,7 +84,7 @@ class SchemaGrokker(martian.InstanceGrokker):
         
         return True
 
-def scribble_schema(interface,):
+def scribble_schema(interface):
     
     filename = interface.getTaggedValue(FILENAME_KEY)
     schema = interface.queryTaggedValue(SCHEMA_NAME_KEY, u"")
@@ -95,6 +95,6 @@ def scribble_schema(interface,):
         raise GrokImportError(u"Schema '%s' specified for interface %s does not exist in %s." % 
                                 (schema, interface.__identifier__, filename,)) 
     
-    utils.sync_schema(model.lookup_schema(schema), interface)
+    utils.sync_schema(model.schemata[schema], interface)
     
 __all__ = ('Schema', 'model',)

@@ -12,30 +12,12 @@ class IModel(Interface):
     
     schema = zope.schema.InterfaceField(title=u"Default schema",
                                         readonly=True)
-    
-    metadata = zope.schema.Dict(title=u"Default schema metadata",
-                                description=u"Metadata is managed by third party utilities",
-                                key_type=zope.schema.TextLine(title=u"Arbitrary key"),
-                                value_type=zope.schema.Object(title=u"Arbitrary value",
-                                                              schema=Interface),
-                                readonly=True)
-    
+
     schemata = zope.schema.Dict(title=u"Schemata",
                                 key_type=zope.schema.TextLine(title=u"Schema name",
                                         description=u"Default schema is under the key u''."),
                                 value_type=zope.schema.Object(title=u"Schema interface",
-                                        description=u"Metadata dict is a tagged value under the key 'plone.supermodel.metadata'",
                                         schema=IInterface))
-    
-    def lookup_schema(schema=u""):
-        """Return the schema with the given name, or None if it cannot be 
-        found.
-        """
-    
-    def lookup_metadata(self, schema=u""):
-        """Return the metadata dict for the schema with the given name.
-        Returns None if the schema cannot be found.
-        """
 
 class IXMLToSchema(Interface):
     """Functionality to parse an XML representation of a schema and return
@@ -45,8 +27,7 @@ class IXMLToSchema(Interface):
     
         schema = xml_schema('schema.xml')
         
-    To get more detailed information, including metadata that is read and
-    populated by third party plugins, use:
+    If a file contains multiple schemata, you can load them all using:
     
         model = load_file('schema.xml')
         
@@ -100,6 +81,7 @@ class IXMLToSchema(Interface):
         """Return an XML string representing the given schema interface. This
         is a convenience method around the serialize_model() method, below.
         """
+
     def serialize_model(model):
         """Return an XML string representing the given model, as returned by
         the load_file() or load_string() method.
@@ -146,17 +128,15 @@ class ISchemaMetadataHandler(Interface):
     namespace = zope.schema.URI(title=u"XML namespace used by this handler", required=False)
     prefix = zope.schema.ASCII(title=u"Preferred XML schema namespace for serialisation", required=False)
     
-    def read(schema_node, schema, schema_metadata):
+    def read(schema_node, schema):
         """Called once the schema in the given <schema /> node has been
-        read. schema is the schema interface that was read. schema_metadata 
-        is a dict that can be written to, containing the current set of 
-        metadata for this schema, specific to this handler.
+        read. schema is the schema interface that was read.
         """
 
-    def write(schema_node, schema, schema_metadata):
-        """Write the metadata contained in the schema_metadata, which pertains
-        to the given schema, to the schema_node. The node will already exist
-        and be populated with standard data.
+    def write(schema_node, schema):
+        """Write the metadata contained in the given schema, to the
+        schema_node. The node will already exist and be populated with
+        standard data.
         """
 
 class IFieldMetadataHandler(Interface):
@@ -168,15 +148,14 @@ class IFieldMetadataHandler(Interface):
     namespace = zope.schema.URI(title=u"XML namespace used by this handler", required=False)
     prefix = zope.schema.ASCII(title=u"Preferred XML schema namespace for serialisation", required=False)
     
-    def read(field_node, field, schema_metadata):
+    def read(field_node, schema, field):
         """Called once the field in the given <field /> node has been
-        read. field is the field instance that was read. schema_metadata 
-        is a dict that can be written to, containing the current set of 
-        metadata for this schema, specific to this handler.
+        read. field is the field instance that was read. schema is the schema
+        it is a part of.
         """
     
-    def write(field_node, field, schema_metadata):
-        """Write the metadata contained in the schema_metadata, which pertains
-        to the given field, to the field_node. The node will already exist
-        and be populated with standard data.
+    def write(field_node, schema, field):
+        """Write the metadata for the field in the given schema to the
+        field_node. The node will already exist and be populated with
+        standard data.
         """

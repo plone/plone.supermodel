@@ -297,13 +297,13 @@ Metadata handlers should be able to reciprocally read and write metadata.
     ...     namespace = "http://namespaces.acme.com/ui"
     ...     prefix = "ui"
     ...     
-    ...     def read(self, schema_node, schema, schema_metadata):
+    ...     def read(self, schema_node, schema):
     ...         layout = schema_node.get(ns('layout', self.namespace))
     ...         if layout:
-    ...             schema_metadata['layout'] = layout
+    ...             schema.setTaggedValue(u'acme.layout', layout)
     ...             
-    ...     def write(self, schema_node, schema, schema_metadata):
-    ...         layout = schema_metadata.get('layout', None)
+    ...     def write(self, schema_node, schema):
+    ...         layout = schema.queryTaggedValue(u'acme.layout', None)
     ...         if layout:
     ...             schema_node.set(ns('layout', self.namespace), layout)
 
@@ -316,34 +316,35 @@ Metadata handlers should be able to reciprocally read and write metadata.
     ...     namespace = "http://namespaces.acme.com/ui"
     ...     prefix = "ui"
     ...         
-    ...     def read(self, field_node, field, schema_metadata):
+    ...     def read(self, field_node, schema, field):
+    ...         name = field.__name__
     ...         widget = field_node.get(ns('widget', self.namespace))
     ...         if widget:
-    ...             name = field.__name__
-    ...             schema_metadata.setdefault(name, {})['widget'] = widget
+    ...             widgets = schema.queryTaggedValue(u'acme.widgets', {})
+    ...             widgets[name] = widget
+    ...             schema.setTaggedValue(u'acme.widgets', widgets)
     ...
-    ...     def write(self, field_node, field, schema_metadata):
+    ...     def write(self, field_node, schema, field):
     ...         name = field.__name__
-    ...         widget = schema_metadata.get(name, {}).get('widget', {})
+    ...         widget = schema.queryTaggedValue(u'acme.widgets', {}).get(name, {})
     ...         if widget:
     ...             field_node.set(ns('widget', self.namespace), widget)
 
     >>> provideUtility(component=FieldWidgetMetadata(), name='acme.ui.fields')
 
-When this model is loaded, the 'metadata' of each schema that was parsed
-will contain keys 'acme.ui.schema' and 'acme.ui.fields', where the metadata above will be stored. The default schema's metadata is available under
-'model.metadata'.
+When this model is loaded, utilities above will be invoked for each schema
+and each field, respectively.
 
     >>> model = load_string(schema)
 
-    >>> sorted(model.metadata.keys())
-    [u'acme.ui.fields', u'acme.ui.schema']
+    >>> sorted(model.schema.getTaggedValueTags())
+    [u'acme.layout', u'acme.widgets']
 
-    >>> model.metadata[u'acme.ui.schema']
-    {'layout': 'horizontal'}
+    >>> model.schema.getTaggedValue('acme.layout')
+    'horizontal'
 
-    >>> model.metadata[u'acme.ui.fields']
-    {'title': {'widget': 'largetype'}}
+    >>> model.schema.getTaggedValue('acme.widgets')
+    {'title': 'largetype'}
 
 Of course, we can also serialize the schema back to XML. Here, the 'prefix'
 set in the utility (if any) will be used by default.

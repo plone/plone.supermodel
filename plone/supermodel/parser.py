@@ -10,7 +10,7 @@ from plone.supermodel.interfaces import IFieldMetadataHandler
 
 from plone.supermodel.utils import ns
 
-from plone.supermodel.model import Model, METADATA_KEY
+from plone.supermodel.model import Model
 
 from elementtree import ElementTree
 
@@ -50,6 +50,8 @@ def parse(source, policy=u""):
         if schema_name is None:
             schema_name = u""
         
+        field_elements = {}
+        
         for field_element in schema_element.findall(ns('field')):
             
             # Parse field attributes
@@ -67,22 +69,21 @@ def parse(source, policy=u""):
             
             field = handler.read(field_element)
             schema_attributes[field_name] = field
-            
-            # Let metadata handlers write metadata
-            for handler_name, metadata_handler in field_metadata_handlers:
-                metadata_dict = schema_metadata.setdefault(handler_name, {})
-                metadata_handler.read(field_element, field, metadata_dict)
+            field_elements[field_name] = field_element
             
         schema = InterfaceClass(name=policy_util.name(schema_name, tree),
                                 bases=policy_util.bases(schema_name, tree),
                                 __module__=policy_util.module(schema_name, tree),
                                 attrs=schema_attributes)
         
-        for handler_name, metadata_handler in schema_metadata_handlers:
-            metadata_dict = schema_metadata.setdefault(handler_name, {})
-            metadata_handler.read(schema_element, schema, metadata_dict)
+        # Let metadata handlers write metadata
+        for handler_name, metadata_handler in field_metadata_handlers:
+            for field_name in schema:
+                metadata_handler.read(field_elements[field_name], schema, schema[field_name])
         
-        schema.setTaggedValue(METADATA_KEY, schema_metadata)
+        for handler_name, metadata_handler in schema_metadata_handlers:
+            metadata_handler.read(schema_element, schema)
+
         model.schemata[schema_name] = schema
     
     return model

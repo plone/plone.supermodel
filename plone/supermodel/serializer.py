@@ -11,7 +11,6 @@ from plone.supermodel.interfaces import ISchemaMetadataHandler
 from plone.supermodel.interfaces import IFieldMetadataHandler
 
 from plone.supermodel.interfaces import XML_NAMESPACE
-from plone.supermodel.utils import ns
 
 from elementtree import ElementTree
 
@@ -88,8 +87,6 @@ def serialize(model):
     
     for schema_name, schema in model.schemata.items():
         
-        metadata_for_schema = model.lookup_metadata(schema_name)
-        
         schema_element = ElementTree.Element('schema')
         if schema_name:
             schema_element.set('name', schema_name)
@@ -107,12 +104,10 @@ def serialize(model):
                 schema_element.append(field_element)
                 
                 for handler_name, metadata_handler in field_metadata_handlers:
-                    metadata_dict = metadata_for_schema.get(handler_name, {})
-                    metadata_handler.write(field_element, field, metadata_dict)
+                    metadata_handler.write(field_element, schema, field)
         
         for handler_name, metadata_handler in schema_metadata_handlers:
-            metadata_dict = metadata_for_schema.get(handler_name, {})
-            metadata_handler.write(schema_element, schema, metadata_dict)
+            metadata_handler.write(schema_element, schema)
         
         xml.append(schema_element)
 

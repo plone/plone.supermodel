@@ -13,7 +13,7 @@ _model_cache = {}
 
 def xml_schema(filename, schema=u"", policy=u"", _frame=2):
     model = load_file(filename, policy=policy, _frame=_frame+1)
-    return model.lookup_schema(schema)
+    return model.schemata[schema]
 
 def load_file(filename, reload=False, policy=u"", _frame=2):
     global _model_cache
