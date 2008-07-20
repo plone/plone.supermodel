@@ -2,7 +2,7 @@ import os.path
 import sys
 import re
 
-from zope.schema import getFieldsInOrder
+from zope.schema.interfaces import IField
 
 from plone.supermodel.interfaces import XML_NAMESPACE
 
@@ -39,7 +39,18 @@ def relative_to_calling_package(filename, calling_frame=2):
         directory = os.path.abspath(directory)
         return os.path.abspath(os.path.join(directory, filename))
 
-def sync_schema(source, dest, overwrite=False):
+def sorted_fields(schema):
+    """Like getFieldsInOrder, but does not include fields from bases
+    """
+    fields = []
+    for name in schema.names(all=False):
+        field = schema[name]
+        if IField.providedBy(field):
+            fields.append((name, field,))
+    fields.sort(key=lambda item: item[1].order)
+    return fields
+
+def sync_schema(source, dest, overwrite=False, sync_bases=False):
     """Copy attributes and tagged values from the source to the destination.
     If overwrite is False, do not overwrite attributes or tagged values that
     already exist or delete ones that don't exist in source.
@@ -49,7 +60,7 @@ def sync_schema(source, dest, overwrite=False):
         to_delete = set()
     
         # Delete fields in dest, but not in source
-        for name, field in getFieldsInOrder(dest):
+        for name, field in sorted_fields(dest):
             if name not in source:
                 to_delete.add(name)
     
@@ -61,7 +72,7 @@ def sync_schema(source, dest, overwrite=False):
 
     # Add fields that are in source, but not in dest
     
-    for name, field in getFieldsInOrder(source):
+    for name, field in sorted_fields(source):
         if overwrite or name not in dest:
             
             clone = field.__class__.__new__(field.__class__)
@@ -81,3 +92,12 @@ def sync_schema(source, dest, overwrite=False):
         if overwrite or tag not in dest_tags:
             value = source.getTaggedValue(tag)
             dest.setTaggedValue(tag, value)
+
+    # Sync bases
+    if sync_bases:
+        bases = list(source.__bases__)
+        if not overwrite:
+            for base in dest.__bases__:
+                if base not in bases:
+                    bases.append(base)
+        dest.__bases__ = tuple(bases)

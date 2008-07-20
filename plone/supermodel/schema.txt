@@ -223,7 +223,7 @@ of just a single schema using serialize_schema():
     >>> from plone.supermodel import serialize_schema
     >>> print serialize_schema(ITestContent) # doctest: +NORMALIZE_WHITESPACE
     <model xmlns="http://namespaces.plone.org/supermodel/schema">
-      <schema>
+      <schema based-on="plone.supermodel.directives.Schema">
         <field name="title" type="zope.schema.TextLine">
           <title>Title</title>
         </field><field name="body" type="zope.schema.Text">
@@ -235,7 +235,7 @@ of just a single schema using serialize_schema():
     
     >>> print serialize_schema(ITestMetadata, name=u"metadata") # doctest: +NORMALIZE_WHITESPACE
     <model xmlns="http://namespaces.plone.org/supermodel/schema">
-      <schema name="metadata">
+      <schema based-on="plone.supermodel.directives.Schema" name="metadata">
         <field name="created" type="zope.schema.Datetime">
           <required>False</required>
           <title>Created date</title>
@@ -249,6 +249,83 @@ of just a single schema using serialize_schema():
 Finally, let's clean up the temporary directory.
 
     >>> shutil.rmtree(tmpdir)
+
+Base interface support
+----------------------
+
+When building a schema interface from XML, it is possible to specify a base
+interface. This is analogous to "subclassing" an existing interface. The XML
+schema representation can override and/or extend fields from the base.
+
+For the purposes of this test, we have defined a dummy interface in 
+plone.supermodel.tests. We can't define it in the doctest, because the import
+resolver needs to have a proper module path. The interface looks like this
+though:
+
+    class IBase(Interface):
+        title = zope.schema.TextLine(title=u"Title")
+        description = zope.schema.TextLine(title=u"Description")
+        name = zope.schema.TextLine(title=u"Name")
+
+In real life, you'd more likely have a dotted name like
+my.package.interfaces.IBase, of course.
+
+Then, let's define a schema that is based on this interface.
+    
+    >>> schema = """\
+    ... <?xml version="1.0" encoding="UTF-8"?>
+    ... <model xmlns="http://namespaces.plone.org/supermodel/schema">
+    ...     <schema based-on="plone.supermodel.tests.IBase">
+    ...         <field type="zope.schema.Text" name="description">
+    ...             <title>Description</title>
+    ...             <description>A short summary</description>
+    ...         </field>
+    ...         <field type="zope.schema.Int" name="age">
+    ...             <title>Age</title>
+    ...         </field>
+    ...     </schema>
+    ... </model>
+    ... """
+
+Here, notice the use of the 'based-on' attribute, which specifies a dotted
+name to the base interface. It is possible to specify multiple interfaces
+as a space-separated list. However, if you find that you need this, you
+may want to ask yourself why. :) Inside the schema proper, we override the
+'description' field and add a new field, 'age'.
+
+When we load this model, we should find that the __bases__ list of the
+generated interface contains the base schema.
+
+    >>> model = load_string(schema)
+    >>> model.schema.__bases__
+    (<InterfaceClass plone.supermodel.tests.IBase>,)
+    
+The fields of the base interface will also be replicated in the new schema.
+
+    >>> getFieldNamesInOrder(model.schema)
+    ['title', 'description', 'name', 'age']
+    
+Notice how the order of the 'description' field is dictated by where it
+appeared in the base interface, not where it appears in the XML schema.
+
+We should also verify that the description field was indeed overridden:
+
+    >>> model.schema['description'] # doctest: +ELLIPSIS
+    <zope.schema._bootstrapfields.Text object at ...>
+    
+Finally, let's verify that bases are preserved upon serialisation:
+
+    >>> print serialize_schema(model.schema) # doctest: +NORMALIZE_WHITESPACE
+    <model xmlns="http://namespaces.plone.org/supermodel/schema">
+      <schema based-on="plone.supermodel.tests.IBase">
+        <field name="description" type="zope.schema.Text">
+          <description>A short summary</description>
+          <title>Description</title>
+        </field><field name="age" type="zope.schema.Int">
+          <title>Age</title>
+        </field>
+      </schema>
+    </model>
 
 Fieldset support
 ----------------
@@ -383,7 +460,6 @@ fieldset.
         </fieldset><fieldset label="Author info" name="author" />
       </schema>
     </model>
-
 
 Fieldsets can also be defined with directives:
     

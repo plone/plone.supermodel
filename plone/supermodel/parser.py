@@ -2,6 +2,10 @@ from zope.interface import implements
 from zope.interface.interface import InterfaceClass
 from zope.component import getUtility, queryUtility, getUtilitiesFor
 
+from zope.schema import getFields
+
+from zope.dottedname.resolve import resolve
+
 from plone.supermodel.interfaces import ISchemaPolicy
 from plone.supermodel.interfaces import IFieldExportImportHandler
 
@@ -42,7 +46,7 @@ def parse(source, policy=u""):
     
     policy_util = getUtility(ISchemaPolicy, name=policy)
     
-    def read_field(field_element, schema_attributes, field_elements):
+    def read_field(field_element, schema_attributes, field_elements, base_fields):
         
         # Parse field attributes
         field_name = field_element.get('name')
@@ -58,6 +62,14 @@ def parse(source, policy=u""):
                 raise ValueError("Field type %s specified for field %s is not supported" % (field_type, field_name,))
     
         field = handler.read(field_element)
+        
+        # Preserve order from base interfaces if this field is an override
+        # of a field with the same name in a base interface
+        base_field = base_fields.get(field_name, None)
+        if base_field is not None:
+            field.order = base_field.order
+        
+        # Save for the schema
         schema_attributes[field_name] = field
         field_elements[field_name] = field_element
         
@@ -71,11 +83,19 @@ def parse(source, policy=u""):
         if schema_name is None:
             schema_name = u""
         
+        bases = ()
+        base_fields = {}
+        based_on = schema_element.get('based-on')
+        if based_on is not None:
+            bases = tuple([resolve(dotted) for dotted in based_on.split()])
+            for base_schema in bases:
+                base_fields.update(getFields(base_schema))
+        
         field_elements = {}
         
         # Read global fields
         for field_element in schema_element.findall(ns('field')):
-            read_field(field_element, schema_attributes, field_elements)
+            read_field(field_element, schema_attributes, field_elements, base_fields)
     
         # Read fieldsets and their fields
         fieldsets = []
@@ -84,7 +104,7 @@ def parse(source, policy=u""):
         for subelement in schema_element:
             
             if subelement.tag == ns('field'):
-                read_field(subelement, schema_attributes, field_elements)
+                read_field(subelement, schema_attributes, field_elements, base_fields)
             elif subelement.tag == ns('fieldset'):
                 
                 fieldset_name = subelement.get('name')
@@ -102,12 +122,12 @@ def parse(source, policy=u""):
                     fieldsets.append(fieldset)
                 
                 for field_element in subelement.findall(ns('field')):
-                    parsed_field_name = read_field(field_element, schema_attributes, field_elements)
+                    parsed_field_name = read_field(field_element, schema_attributes, field_elements, base_fields)
                     if parsed_field_name:
                         fieldset.fields.append(parsed_field_name)
     
         schema = InterfaceClass(name=policy_util.name(schema_name, tree),
-                                bases=policy_util.bases(schema_name, tree),
+                                bases=bases + policy_util.bases(schema_name, tree),
                                 __module__=policy_util.module(schema_name, tree),
                                 attrs=schema_attributes)
         

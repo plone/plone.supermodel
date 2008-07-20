@@ -122,6 +122,6 @@ def scribble_schema(interface):
         raise GrokImportError(u"Schema '%s' specified for interface %s does not exist in %s." % 
                                 (schema, interface.__identifier__, filename,)) 
     
-    utils.sync_schema(model.schemata[schema], interface)
+    utils.sync_schema(model.schemata[schema], interface, overwrite=False)
     
 __all__ = ('Schema', 'model',)

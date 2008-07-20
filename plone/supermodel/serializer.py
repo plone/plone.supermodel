@@ -2,7 +2,6 @@ from zope.interface import Interface, implements
 from zope.component import adapts, getUtilitiesFor
 
 from zope.schema.interfaces import IField
-from zope.schema import getFieldNamesInOrder
 
 from zope.component import queryUtility
 
@@ -11,8 +10,9 @@ from plone.supermodel.interfaces import ISchemaMetadataHandler
 from plone.supermodel.interfaces import IFieldMetadataHandler
 
 from plone.supermodel.interfaces import XML_NAMESPACE
-
 from plone.supermodel.model import FIELDSETS_KEY
+
+from plone.supermodel.utils import sorted_fields
 
 from elementtree import ElementTree
 
@@ -110,13 +110,16 @@ def serialize(model):
         for fieldset in fieldsets:
             fieldset_fields.update(fieldset.fields)
         
-        non_fieldset_fields = [name for name in getFieldNamesInOrder(schema) 
+        non_fieldset_fields = [name for name, field in sorted_fields(schema)
                                 if name not in fieldset_fields]
-        
         
         schema_element = ElementTree.Element('schema')
         if schema_name:
             schema_element.set('name', schema_name)
+        
+        bases = [b.__identifier__ for b in schema.__bases__]
+        if bases:
+            schema_element.set('based-on', ' '.join(bases))
         
         for field_name in non_fieldset_fields:
             field = schema[field_name]

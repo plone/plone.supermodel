@@ -29,6 +29,7 @@ setup(name='plone.supermodel',
           'zope.interface',
           'zope.schema',
           'zope.deferredimport',
+          'zope.dottedname',
           'grokcore.component',          
           'elementtree',
           # -*- Extra requirements: -*-
