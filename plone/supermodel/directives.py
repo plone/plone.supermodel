@@ -99,6 +99,9 @@ class SchemaGrokker(martian.InstanceGrokker):
         
             directory = os.path.abspath(directory)
             filename = os.path.abspath(os.path.join(directory, filename))
+            
+            # Let / act as path separator on all platforms
+            filename = filename.replace('/', os.path.sep)
         
             interface.setTaggedValue(FILENAME_KEY, filename)
         
