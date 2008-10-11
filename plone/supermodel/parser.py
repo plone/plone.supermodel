@@ -138,7 +138,8 @@ def parse(source, policy=u""):
         # Let metadata handlers write metadata
         for handler_name, metadata_handler in field_metadata_handlers:
             for field_name in schema:
-                metadata_handler.read(field_elements[field_name], schema, schema[field_name])
+                if field_name in field_elements:
+                    metadata_handler.read(field_elements[field_name], schema, schema[field_name])
         
         for handler_name, metadata_handler in schema_metadata_handlers:
             metadata_handler.read(schema_element, schema)
