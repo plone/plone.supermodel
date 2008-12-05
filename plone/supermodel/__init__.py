@@ -2,7 +2,7 @@ from StringIO import StringIO
 
 from zope.interface import moduleProvides
 
-from plone.supermodel.interfaces import IXMLToSchema
+from plone.supermodel.interfaces import FILENAME_KEY, IXMLToSchema
 from plone.supermodel import parser
 from plone.supermodel import serializer
 from plone.supermodel import utils
@@ -21,7 +21,7 @@ def load_file(filename, reload=False, policy=u"", _frame=2):
     if reload or path not in _model_cache:
         parsed_model = parser.parse(path, policy=policy)
         for schema in parsed_model.schemata.values():
-            schema.setTaggedValue(model.FILENAME_KEY, path)
+            schema.setTaggedValue(FILENAME_KEY, path)
         _model_cache[path] = parsed_model
     return _model_cache[path]
 

@@ -14,7 +14,8 @@ from plone.supermodel.interfaces import IFieldMetadataHandler
 
 from plone.supermodel.utils import ns
 
-from plone.supermodel.model import Model, Fieldset, FIELDSETS_KEY
+from plone.supermodel.model import Model, Fieldset
+from plone.supermodel.interfaces import FIELDSETS_KEY
 
 from elementtree import ElementTree
 

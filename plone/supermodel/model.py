@@ -3,12 +3,6 @@ from zope.interface import implements
 from plone.supermodel.interfaces import IModel
 from plone.supermodel.interfaces import IFieldset
 
-# Keys for tagged values on interfaces
-
-FILENAME_KEY = 'plone.supermodel.filename'       # absolute file name of model file
-SCHEMA_NAME_KEY = 'plone.supermodel.schemaname'  # name of schema that was loaded from the model
-FIELDSETS_KEY = 'plone.supermodel.fieldsets'     # list of fieldsets
-
 class Fieldset(object):
     implements(IFieldset)
     

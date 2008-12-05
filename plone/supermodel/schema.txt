@@ -369,7 +369,7 @@ default schema above is unrelated to the one in the metadata schema.
     >>> getFieldNamesInOrder(model.schemata['metadata'])
     ['created', 'creator']
     
-    >>> from plone.supermodel.model import FIELDSETS_KEY
+    >>> from plone.supermodel.interfaces import FIELDSETS_KEY
     >>> model.schema.getTaggedValue(FIELDSETS_KEY)
     [<Fieldset 'dates' of publication_date, expiry_date, notification_date>]
 

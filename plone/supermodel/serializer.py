@@ -10,7 +10,7 @@ from plone.supermodel.interfaces import ISchemaMetadataHandler
 from plone.supermodel.interfaces import IFieldMetadataHandler
 
 from plone.supermodel.interfaces import XML_NAMESPACE
-from plone.supermodel.model import FIELDSETS_KEY
+from plone.supermodel.interfaces import FIELDSETS_KEY
 
 from plone.supermodel.utils import sorted_fields
 
