@@ -43,22 +43,6 @@ class IXMLToSchema(Interface):
     If a file contains multiple schemata, you can load them all using:
     
         model = load_file('schema.xml')
-        
-    To build a filesystem interface from a schema, use:
-    
-        from plone.supermodel import Schema, model
-        
-        class IMySchema(Schema):
-            model("schema.xml")
-            
-    and add this to your configure.zcml:
-    
-    <configure xmlns="http://namespaces.zope.org/zope"
-        xmlns:grok="http://namespaces.zope.org/grok">
-    
-        <grok:grok package="." />
-        
-    </configure>
     """
     
     def xml_schema(filename, schema=u"", policy=u""):

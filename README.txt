@@ -8,8 +8,7 @@ zope.schema fields. The principal use cases are:
  with syntax like::
  
   >>> from plone.supermodel import xml_schema
-  >>> class IMySchema( xml_schema("myschema.xml") ):
-  ...     """My schema, read from XML"""
+  >>> IMySchema = xml_schema("myschema.xml")
       
  2. Save and load interface definitions via an XML format. To turn a schema
  interface into XML, you can do::
@@ -17,9 +16,9 @@ zope.schema fields. The principal use cases are:
   >>> from plone.supermodel import serialize_schema
   >>> xml_string = serialize_schema(IMySchema)
 
- To get a schema from an XML file, you can use the xml_schema() function 
- above, or you can use the more powerful spec() function, which turns a dict
- of all schemata and widget hints in a given XML file.
+To get a schema from an XML file, you can use the xml_schema() function above,
+or you can use the more powerful spec() function, which turns a dict of all
+schemata and widget hints in a given XML file.
 
 See schema.txt and interfaces.py in the source code for more information, 
 including details on how to give widget hints for forms and how to keep 

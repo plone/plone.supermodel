@@ -50,7 +50,7 @@ Next, let's define a sample model with a single, unnamed schema.
     ... </model>
     ... """
 
-We can parse this model using the long_string() function:
+We can parse this model using the load_string() function:
 
     >>> from plone.supermodel import load_string
     >>> model = load_string(schema)
@@ -148,73 +148,25 @@ directory.
     >>> schema_file.write(schema)
     >>> schema_file.close()
 
-We can define interfaces from this with a convenient syntax:
+We can define interfaces from this using a helper function:
 
-    >>> from plone.supermodel.directives import Schema, model
-    >>> class ITestContent(Schema):
-    ...     model(schema_filename)
+    >>> from plone.supermodel import xml_schema
+    >>> ITestContent = xml_schema(schema_filename)
     
 Note: If the schema filename is not an absolute path, it will be found 
 relative to the module where the interface is defined.
 
-This class can be "grokked" to produce a proper schema interface. To do so,
-you must first ensure that the meta.zcml file from plone.supermodel is loaded.
-We simulate this in the test:
-
-    >>> from grokcore.component.testing import grok, grok_component
-    >>> grok('plone.supermodel.directives')
-
-Then, add the following in the configure.zcml file for the package where the
-interface is defined:
-
-    <configure xmlns="http://namespaces.zope.org/zope"
-               xmlns:grok="http://namespaces.zope.org/grok">
-
-        <grok:grok package="." />
-
-    </configure>
-
-Again, for the purposes of testing, we will simulate this with a helper 
-function from grokcore.component:
-
-    >>> grok_component('ITestContent', ITestContent)
-    True
-
-After grokking, the interface should have the fields of the default (unnamed)
-schema:
+After being loaded, the interface should have the fields of the default
+(unnamed) schema:
 
     >>> getFieldNamesInOrder(ITestContent)
     ['title', 'body']
 
-It also contains the filename that the schema was loaded from and the schema 
-name as a tagged values in the base interface.
-
-    >>> from plone.supermodel.model import FILENAME_KEY, SCHEMA_NAME_KEY
-    >>> ITestContent.getTaggedValue(FILENAME_KEY) # doctest: +ELLIPSIS
-    '.../schema.xml'
-    >>> ITestContent.getTaggedValue(SCHEMA_NAME_KEY)
-    u''
-
 We can also use a different, named schema:
 
-    >>> class ITestMetadata(Schema):
-    ...     """Test metadata schema, built from XML
-    ...     """
-    ...     model(schema_filename, schema=u"metadata")
-
-    >>> grok_component('ITestMetadata', ITestMetadata)
-    True
-
+    >>> ITestMetadata = xml_schema(schema_filename, schema=u"metadata")
     >>> getFieldNamesInOrder(ITestMetadata)
     ['created', 'creator']
-
-This interface also has tagged values for the filename and schema name.
-
-    >>> ITestMetadata.getTaggedValue(FILENAME_KEY) # doctest: +ELLIPSIS
-    '.../schema.xml'
-    >>> ITestMetadata.getTaggedValue(SCHEMA_NAME_KEY)
-    u'metadata'
-    
 
 Of course, a schema can also be written to XML. Either, you can build a model
 dict as per the serialize_model() method seen above, or you can write a model
@@ -223,7 +175,7 @@ of just a single schema using serialize_schema():
     >>> from plone.supermodel import serialize_schema
     >>> print serialize_schema(ITestContent) # doctest: +NORMALIZE_WHITESPACE
     <model xmlns="http://namespaces.plone.org/supermodel/schema">
-      <schema based-on="plone.supermodel.directives.Schema">
+      <schema>
         <field name="title" type="zope.schema.TextLine">
           <title>Title</title>
         </field><field name="body" type="zope.schema.Text">
@@ -235,7 +187,7 @@ of just a single schema using serialize_schema():
     
     >>> print serialize_schema(ITestMetadata, name=u"metadata") # doctest: +NORMALIZE_WHITESPACE
     <model xmlns="http://namespaces.plone.org/supermodel/schema">
-      <schema based-on="plone.supermodel.directives.Schema" name="metadata">
+      <schema name="metadata">
         <field name="created" type="zope.schema.Datetime">
           <required>False</required>
           <title>Created date</title>
@@ -460,28 +412,6 @@ fieldset.
         </fieldset><fieldset label="Author info" name="author" />
       </schema>
     </model>
-
-Fieldsets can also be defined with directives:
-    
-    >>> import zope.schema
-    >>> from plone.supermodel.directives import fieldset
-
-    >>> class IGrouped(Schema):
-    ...     
-    ...     fieldset(u"default", label="Default", fields=['title', 'description'])
-    ...     fieldset(u"metadata", label="Metadata", fields=['date'])
-    ...     
-    ...     title = zope.schema.TextLine(title=u"Title")
-    ...     description = zope.schema.TextLine(title=u"Description")
-    ...     
-    ...     publication_date = zope.schema.Date(title=u"Publication date")
-
-    >>> grok_component("IGrouped", IGrouped)
-    True
-    
-    >>> from plone.supermodel.model import FIELDSETS_KEY
-    >>> IGrouped.getTaggedValue(FIELDSETS_KEY)
-    [<Fieldset 'default' of title, description>, <Fieldset 'metadata' of date>]
 
 Creating custom metadata handlers
 ---------------------------------
