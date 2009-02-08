@@ -147,6 +147,39 @@ class TestUtils(unittest.TestCase):
         self.assertEquals((IBase, IOtherBase,), IDest.__bases__)
         self.assertEquals(['base', 'foo', 'two', 'one', 'three'], getFieldNamesInOrder(IDest))
 
+    def test_merged_tagged_value_list(self):
+        
+        class IBase1(Interface):
+            pass
+        class IBase2(Interface):
+            pass
+        class IBase3(Interface):
+            pass
+        class ISchema(IBase1, IBase2, IBase3):
+            pass
+            
+        IBase1.setTaggedValue(u"foo",  [1,2])  # more specific than IBase2 and IBase3
+        IBase3.setTaggedValue(u"foo",  [3,4])  # least specific of the bases
+        ISchema.setTaggedValue(u"foo", [4,5])  # most specific
+        
+        self.assertEquals([3,4, 1,2, 4,5], utils.merged_tagged_value_list(ISchema, u"foo"))
+
+    def test_merged_tagged_value_dict(self):
+        
+        class IBase1(Interface):
+            pass
+        class IBase2(Interface):
+            pass
+        class IBase3(Interface):
+            pass
+        class ISchema(IBase1, IBase2, IBase3):
+            pass
+            
+        IBase1.setTaggedValue(u"foo",  {1:1, 2:1})      # more specific than IBase2 and IBase3
+        IBase3.setTaggedValue(u"foo",  {3:3, 2:3, 4:3}) # least specific of the bases
+        ISchema.setTaggedValue(u"foo", {4:4, 5:4})      # most specific
+        
+        self.assertEquals({1:1, 2:1, 3:3, 4:4, 5:4}, utils.merged_tagged_value_dict(ISchema, u"foo"))
 
 def test_suite():
     return unittest.TestSuite((

@@ -50,6 +50,28 @@ def sorted_fields(schema):
     fields.sort(key=lambda item: item[1].order)
     return fields
 
+def merged_tagged_value_dict(schema, name):
+    """Look up the tagged value 'name' in schema and all its bases, assuming
+    that the value under 'name' is a dict. Return a dict that consists of
+    all dict items, with those from more-specific interfaces overriding those
+    from more-general ones.
+    """
+    tv = {}
+    for iface in reversed(schema.__iro__):
+        tv.update(iface.queryTaggedValue(name, {}))
+    return tv
+
+def merged_tagged_value_list(schema, name):
+    """Look up the tagged value 'name' in schema and all its bases, assuming
+    that the value under 'name' is a list. Return a list that consists of
+    all elements from all interfaces and base interfaces, with values from
+    more-specific interfaces appearing at the end of the list.
+    """
+    tv = []
+    for iface in reversed(schema.__iro__):
+        tv.extend(iface.queryTaggedValue(name, []))
+    return tv
+
 def sync_schema(source, dest, overwrite=False, sync_bases=False):
     """Copy attributes and tagged values from the source to the destination.
     If overwrite is False, do not overwrite attributes or tagged values that
