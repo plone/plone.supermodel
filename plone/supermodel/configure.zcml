@@ -3,6 +3,16 @@
     xmlns:five="http://namespaces.zope.org/five"
     i18n_domain="plone.supermodel">
 
+    <!-- Unicode converters -->
+
+    <adapter factory=".converters.DefaultFromUnicode" />
+    <adapter factory=".converters.DateFromUnicode" />
+    <adapter factory=".converters.DatetimeFromUnicode" />
+    <adapter factory=".converters.InterfaceFieldFromUnicode" />
+
+    <adapter factory=".converters.DefaultToUnicode" />
+    <adapter factory=".converters.InterfaceFieldToUnicode" />
+
     <!-- Field handlers for all of zope.schema -->
     
     <utility
@@ -72,10 +82,6 @@
     <utility
         component=".fields.DateHandler"
         name="zope.schema.Date"
-        />
-    <utility
-        component=".fields.TimedeltaHandler"
-        name="zope.schema.Timedelta"
         />
     <utility
         component=".fields.SourceTextHandler"

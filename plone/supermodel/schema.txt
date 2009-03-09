@@ -20,6 +20,7 @@ and can be loaded from the configure.zcml file of plone.supermodel.
     ...      i18n_domain="plone.behavior.tests">
     ...      
     ...     <include package="zope.component" file="meta.zcml" />
+    ...     <include package="zope.app.component" file="meta.zcml" />
     ...     
     ...     <include package="plone.supermodel" />
     ...     
@@ -92,10 +93,10 @@ Similarly, we can serialize a model to an XML representation:
         <field name="title" type="zope.schema.TextLine">
           <title>Title</title>
         </field><field name="description" type="zope.schema.Text">
-          <min_length>10</min_length>
           <description>A short summary</description>
-          <title>Description</title>
+          <min_length>10</min_length>
           <required>False</required>
+          <title>Description</title>
         </field>
       </schema>
     </model>
@@ -179,8 +180,8 @@ of just a single schema using serialize_schema():
         <field name="title" type="zope.schema.TextLine">
           <title>Title</title>
         </field><field name="body" type="zope.schema.Text">
-          <title>Body text</title>
           <max_length>10000</max_length>
+          <title>Body text</title>
         </field>
       </schema>
     </model>
@@ -385,8 +386,8 @@ fieldset.
         <field name="title" type="zope.schema.TextLine">
           <title>Title</title>
         </field><field name="body" type="zope.schema.Text">
-          <title>Body text</title>
           <max_length>10000</max_length>
+            <title>Body text</title>
         </field><field name="author" type="zope.schema.TextLine">
           <title>Author</title>
         </field><fieldset description="Standard dates" label="Dates" name="dates">
@@ -514,10 +515,10 @@ set in the utility (if any) will be used by default.
         <field name="title" type="zope.schema.TextLine" ui:widget="largetype">
           <title>Title</title>
         </field><field name="description" type="zope.schema.Text">
-          <min_length>10</min_length>
           <description>A short summary</description>
-          <title>Description</title>
+          <min_length>10</min_length>
           <required>False</required>
+          <title>Description</title>
         </field>
       </schema>
     </model>

@@ -187,6 +187,9 @@ def test_suite():
         doctest.DocFileSuite('schema.txt',
             setUp=zope.app.testing.placelesssetup.setUp,
             tearDown=zope.app.testing.placelesssetup.tearDown),
+        doctest.DocFileSuite('fields.txt',
+            setUp=zope.app.testing.placelesssetup.setUp,
+            tearDown=zope.app.testing.placelesssetup.tearDown),
         ))
 
 if __name__ == '__main__':

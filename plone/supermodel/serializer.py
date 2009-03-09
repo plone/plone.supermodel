@@ -1,4 +1,4 @@
-from zope.interface import Interface, implements
+from zope.interface import implements
 from zope.component import adapts, getUtilitiesFor
 
 from zope.schema.interfaces import IField
@@ -11,35 +11,11 @@ from plone.supermodel.interfaces import IFieldMetadataHandler
 
 from plone.supermodel.interfaces import XML_NAMESPACE
 from plone.supermodel.interfaces import FIELDSETS_KEY
+from plone.supermodel.interfaces import IFieldNameExtractor
 
-from plone.supermodel.utils import sorted_fields
+from plone.supermodel.utils import sorted_fields, pretty_xml
 
 from elementtree import ElementTree
-
-def indent(elem, level=0):
-    i = "\n" + level * "  "
-    if len(elem):
-        if not elem.text or not elem.text.strip():
-            elem.text = i + "  "
-        for elem in elem:
-            indent(elem, level+1)
-        if not elem.tail or not elem.tail.strip():
-            elem.tail = i
-    else:
-        if level and (not elem.tail or not elem.tail.strip()):
-            elem.tail = i
-
-def pretty_xml(tree):
-    indent(tree)
-    return ElementTree.tostring(tree)
-
-class IFieldNameExtractor(Interface):
-    """Adapter to determine the canonical name of a field
-    """
-    
-    def __call__():
-        """Return the name of the adapted field
-        """
 
 class DefaultFieldNameExtractor(object):
     """Extract a name

@@ -1,5 +1,7 @@
 from StringIO import StringIO
 
+import patches
+
 from zope.interface import moduleProvides
 
 from plone.supermodel.interfaces import FILENAME_KEY, IXMLToSchema

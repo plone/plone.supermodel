@@ -162,3 +162,19 @@ class IFieldMetadataHandler(Interface):
         field_node. The node will already exist and be populated with
         standard data.
         """
+
+class IFieldNameExtractor(Interface):
+    """Adapter to determine the canonical name of a field
+    """
+    
+    def __call__():
+        """Return the name of the adapted field
+        """
+class IToUnicode(Interface):
+    """Reciprocal to IToUnicode. Adapting a field to this interface allows
+    a string representation to be extracted.
+    """
+    
+    def toUnicode(value):
+        """Convert the field value to a unicode string.
+        """
