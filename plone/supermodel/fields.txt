@@ -779,20 +779,224 @@ InterfaceField
 Tuple
 -----
 
+    >>> field = schema.Tuple(__name__=u"name", title=u"Test", 
+    ...     description=u"Test desc", required=False, readonly=True,
+    ...     default=(1,2), missing_value=(),
+    ...     min_length=2, max_length=10,
+    ...     value_type=schema.Int(title=u"Val"))
+    >>> field_type = IFieldNameExtractor(field)()
+    >>> handler = getUtility(IFieldExportImportHandler, name=field_type)
+    >>> element = handler.write(field, u'dummy', field_type)
+    >>> print pretty_xml(element)
+    <field name="dummy" type="zope.schema.Tuple">
+      <default>
+        <element>1</element>
+        <element>2</element>
+      </default><description>Test desc</description>
+      <max_length>10</max_length>
+      <min_length>2</min_length>
+      <missing_value />
+      <readonly>True</readonly>
+      <required>False</required>
+      <title>Test</title>
+      <value_type type="zope.schema.Int">
+        <title>Val</title>
+      </value_type>
+    </field>
+    
+    >>> reciprocal = handler.read(element)
+    >>> reciprocal.__class__
+    <class 'zope.schema._field.Tuple'>
+    >>> reciprocal.__name__
+    u'dummy'
+    >>> reciprocal.title
+    u'Test'
+    >>> reciprocal.description
+    u'Test desc'
+    >>> reciprocal.required
+    False
+    >>> reciprocal.readonly
+    True
+    >>> reciprocal.default
+    (1, 2)
+    >>> reciprocal.missing_value
+    ()
+    >>> reciprocal.min_length
+    2
+    >>> reciprocal.max_length
+    10
+    >>> reciprocal.value_type.__class__
+    <class 'zope.schema._bootstrapfields.Int'>
+    >>> reciprocal.value_type.title
+    u'Val'
+
 List
 ----
+
+    >>> field = schema.List(__name__=u"name", title=u"Test", 
+    ...     description=u"Test desc", required=False, readonly=True,
+    ...     default=[1,2], missing_value=[],
+    ...     min_length=2, max_length=10,
+    ...     value_type=schema.Int(title=u"Val"))
+    >>> field_type = IFieldNameExtractor(field)()
+    >>> handler = getUtility(IFieldExportImportHandler, name=field_type)
+    >>> element = handler.write(field, u'dummy', field_type)
+    >>> print pretty_xml(element)
+    <field name="dummy" type="zope.schema.List">
+      <default>
+        <element>1</element>
+        <element>2</element>
+      </default><description>Test desc</description>
+      <max_length>10</max_length>
+      <min_length>2</min_length>
+      <missing_value />
+      <readonly>True</readonly>
+      <required>False</required>
+      <title>Test</title>
+      <value_type type="zope.schema.Int">
+        <title>Val</title>
+      </value_type>
+    </field>
+    
+    >>> reciprocal = handler.read(element)
+    >>> reciprocal.__class__
+    <class 'zope.schema._field.List'>
+    >>> reciprocal.__name__
+    u'dummy'
+    >>> reciprocal.title
+    u'Test'
+    >>> reciprocal.description
+    u'Test desc'
+    >>> reciprocal.required
+    False
+    >>> reciprocal.readonly
+    True
+    >>> reciprocal.default
+    [1, 2]
+    >>> reciprocal.missing_value
+    []
+    >>> reciprocal.min_length
+    2
+    >>> reciprocal.max_length
+    10
+    >>> reciprocal.value_type.__class__
+    <class 'zope.schema._bootstrapfields.Int'>
+    >>> reciprocal.value_type.title
+    u'Val'
 
 Set
 ---
 
+    >>> field = schema.Set(__name__=u"name", title=u"Test", 
+    ...     description=u"Test desc", required=False, readonly=True,
+    ...     default=set((1,2)), missing_value=set(),
+    ...     min_length=2, max_length=10,
+    ...     value_type=schema.Int(title=u"Val"))
+    >>> field_type = IFieldNameExtractor(field)()
+    >>> handler = getUtility(IFieldExportImportHandler, name=field_type)
+    >>> element = handler.write(field, u'dummy', field_type)
+    >>> print pretty_xml(element)
+    <field name="dummy" type="zope.schema.Set">
+      <default>
+        <element>1</element>
+        <element>2</element>
+      </default><description>Test desc</description>
+      <max_length>10</max_length>
+      <min_length>2</min_length>
+      <missing_value />
+      <readonly>True</readonly>
+      <required>False</required>
+      <title>Test</title>
+      <value_type type="zope.schema.Int">
+        <title>Val</title>
+      </value_type>
+    </field>
+    
+    >>> reciprocal = handler.read(element)
+    >>> reciprocal.__class__
+    <class 'zope.schema._field.Set'>
+    >>> reciprocal.__name__
+    u'dummy'
+    >>> reciprocal.title
+    u'Test'
+    >>> reciprocal.description
+    u'Test desc'
+    >>> reciprocal.required
+    False
+    >>> reciprocal.readonly
+    True
+    >>> reciprocal.default
+    set([1, 2])
+    >>> reciprocal.missing_value
+    set([])
+    >>> reciprocal.min_length
+    2
+    >>> reciprocal.max_length
+    10
+    >>> reciprocal.value_type.__class__
+    <class 'zope.schema._bootstrapfields.Int'>
+    >>> reciprocal.value_type.title
+    u'Val'
+
 FrozenSet
 ---------
+
+    >>> field = schema.FrozenSet(__name__=u"name", title=u"Test", 
+    ...     description=u"Test desc", required=False, readonly=True,
+    ...     default=frozenset((1,2)), missing_value=frozenset(),
+    ...     min_length=2, max_length=10,
+    ...     value_type=schema.Int(title=u"Val"))
+    >>> field_type = IFieldNameExtractor(field)()
+    >>> handler = getUtility(IFieldExportImportHandler, name=field_type)
+    >>> element = handler.write(field, u'dummy', field_type)
+    >>> print pretty_xml(element)
+    <field name="dummy" type="zope.schema.FrozenSet">
+      <default>
+        <element>1</element>
+        <element>2</element>
+      </default><description>Test desc</description>
+      <max_length>10</max_length>
+      <min_length>2</min_length>
+      <missing_value />
+      <readonly>True</readonly>
+      <required>False</required>
+      <title>Test</title>
+      <value_type type="zope.schema.Int">
+        <title>Val</title>
+      </value_type>
+    </field>
+    
+    >>> reciprocal = handler.read(element)
+    >>> reciprocal.__class__
+    <class 'zope.schema._field.FrozenSet'>
+    >>> reciprocal.__name__
+    u'dummy'
+    >>> reciprocal.title
+    u'Test'
+    >>> reciprocal.description
+    u'Test desc'
+    >>> reciprocal.required
+    False
+    >>> reciprocal.readonly
+    True
+    >>> reciprocal.default
+    frozenset([1, 2])
+    >>> reciprocal.missing_value
+    frozenset([])
+    >>> reciprocal.min_length
+    2
+    >>> reciprocal.max_length
+    10
+    >>> reciprocal.value_type.__class__
+    <class 'zope.schema._bootstrapfields.Int'>
+    >>> reciprocal.value_type.title
+    u'Val'
 
 Dict
 ----
 
-Choice
+Object
 ------
 
-Object
+Choice
 ------

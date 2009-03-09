@@ -53,7 +53,7 @@
         />
     <utility
         component=".fields.TupleHandler"
-        name="zope.schema.Tule"
+        name="zope.schema.Tuple"
         />
     <utility
         component=".fields.ListHandler"

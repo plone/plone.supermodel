@@ -4,7 +4,7 @@ import re
 
 from elementtree import ElementTree
 
-from zope.schema.interfaces import IField, IFromUnicode, ICollection
+from zope.schema.interfaces import IField, IFromUnicode
 
 from plone.supermodel.interfaces import XML_NAMESPACE, IToUnicode
 
@@ -53,54 +53,55 @@ def field_typecast(field, value):
                     pass
     return value
 
-def element_to_value(field, element, default=_marker, converter=None):
+def element_to_value(field, element, default=_marker, converter=None, value_type=None):
     """Read the contents of an element that is assumed to represent a value
-    allowable by the given field.
+    allowable by the given field. If converter is given, it should
+    be an IFromUnicode instance. If not, the field will be adapted to this
+    interface to obtain a converter. If value_type is given, the value will
+    be assumed to be an iterable, and the converter will operate on each
+    value element.
     """
     
     value = default
-    
-    if converter is None:
-        converter = IFromUnicode(field)
-    
-    # If we have a collection, we need to look at the value_type.
-    # We look for <element>value</element> child elements and get the
-    # value from there
-    if ICollection.providedBy(field):
-        value_type = field.value_type
-        element_converter = IFromUnicode(value_type)
+        
+    if value_type is not None:
+        if converter is None:
+            converter = IFromUnicode(value_type)
         value = []
         for child in element:
             if child.tag != 'element':
                 continue
-            value.append(element_converter.fromUnicode(unicode(child.text)))
+            value.append(converter.fromUnicode(unicode(child.text)))
         value = field_typecast(field, value)
-    
-    # Otherwise, just get the value of the element
     else:
+        if converter is None:
+            converter = IFromUnicode(field)
         value = converter.fromUnicode(unicode(element.text))
       
     return value
     
-def value_to_element(field, value, converter=None):
+def value_to_element(field, value, converter=None, value_type=None):
     """Create and return an element that describes the given value, which is
-    assumed to be valid for the given field.
+    assumed to be valid for the given field. If converter is given, it should
+    be an IToUnicode instance. If not, the field will be adapted to this
+    interface to obtain a converter. If value_type is given, the value will
+    be assumed to be an iterable, and the converter will operate on each
+    value element.
     """
     
     child = ElementTree.Element(field.__name__)
     
-    if converter is None:
-        converter = IToUnicode(field)
-    
     if value is not None:
-        if ICollection.providedBy(field):
-            value_type = field.value_type
-            element_converter = IToUnicode(value_type)
+        if value_type is not None:
+            if converter is None:
+                converter = IToUnicode(value_type)
             for e in value:
                 list_element = ElementTree.Element('element')
-                list_element.text = element_converter.toUnicode(e)
+                list_element.text = converter.toUnicode(e)
                 child.append(list_element)
         else:
+            if converter is None:
+                converter = IToUnicode(field)
             child.text = converter.toUnicode(value)
         
     return child

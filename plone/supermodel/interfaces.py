@@ -118,7 +118,7 @@ class IFieldExportImportHandler(Interface):
         """Read a field from the node and return a new instance
         """
         
-    def write(field, field_name, field_type):
+    def write(field, field_name, field_type, element_name='field'):
         """Create and return a new node representing the given field
         """
         

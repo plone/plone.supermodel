@@ -1,10 +1,13 @@
 from elementtree import ElementTree
     
-from zope.interface import implements
-from zope.interface import implementedBy
+from zope.interface import implements, implementedBy
+from zope.component import queryUtility
 
 import zope.schema
 
+from zope.schema.interfaces import IField, ICollection
+
+from plone.supermodel.interfaces import IFieldNameExtractor
 from plone.supermodel.interfaces import IFieldExportImportHandler, IToUnicode
 
 from plone.supermodel.utils import no_ns, value_to_element, element_to_value
@@ -21,7 +24,7 @@ class BaseHandler(object):
     implements(IFieldExportImportHandler)
     
     # Elements that we will not write
-    filtered_attributes = frozenset(['order',])
+    filtered_attributes = frozenset(['order', 'unique',])
     
     # Elements that are of the same type as the field itself
     field_type_attributes = ('min', 'max', 'default',)
@@ -30,9 +33,11 @@ class BaseHandler(object):
     # otherwise not validated
     nonvalidated_field_type_attributes = ('missing_value',)
     
-    def __init__(self, klass, element_name):
+    # Attributes that contain another field. Unfortunately, 
+    field_instance_attributes = ('key_type', 'value_type',)
+    
+    def __init__(self, klass):
         self.klass = klass
-        self.element_name = element_name
         self.field_attributes = {}
         
         # Build a dict of the parameters supported by this field type.
@@ -52,10 +57,20 @@ class BaseHandler(object):
             attribute_name = no_ns(attribute_element.tag)
             attribute_field = self.field_attributes.get(attribute_name, None)
             if attribute_field is not None:
+
                 if attribute_name in self.field_type_attributes:
                     deferred[attribute_name] = attribute_element
+
                 elif attribute_name in self.nonvalidated_field_type_attributes:
                     deferred_nonvalidated[attribute_name] = attribute_element
+
+                elif attribute_name in self.field_instance_attributes:                    
+                    
+                    attribute_field_type = attribute_element.get('type')
+                    handler = queryUtility(IFieldExportImportHandler, name=attribute_field_type)
+                    
+                    attributes[attribute_name] = handler.read(attribute_element)
+                    
                 else:
                     attributes[attribute_name] = \
                         self.read_attribute(attribute_element, attribute_field)
@@ -87,11 +102,15 @@ class BaseHandler(object):
                 
         return field_instance
     
-    def write(self, field, name, type):
+    def write(self, field, name, type, element_name='field'):
         """Create and return a new element representing the given field
         """
-        element = ElementTree.Element(self.element_name)
-        element.set('name', name)
+        
+        element = ElementTree.Element(element_name)
+        
+        if name:
+            element.set('name', name)
+            
         element.set('type', type)
         
         for attribute_name in sorted(self.field_attributes.keys()):
@@ -111,23 +130,50 @@ class BaseHandler(object):
         a type described by the given Field object.
         """
         
-        return element_to_value(attribute_field, element)
+        value_type = None
+        if ICollection.providedBy(attribute_field):
+            value_type = attribute_field.value_type
+        
+        return element_to_value(attribute_field, element, value_type=value_type)
         
     def write_attribute(self, attribute_field, field, ignore_default=True):
         """Create and return a element that describes the given attribute
         field on the given field
         """
         
+        attribute_field_name = attribute_field.__name__
         attribute_field = attribute_field.bind(field)
         value = attribute_field.get(field)
         
         if ignore_default and value == attribute_field.default:
             return None
- 
-        converter = None
-    
-        if attribute_field.__name__ in self.field_type_attributes or \
-                attribute_field.__name__ in self.nonvalidated_field_type_attributes:
-            converter = IToUnicode(field)
         
-        return value_to_element(attribute_field, value, converter=converter)
+        # The value points to another field. Recurse.
+        if IField.providedBy(value):
+            
+            name_extractor = IFieldNameExtractor(value)
+            value_field_type = name_extractor()
+            
+            handler = queryUtility(IFieldExportImportHandler, name=value_field_type)
+            if handler is None:
+                return None
+            
+            return handler.write(value, None, value_field_type, element_name=attribute_field_name)
+        
+        # The value is a list. Write elements.
+        elif isinstance(value, (tuple, list, set, frozenset,)) and \
+                ICollection.providedBy(field) and \
+                (attribute_field_name in self.field_type_attributes or
+                 attribute_field_name in self.nonvalidated_field_type_attributes):
+            
+            return value_to_element(attribute_field, value, value_type=field.value_type)
+            
+        # The value is a 'primitive'. Convert to unicode and place in element.
+        else:
+            converter = None
+    
+            if attribute_field.__name__ in self.field_type_attributes or \
+                    attribute_field.__name__ in self.nonvalidated_field_type_attributes:
+                converter = IToUnicode(field)
+        
+            return value_to_element(attribute_field, value, converter=converter)
