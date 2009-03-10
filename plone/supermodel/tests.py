@@ -7,6 +7,8 @@ import zope.component.testing
 from zope.testing import doctest
 
 from zope.schema import getFieldNamesInOrder
+from zope.schema.interfaces import IContextSourceBinder
+from zope.schema.vocabulary import SimpleVocabulary
 from zope import schema
 
 from plone.supermodel import utils
@@ -15,6 +17,8 @@ class IBase(Interface):
     title = schema.TextLine(title=u"Title")
     description = schema.TextLine(title=u"Description")
     name = schema.TextLine(title=u"Name")
+
+# Used in fields.txt
 
 class IDummy(Interface):
     title = schema.TextLine(title=u"Title")
@@ -26,6 +30,18 @@ class Dummy(object):
         self.title = u''
 
 dummy1 = Dummy()
+
+class Binder(object):
+    implements(IContextSourceBinder)
+    
+    def __init__(self):
+        pass
+        
+    def __call__(self, context):
+        return SimpleVocabulary.fromValues(['a','d','f'])
+
+dummy_binder = Binder()
+dummy_vocabulary_instance = SimpleVocabulary.fromItems([(1,'a'), (2,'c')])
 
 class TestUtils(unittest.TestCase):
     

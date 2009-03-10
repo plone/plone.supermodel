@@ -111,6 +111,10 @@
         component=".fields.ObjectHandler"
         name="zope.schema.Object"
         />
+    <utility
+        component=".fields.ChoiceHandler"
+        name="zope.schema.Choice"
+        />
             
     <!-- Field name extractors -->
     <adapter factory=".serializer.DefaultFieldNameExtractor" />

@@ -1,11 +1,12 @@
 from elementtree import ElementTree
     
-from zope.interface import implements, implementedBy
+from zope.interface import Interface, implements, implementedBy
 from zope.component import queryUtility
 
 import zope.schema
 
 from zope.schema.interfaces import IField, ICollection, IDict
+from zope.schema.interfaces import IVocabularyTokenized, IContextSourceBinder
 
 from plone.supermodel.interfaces import IFieldNameExtractor
 from plone.supermodel.interfaces import IFieldExportImportHandler, IToUnicode
@@ -23,8 +24,10 @@ class BaseHandler(object):
     
     implements(IFieldExportImportHandler)
     
-    # Elements that we will not write
-    filtered_attributes = frozenset(['order', 'unique',])
+    # Elements that we will not read/write. 'r' means skip when reading;
+    # 'w' means skip when writing; 'rw' means skip always.
+
+    filtered_attributes = {'order': 'rw', 'unique': 'rw'}
     
     # Elements that are of the same type as the field itself
     field_type_attributes = ('min', 'max', 'default',)
@@ -55,6 +58,10 @@ class BaseHandler(object):
         
         for attribute_element in element:
             attribute_name = no_ns(attribute_element.tag)
+            
+            if 'r' in self.filtered_attributes.get(attribute_name, ''):
+                continue
+            
             attribute_field = self.field_attributes.get(attribute_name, None)
             if attribute_field is not None:
 
@@ -81,6 +88,9 @@ class BaseHandler(object):
         
         field_instance = self.klass(__name__=name, **attributes)
         
+        # some fields can't validate fully until they're finished setting up
+        field_instance._init_field = True
+        
         # Handle those elements that can only be set up once the field is
         # constructed, in the preferred order.
         for attribute_name in self.field_type_attributes:
@@ -103,7 +113,8 @@ class BaseHandler(object):
                 attribute_element = deferred_nonvalidated[attribute_name]
                 value = self.read_attribute(attribute_element, clone)
                 setattr(field_instance, attribute_name, value)
-                
+        
+        field_instance._init_field = True
         return field_instance
     
     def write(self, field, name, type, element_name='field'):
@@ -119,7 +130,7 @@ class BaseHandler(object):
         
         for attribute_name in sorted(self.field_attributes.keys()):
             attribute_field = self.field_attributes[attribute_name]
-            if attribute_name in self.filtered_attributes:
+            if 'w' in self.filtered_attributes.get(attribute_name, ''):
                 continue
             child = self.write_attribute(attribute_field, field)
             if child is not None:
@@ -216,3 +227,64 @@ class ObjectHandler(BaseHandler):
 
     def write(self, field, name, type, element_name='field'):
         raise NotImplementedError, u"Serialisation of object fields is not supported"
+
+class ChoiceHandler(BaseHandler):
+    """Special handling for the Choice field
+    """
+    
+    def __init__(self, klass):
+        super(ChoiceHandler, self).__init__(klass)
+        
+        
+        # Special options for the constructor. These are not automatically written.
+        
+        self.filtered_attributes.update({'vocabulary': 'w', 
+                                         'values': 'w',
+                                         'source': 'w'})
+        
+        self.field_attributes['vocabulary'] = \
+            zope.schema.TextLine(__name__='vocabulary', title=u"Named vocabulary")
+        
+        self.field_attributes['values'] = \
+            zope.schema.List(__name__='values', title=u"Values",
+                                value_type=zope.schema.Text(title=u"Value"))
+        
+        # XXX: We can't be more specific about the schema, since the field
+        # supports both ISource and IContextSourceBinder. However, the 
+        # initialiser will validate.
+        self.field_attributes['source'] = \
+            zope.schema.Object(__name__='source', title=u"Source", schema=Interface) 
+    
+    def write(self, field, name, type, element_name='field'):
+        
+        element = super(ChoiceHandler, self).write(field, name, type, element_name)
+        
+        # write vocabulary or values list
+    
+        # Named vocabulary
+        if field.vocabularyName is not None and field.vocabulary is None:
+            attribute_field = self.field_attributes['vocabulary']
+            child = value_to_element(attribute_field, field.vocabularyName)
+            element.append(child)
+        
+        # Listed vocabulary - attempt to convert to a simple list of values
+        elif field.vocabularyName is None and IVocabularyTokenized.providedBy(field.vocabulary):
+            value = []
+            for term in field.vocabulary:
+                if not isinstance(term.value, (str, unicode),) or term.token != str(term.value):
+                    raise NotImplementedError(u"Cannot export a vocabulary that is not "
+                                               "based on a simple list of values")                    
+                value.append(term.value)
+            
+            attribute_field = self.field_attributes['values']
+            child = value_to_element(attribute_field, value, value_type=attribute_field.value_type)
+            element.append(child)
+        
+        # Anything else is not allowed - we can't export ISource/IVocabulary or
+        #  IContextSourceBinder objects.
+        else:
+            raise NotImplementedError(u"Choice fields with vocabularies not based on "
+                                        "a simple list of values or a named vocabulary "
+                                        "cannot be exported")
+        
+        return element

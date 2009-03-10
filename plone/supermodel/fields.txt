@@ -40,7 +40,7 @@ Then, let's test each field in turn.
 Bytes
 -----
 
-    >>> field = schema.Bytes(__name__=u"name", title=u"Test", 
+    >>> field = schema.Bytes(__name__=u"dummy", title=u"Test", 
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default='abc', missing_value='m',
     ...     min_length=2, max_length=10)
@@ -84,7 +84,7 @@ Bytes
 BytesLine
 ---------
 
-    >>> field = schema.BytesLine(__name__=u"name", title=u"Test", 
+    >>> field = schema.BytesLine(__name__=u"dummy", title=u"Test", 
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default='abc', missing_value='m',
     ...     min_length=2, max_length=10)
@@ -128,7 +128,7 @@ BytesLine
 ASCII
 -----
 
-    >>> field = schema.ASCII(__name__=u"name", title=u"Test", 
+    >>> field = schema.ASCII(__name__=u"dummy", title=u"Test", 
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default='abc', missing_value='m',
     ...     min_length=2, max_length=10)
@@ -172,7 +172,7 @@ ASCII
 ASCIILine
 ---------
 
-    >>> field = schema.ASCIILine(__name__=u"name", title=u"Test", 
+    >>> field = schema.ASCIILine(__name__=u"dummy", title=u"Test", 
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default='abc', missing_value='m',
     ...     min_length=2, max_length=10)
@@ -216,7 +216,7 @@ ASCIILine
 Text
 ----
 
-    >>> field = schema.Text(__name__=u"name", title=u"Test", 
+    >>> field = schema.Text(__name__=u"dummy", title=u"Test", 
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default=u'abc', missing_value=u'm',
     ...     min_length=2, max_length=10)
@@ -260,7 +260,7 @@ Text
 TextLine
 --------
 
-    >>> field = schema.TextLine(__name__=u"name", title=u"Test", 
+    >>> field = schema.TextLine(__name__=u"dummy", title=u"Test", 
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default=u'abc', missing_value=u'm',
     ...     min_length=2, max_length=10)
@@ -304,7 +304,7 @@ TextLine
 SourceText
 ----------
 
-    >>> field = schema.SourceText(__name__=u"name", title=u"Test", 
+    >>> field = schema.SourceText(__name__=u"dummy", title=u"Test", 
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default=u'abc', missing_value=u'm',
     ...     min_length=2, max_length=10)
@@ -348,7 +348,7 @@ SourceText
 URI
 ---
 
-    >>> field = schema.URI(__name__=u"name", title=u"Test", 
+    >>> field = schema.URI(__name__=u"dummy", title=u"Test", 
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default='http://plone.org', missing_value='m',
     ...     min_length=2, max_length=100)
@@ -392,7 +392,7 @@ URI
 Id
 --
 
-    >>> field = schema.Id(__name__=u"name", title=u"Test", 
+    >>> field = schema.Id(__name__=u"dummy", title=u"Test", 
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default='a.b.c', missing_value='m',
     ...     min_length=2, max_length=10)
@@ -436,7 +436,7 @@ Id
 DottedName
 -----------
 
-    >>> field = schema.DottedName(__name__=u"name", title=u"Test", 
+    >>> field = schema.DottedName(__name__=u"dummy", title=u"Test", 
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default='a.b.c', missing_value='m',
     ...     min_length=2, max_length=10, min_dots=2, max_dots=4)
@@ -486,7 +486,7 @@ DottedName
 Password
 --------
 
-    >>> field = schema.Password(__name__=u"name", title=u"Test", 
+    >>> field = schema.Password(__name__=u"dummy", title=u"Test", 
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default=u'abc', missing_value=u'm',
     ...     min_length=2, max_length=10)
@@ -530,7 +530,7 @@ Password
 Bool
 ----
 
-    >>> field = schema.Bool(__name__=u"name", title=u"Test", 
+    >>> field = schema.Bool(__name__=u"dummy", title=u"Test", 
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default=False, missing_value=True)
     >>> field_type = IFieldNameExtractor(field)()
@@ -567,7 +567,7 @@ Bool
 Int
 ---
 
-    >>> field = schema.Int(__name__=u"name", title=u"Test", 
+    >>> field = schema.Int(__name__=u"dummy", title=u"Test", 
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default=12, missing_value=-1,
     ...     min=1, max=99)
@@ -611,7 +611,7 @@ Int
 Float
 -----
 
-    >>> field = schema.Float(__name__=u"name", title=u"Test", 
+    >>> field = schema.Float(__name__=u"dummy", title=u"Test", 
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default=12.1, missing_value=-1.0,
     ...     min=1.123, max=99.5)
@@ -655,7 +655,7 @@ Float
 Date
 ----
 
-    >>> field = schema.Date(__name__=u"name", title=u"Test", 
+    >>> field = schema.Date(__name__=u"dummy", title=u"Test", 
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default=datetime.date(2001,1,2), missing_value=datetime.date(2000,1,1),
     ...     min=datetime.date(2000,10,12), max=datetime.date(2099,12,31))
@@ -699,7 +699,7 @@ Date
 Datetime
 ---------
 
-    >>> field = schema.Datetime(__name__=u"name", title=u"Test", 
+    >>> field = schema.Datetime(__name__=u"dummy", title=u"Test", 
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default=datetime.datetime(2001,1,2,1,2,3), missing_value=datetime.datetime(2000,1,1,2,3,4),
     ...     min=datetime.datetime(2000,10,12,0,0,2), max=datetime.datetime(2099,12,31,1,2,2))
@@ -743,7 +743,7 @@ Datetime
 InterfaceField
 ---------------
 
-    >>> field = schema.InterfaceField(__name__=u"name", title=u"Test", 
+    >>> field = schema.InterfaceField(__name__=u"dummy", title=u"Test", 
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default=plone.supermodel.tests.IDummy,
     ...     missing_value=plone.supermodel.tests.IDummy)
@@ -781,7 +781,7 @@ InterfaceField
 Tuple
 -----
 
-    >>> field = schema.Tuple(__name__=u"name", title=u"Test", 
+    >>> field = schema.Tuple(__name__=u"dummy", title=u"Test", 
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default=(1,2), missing_value=(),
     ...     min_length=2, max_length=10,
@@ -835,7 +835,7 @@ Tuple
 List
 ----
 
-    >>> field = schema.List(__name__=u"name", title=u"Test", 
+    >>> field = schema.List(__name__=u"dummy", title=u"Test", 
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default=[1,2], missing_value=[],
     ...     min_length=2, max_length=10,
@@ -889,7 +889,7 @@ List
 Set
 ---
 
-    >>> field = schema.Set(__name__=u"name", title=u"Test", 
+    >>> field = schema.Set(__name__=u"dummy", title=u"Test", 
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default=set((1,2)), missing_value=set(),
     ...     min_length=2, max_length=10,
@@ -943,7 +943,7 @@ Set
 FrozenSet
 ---------
 
-    >>> field = schema.FrozenSet(__name__=u"name", title=u"Test", 
+    >>> field = schema.FrozenSet(__name__=u"dummy", title=u"Test", 
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default=frozenset((1,2)), missing_value=frozenset(),
     ...     min_length=2, max_length=10,
@@ -997,7 +997,7 @@ FrozenSet
 Dict
 ----
 
-    >>> field = schema.Dict(__name__=u"name", title=u"Test", 
+    >>> field = schema.Dict(__name__=u"dummy", title=u"Test", 
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default={'a':1, 'b':2}, missing_value={},
     ...     min_length=2, max_length=10,
@@ -1065,7 +1065,7 @@ to pickling).
     >>> dummy1 = plone.supermodel.tests.Dummy()
     >>> dummy2 = plone.supermodel.tests.Dummy()
 
-    >>> field = schema.Object(__name__=u"name", title=u"Test", 
+    >>> field = schema.Object(__name__=u"dummy", title=u"Test", 
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default=dummy1, missing_value=dummy2,
     ...     schema=plone.supermodel.tests.IDummy)
@@ -1111,3 +1111,203 @@ object field that references a particular dotted name.
 
 Choice
 ------
+
+The choice field supports several different modes: a named vocabulary, a list
+of values, a source object, or a source context binder object. However,
+plone.supermodel only supports exporting named vocabularies or lists of
+unicode string values. In addition, it is possible to import (but not export)
+a source or context source binder, provided it can be imported from a 
+dotted name.
+
+1. Named vocabularies
+
+These can be both exported and imported.
+
+    >>> field = schema.Choice(__name__=u"dummy", title=u"Test", 
+    ...     description=u"Test desc", required=False, readonly=True,
+    ...     default='a', missing_value='', vocabulary=u'dummy.vocab')
+
+    >>> field_type = IFieldNameExtractor(field)()
+    >>> handler = getUtility(IFieldExportImportHandler, name=field_type)
+    >>> element = handler.write(field, u'dummy', field_type)
+    >>> print pretty_xml(element)
+    <field name="dummy" type="zope.schema.Choice">
+      <default>a</default>
+      <description>Test desc</description>
+      <missing_value />
+      <readonly>True</readonly>
+      <required>False</required>
+      <title>Test</title>
+      <vocabulary>dummy.vocab</vocabulary>
+    </field>
+    
+    >>> reciprocal = handler.read(element)
+    >>> reciprocal.__class__
+    <class 'zope.schema._field.Choice'>
+    >>> reciprocal.__name__
+    u'dummy'
+    >>> reciprocal.title
+    u'Test'
+    >>> reciprocal.description
+    u'Test desc'
+    >>> reciprocal.required
+    False
+    >>> reciprocal.readonly
+    True
+    >>> reciprocal.default # note - value is always unicode
+    u'a'
+    >>> reciprocal.missing_value # note - value is always unicode
+    u''
+    >>> reciprocal.vocabulary is None
+    True
+    >>> reciprocal.vocabularyName
+    u'dummy.vocab'
+    
+2. Values vocabularies
+
+These can be both imported and exported, but note that the value is always
+a unicode string when importing.
+
+    >>> field = schema.Choice(__name__=u"dummy", title=u"Test", 
+    ...     description=u"Test desc", required=False, readonly=True,
+    ...     default='a', missing_value='', values=['a', 'b', 'c'])
+
+    >>> field_type = IFieldNameExtractor(field)()
+    >>> handler = getUtility(IFieldExportImportHandler, name=field_type)
+    >>> element = handler.write(field, u'dummy', field_type)
+    >>> print pretty_xml(element)
+    <field name="dummy" type="zope.schema.Choice">
+      <default>a</default>
+      <description>Test desc</description>
+      <missing_value />
+      <readonly>True</readonly>
+      <required>False</required>
+      <title>Test</title>
+      <values>
+        <element>a</element>
+        <element>b</element>
+        <element>c</element>
+      </values>
+    </field>
+
+    >>> reciprocal = handler.read(element)
+    >>> reciprocal.__class__
+    <class 'zope.schema._field.Choice'>
+    >>> reciprocal.__name__
+    u'dummy'
+    >>> reciprocal.title
+    u'Test'
+    >>> reciprocal.description
+    u'Test desc'
+    >>> reciprocal.required
+    False
+    >>> reciprocal.readonly
+    True
+    >>> reciprocal.default
+    u'a'
+    >>> reciprocal.missing_value
+    u''
+    >>> [t.value for t in reciprocal.vocabulary]
+    [u'a', u'b', u'c']
+    >>> reciprocal.vocabularyName is None
+    True
+
+3. Sources and source binders
+
+We cannot export choice fields with a source or context source binder:
+
+    >>> field = schema.Choice(__name__=u"dummy", title=u"Test", 
+    ...     description=u"Test desc", required=False, readonly=True,
+    ...     vocabulary=plone.supermodel.tests.dummy_vocabulary_instance)
+    >>> field_type = IFieldNameExtractor(field)()
+    >>> handler = getUtility(IFieldExportImportHandler, name=field_type)
+    >>> element = handler.write(field, u'dummy', field_type) # doctest: +ELLIPSIS
+    Traceback (most recent call last):
+    ...
+    NotImplementedError: Cannot export a vocabulary that is not based on a simple list of values
+    
+    >>> field = schema.Choice(__name__=u"dummy", title=u"Test", 
+    ...     description=u"Test desc", required=False, readonly=True,
+    ...     source=plone.supermodel.tests.dummy_vocabulary_instance)
+    >>> field_type = IFieldNameExtractor(field)()
+    >>> handler = getUtility(IFieldExportImportHandler, name=field_type)
+    >>> element = handler.write(field, u'dummy', field_type) # doctest: +ELLIPSIS
+    Traceback (most recent call last):
+    ...
+    NotImplementedError: Cannot export a vocabulary that is not based on a simple list of values
+
+    >>> field = schema.Choice(__name__=u"dummy", title=u"Test", 
+    ...     description=u"Test desc", required=False, readonly=True,
+    ...     source=plone.supermodel.tests.dummy_binder)
+    >>> field_type = IFieldNameExtractor(field)()
+    >>> handler = getUtility(IFieldExportImportHandler, name=field_type)
+    >>> element = handler.write(field, u'dummy', field_type) # doctest: +ELLIPSIS
+    Traceback (most recent call last):
+    ...
+    NotImplementedError: Choice fields with vocabularies not based on a simple list of values or a named vocabulary cannot be exported
+
+However, we can import a choice field with a source, provided that source can
+be specified via an importable dotted name.
+
+    >>> element = ElementTree.XML("""\
+    ... <field name="dummy" type="zope.schema.Choice">
+    ...   <default>a</default>
+    ...   <description>Test desc</description>
+    ...   <missing_value />
+    ...   <readonly>True</readonly>
+    ...   <required>False</required>
+    ...   <title>Test</title>
+    ...   <source>plone.supermodel.tests.dummy_binder</source>
+    ... </field>
+    ... """)
+    
+    >>> reciprocal = handler.read(element)
+    >>> reciprocal.__class__
+    <class 'zope.schema._field.Choice'>
+    >>> reciprocal.__name__
+    u'dummy'
+    >>> reciprocal.title
+    u'Test'
+    >>> reciprocal.description
+    u'Test desc'
+    >>> reciprocal.required
+    False
+    >>> reciprocal.readonly
+    True
+    >>> reciprocal.default
+    u'a'
+    >>> reciprocal.vocabulary is plone.supermodel.tests.dummy_binder
+    True
+    >>> reciprocal.vocabularyName is None
+    True
+
+    >>> element = ElementTree.XML("""\
+    ... <field name="dummy" type="zope.schema.Choice">
+    ...   <default>a</default>
+    ...   <description>Test desc</description>
+    ...   <missing_value />
+    ...   <readonly>True</readonly>
+    ...   <required>False</required>
+    ...   <title>Test</title>
+    ...   <source>plone.supermodel.tests.dummy_vocabulary_instance</source>
+    ... </field>
+    ... """)
+    >>> reciprocal = handler.read(element)
+    >>> reciprocal.__class__
+    <class 'zope.schema._field.Choice'>
+    >>> reciprocal.__name__
+    u'dummy'
+    >>> reciprocal.title
+    u'Test'
+    >>> reciprocal.description
+    u'Test desc'
+    >>> reciprocal.required
+    False
+    >>> reciprocal.readonly
+    True
+    >>> reciprocal.default
+    u'a'
+    >>> reciprocal.vocabulary is plone.supermodel.tests.dummy_vocabulary_instance
+    True
+    >>> reciprocal.vocabularyName is None
+    True
