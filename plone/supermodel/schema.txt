@@ -92,7 +92,8 @@ Similarly, we can serialize a model to an XML representation:
       <schema>
         <field name="title" type="zope.schema.TextLine">
           <title>Title</title>
-        </field><field name="description" type="zope.schema.Text">
+        </field>
+        <field name="description" type="zope.schema.Text">
           <description>A short summary</description>
           <min_length>10</min_length>
           <required>False</required>
@@ -179,7 +180,8 @@ of just a single schema using serialize_schema():
       <schema>
         <field name="title" type="zope.schema.TextLine">
           <title>Title</title>
-        </field><field name="body" type="zope.schema.Text">
+        </field>
+        <field name="body" type="zope.schema.Text">
           <max_length>10000</max_length>
           <title>Body text</title>
         </field>
@@ -192,7 +194,8 @@ of just a single schema using serialize_schema():
         <field name="created" type="zope.schema.Datetime">
           <required>False</required>
           <title>Created date</title>
-        </field><field name="creator" type="zope.schema.TextLine">
+        </field>
+        <field name="creator" type="zope.schema.TextLine">
           <description>Name of the creator</description>
           <title>Creator</title>
         </field>
@@ -274,7 +277,8 @@ Finally, let's verify that bases are preserved upon serialisation:
         <field name="description" type="zope.schema.Text">
           <description>A short summary</description>
           <title>Description</title>
-        </field><field name="age" type="zope.schema.Int">
+        </field>
+        <field name="age" type="zope.schema.Int">
           <title>Age</title>
         </field>
       </schema>
@@ -385,32 +389,40 @@ fieldset.
       <schema>
         <field name="title" type="zope.schema.TextLine">
           <title>Title</title>
-        </field><field name="body" type="zope.schema.Text">
+        </field>
+        <field name="body" type="zope.schema.Text">
           <max_length>10000</max_length>
             <title>Body text</title>
-        </field><field name="author" type="zope.schema.TextLine">
+        </field>
+        <field name="author" type="zope.schema.TextLine">
           <title>Author</title>
-        </field><fieldset description="Standard dates" label="Dates" name="dates">
+        </field>
+        <fieldset description="Standard dates" label="Dates" name="dates">
           <field name="publication_date" type="zope.schema.Date">
             <title>Publication date</title>
-          </field><field name="expiry_date" type="zope.schema.Date">
+          </field>
+          <field name="expiry_date" type="zope.schema.Date">
             <title>Expiry date</title>
-          </field><field name="notification_date" type="zope.schema.Date">
+          </field>
+          <field name="notification_date" type="zope.schema.Date">
             <title>Notification date</title>
           </field>
         </fieldset>
-      </schema><schema name="metadata">
+      </schema>
+      <schema name="metadata">
         <fieldset label="Standard" name="standard">
           <field name="creator" type="zope.schema.TextLine">
             <description>Name of the creator</description>
             <title>Creator</title>
           </field>
-        </fieldset><fieldset label="Metadata dates" name="dates">
+        </fieldset>
+        <fieldset label="Metadata dates" name="dates">
           <field name="created" type="zope.schema.Datetime">
             <required>False</required>
             <title>Created date</title>
           </field>
-        </fieldset><fieldset label="Author info" name="author" />
+        </fieldset>
+        <fieldset label="Author info" name="author" />
       </schema>
     </model>
 
@@ -514,7 +526,8 @@ set in the utility (if any) will be used by default.
       <schema ui:layout="horizontal" xmlns:ui="http://namespaces.acme.com/ui">
         <field name="title" type="zope.schema.TextLine" ui:widget="largetype">
           <title>Title</title>
-        </field><field name="description" type="zope.schema.Text">
+        </field>
+        <field name="description" type="zope.schema.Text">
           <description>A short summary</description>
           <min_length>10</min_length>
           <required>False</required>

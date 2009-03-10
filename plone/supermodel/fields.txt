@@ -806,7 +806,8 @@ Tuple
       <default>
         <element>1</element>
         <element>2</element>
-      </default><description>Test desc</description>
+      </default>
+      <description>Test desc</description>
       <max_length>10</max_length>
       <min_length>2</min_length>
       <missing_value />
@@ -860,7 +861,8 @@ List
       <default>
         <element>1</element>
         <element>2</element>
-      </default><description>Test desc</description>
+      </default>
+      <description>Test desc</description>
       <max_length>10</max_length>
       <min_length>2</min_length>
       <missing_value />
@@ -914,7 +916,8 @@ Set
       <default>
         <element>1</element>
         <element>2</element>
-      </default><description>Test desc</description>
+      </default>
+      <description>Test desc</description>
       <max_length>10</max_length>
       <min_length>2</min_length>
       <missing_value />
@@ -968,7 +971,8 @@ FrozenSet
       <default>
         <element>1</element>
         <element>2</element>
-      </default><description>Test desc</description>
+      </default>
+      <description>Test desc</description>
       <max_length>10</max_length>
       <min_length>2</min_length>
       <missing_value />
@@ -1023,10 +1027,12 @@ Dict
       <default>
         <element key="a">1</element>
         <element key="b">2</element>
-      </default><description>Test desc</description>
+      </default>
+      <description>Test desc</description>
       <key_type type="zope.schema.ASCIILine">
         <title>Key</title>
-      </key_type><max_length>10</max_length>
+      </key_type>
+      <max_length>10</max_length>
       <min_length>2</min_length>
       <missing_value />
       <readonly>True</readonly>

@@ -22,18 +22,31 @@ def no_ns(name):
     """
     return no_ns_re.sub('', name)
 
-def indent(elem, level=0):
-    i = "\n" + level * "  "
-    if len(elem):
-        if not elem.text or not elem.text.strip():
-            elem.text = i + "  "
-        for elem in elem:
-            indent(elem, level+1)
-        if not elem.tail or not elem.tail.strip():
-            elem.tail = i
-    else:
-        if level and (not elem.tail or not elem.tail.strip()):
-            elem.tail = i
+def indent(node, level=0):
+    
+    node_indent = level * "  "
+    child_indent = (level + 1) * "  "
+    
+    # node has childen
+    if len(node):
+        
+        # add indent before first child node
+        if not node.text or not node.text.strip():
+            node.text = "\n" + child_indent
+        
+        # let each child indent itself
+        last_idx = len(node) - 1
+        for idx, child in enumerate(node):
+            indent(child, level + 1)
+            
+            # add a tail for the next child node...
+            if idx != last_idx:
+                if not child.tail or not child.tail.strip():
+                    child.tail = "\n" + child_indent
+            # ... or for the closing element of this node
+            else:
+                if not child.tail or not child.tail.strip():
+                    child.tail = "\n" + node_indent
 
 def pretty_xml(tree):
     indent(tree)
