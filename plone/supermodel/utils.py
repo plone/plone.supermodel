@@ -4,7 +4,7 @@ import re
 
 from elementtree import ElementTree
 
-from zope.schema.interfaces import IField, IFromUnicode
+from zope.schema.interfaces import IField, IFromUnicode, IDict, ICollection
 
 from plone.supermodel.interfaces import XML_NAMESPACE, IToUnicode
 
@@ -53,15 +53,9 @@ def field_typecast(field, value):
                     pass
     return value
 
-def element_to_value(field, element, default=_marker, converter=None, key_type=None, value_type=None):
+def element_to_value(field, element, default=_marker):
     """Read the contents of an element that is assumed to represent a value
     allowable by the given field. 
-    
-    If value_type is given, the value is assumed to be iterable, with elements
-    described by the field value_type.
-    
-    If key_type is given, the value is assumed to be a dict, with keys
-    described by key_type and values described by value_type.
     
     If converter is given, it should be an IToUnicode instance.
     
@@ -70,28 +64,41 @@ def element_to_value(field, element, default=_marker, converter=None, key_type=N
     
     value = default
     
-    # Dict
-    if key_type is not None and value_type is not None:
-        key_converter = IFromUnicode(key_type)
-        value_converter = IFromUnicode(value_type)
+    if IDict.providedBy(field):
+        key_converter = IFromUnicode(field.key_type)
+        value_converter = IFromUnicode(field.value_type)
         
         value = {}
         for child in element:
             if child.tag.lower() != 'element':
                 continue
-            k = key_converter.fromUnicode(unicode(child.attrib['key']))
-            v = value_converter.fromUnicode(unicode(child.text))
+            
+            key_text = child.attrib.get('key', None)
+            if key_text is None:
+                k = None
+            else:
+                k = key_converter.fromUnicode(unicode(key_text))
+            
+            value_text = child.text
+            if value_text is None:
+                v = None
+            else:
+                v= value_converter.fromUnicode(unicode(value_text))
+            
             value[k] = v
         value = field_typecast(field, value)
     
-    # List
-    elif value_type is not None:
-        value_converter = IFromUnicode(value_type)
+    elif ICollection.providedBy(field):
+        value_converter = IFromUnicode(field.value_type)
         value = []
         for child in element:
             if child.tag.lower() != 'element':
                 continue
-            value.append(value_converter.fromUnicode(unicode(child.text)))
+            text = child.text
+            if text is None:
+                value.append(None)
+            else:
+                value.append(value_converter.fromUnicode(unicode(text)))
         value = field_typecast(field, value)
     
     # Unicode
@@ -100,55 +107,50 @@ def element_to_value(field, element, default=_marker, converter=None, key_type=N
         if text is None:
             value = field.missing_value
         else:
-            if converter is None:
-                converter = IFromUnicode(field)
+            converter = IFromUnicode(field)
             value = converter.fromUnicode(unicode(text))
       
     return value
     
-def value_to_element(field, value, converter=None, key_type=None, value_type=None):
+def value_to_element(field, value, name=None, force=False):
     """Create and return an element that describes the given value, which is
     assumed to be valid for the given field.
     
-    If value_type is given, the value is assumed to be iterable, with elements
-    described by the field value_type.
+    If name is given, this will be used as the new element name. Otherwise,
+    the field's __name__ attribute is consulted.
     
-    If key_type is given, the value is assumed to be a dict, with keys
-    described by key_type and values described by value_type.
-    
-    If converter is given, it should be an IToUnicode instance.
-    
-    If not, the field will be adapted to this interface to obtain a converter.
+    If force is True, the value will always be written. Otherwise, it is only
+    written if it is not equal to field.missing_value.
     """
-    
-    child = ElementTree.Element(field.__name__)
-    
-    if value is not None:
-        
-        # Dict
-        if key_type is not None and value_type is not None:
-            key_converter = IToUnicode(key_type)
-            value_converter = IToUnicode(value_type)
+
+    if name is None:
+        name = field.__name__
+
+    child = ElementTree.Element(name)
+
+    if force or value != field.missing_value:
+
+        if IDict.providedBy(field):
+            key_converter = IToUnicode(field.key_type)
+            value_converter = IToUnicode(field.value_type)
+
             for k, v in value.items():
                 list_element = ElementTree.Element('element')
                 list_element.attrib['key'] = key_converter.toUnicode(k)
                 list_element.text = value_converter.toUnicode(v)
                 child.append(list_element)
-        
-        # List
-        elif value_type is not None:
-            value_converter = IToUnicode(value_type)
+
+        elif ICollection.providedBy(field):
+            value_converter = IToUnicode(field.value_type)
             for v in value:
                 list_element = ElementTree.Element('element')
                 list_element.text = value_converter.toUnicode(v)
                 child.append(list_element)
-        
-        # Unicode
+
         else:
-            if converter is None:
-                converter = IToUnicode(field)
+            converter = IToUnicode(field)
             child.text = converter.toUnicode(value)
-        
+
     return child
 
 def relative_to_calling_package(filename, calling_frame=2):

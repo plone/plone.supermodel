@@ -5,11 +5,11 @@ from zope.component import queryUtility
 
 import zope.schema
 
-from zope.schema.interfaces import IField, ICollection, IDict
+from zope.schema.interfaces import IField
 from zope.schema.interfaces import IVocabularyTokenized
 
 from plone.supermodel.interfaces import IFieldNameExtractor
-from plone.supermodel.interfaces import IFieldExportImportHandler, IToUnicode
+from plone.supermodel.interfaces import IFieldExportImportHandler
 
 from plone.supermodel.utils import no_ns, value_to_element, element_to_value
 
@@ -38,6 +38,10 @@ class BaseHandler(object):
     
     # Attributes that contain another field. Unfortunately, 
     field_instance_attributes = ('key_type', 'value_type',)
+    
+    # Fields that are always written
+    
+    forced_fields = frozenset(['default', 'missing_value'])
     
     def __init__(self, klass):
         self.klass = klass
@@ -145,66 +149,37 @@ class BaseHandler(object):
         a type described by the given Field object.
         """
         
-        key_type = None
-        value_type = None
-        
-        if ICollection.providedBy(attribute_field):
-            value_type = attribute_field.value_type
-        elif IDict.providedBy(attribute_field):
-            key_type = attribute_field.key_type
-            value_type = attribute_field.value_type
-        
-        return element_to_value(attribute_field, element, 
-                                    key_type=key_type, value_type=value_type)
+        return element_to_value(attribute_field, element)
         
     def write_attribute(self, attribute_field, field, ignore_default=True):
         """Create and return a element that describes the given attribute
         field on the given field
         """
         
-        attribute_field_name = attribute_field.__name__
+        element_name = attribute_field.__name__
         attribute_field = attribute_field.bind(field)
         value = attribute_field.get(field)
+        
+        force = (element_name in self.forced_fields)
         
         if ignore_default and value == attribute_field.default:
             return None
         
         # The value points to another field. Recurse.
         if IField.providedBy(value):
-            
-            name_extractor = IFieldNameExtractor(value)
-            value_field_type = name_extractor()
-            
+            value_field_type = IFieldNameExtractor(value)()
             handler = queryUtility(IFieldExportImportHandler, name=value_field_type)
             if handler is None:
                 return None
-            
-            return handler.write(value, None, value_field_type, element_name=attribute_field_name)
+            return handler.write(value, name=None, type=value_field_type, element_name=element_name)
         
-        # The value is a list of the field's value_type. Write elements.
-        elif isinstance(value, (tuple, list, set, frozenset,)) and \
-                ICollection.providedBy(field) and \
-                (attribute_field_name in self.field_type_attributes or
-                 attribute_field_name in self.nonvalidated_field_type_attributes):
-            
-            return value_to_element(attribute_field, value, value_type=field.value_type)
+        # For 'default', 'missing_value' etc, we want to validate against
+        # the imported field type itself, not the field type of the attribute
+        if element_name in self.field_type_attributes or \
+                element_name in self.nonvalidated_field_type_attributes:
+            attribute_field = field
         
-        # The value is a dict of the field's key_type/value_type. Write elements with keys.
-        elif isinstance(value, (dict,)) and IDict.providedBy(field) and \
-                (attribute_field_name in self.field_type_attributes or
-                 attribute_field_name in self.nonvalidated_field_type_attributes):
-            return value_to_element(attribute_field, value,
-                                        key_type=field.key_type, value_type=field.value_type)
-
-        # The value is a 'primitive'. Convert to unicode and place in element.
-        else:
-            converter = None
-    
-            if attribute_field.__name__ in self.field_type_attributes or \
-                    attribute_field.__name__ in self.nonvalidated_field_type_attributes:
-                converter = IToUnicode(field)
-        
-            return value_to_element(attribute_field, value, converter=converter)
+        return value_to_element(attribute_field, value, name=element_name, force=force)
 
 class DictHandler(BaseHandler):
     """Special handling for the Dict field, which uses Attribute instead of
@@ -267,7 +242,7 @@ class ChoiceHandler(BaseHandler):
         # Named vocabulary
         if field.vocabularyName is not None and field.vocabulary is None:
             attribute_field = self.field_attributes['vocabulary']
-            child = value_to_element(attribute_field, field.vocabularyName)
+            child = value_to_element(attribute_field, field.vocabularyName, name='vocabulary', force=True)
             element.append(child)
         
         # Listed vocabulary - attempt to convert to a simple list of values
@@ -280,7 +255,7 @@ class ChoiceHandler(BaseHandler):
                 value.append(term.value)
             
             attribute_field = self.field_attributes['values']
-            child = value_to_element(attribute_field, value, value_type=attribute_field.value_type)
+            child = value_to_element(attribute_field, value, name='values', force=True)
             element.append(child)
         
         # Anything else is not allowed - we can't export ISource/IVocabulary or
