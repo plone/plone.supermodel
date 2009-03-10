@@ -141,7 +141,7 @@ def value_to_element(field, value, name=None, force=False):
 
     child = ElementTree.Element(name)
 
-    if force or value != field.missing_value:
+    if value is not None and (force or value != field.missing_value):
 
         if IDict.providedBy(field):
             key_converter = IToUnicode(field.key_type)
