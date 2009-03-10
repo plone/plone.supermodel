@@ -80,6 +80,9 @@ class BaseHandler(object):
                     attribute_field_type = attribute_element.get('type')
                     handler = queryUtility(IFieldExportImportHandler, name=attribute_field_type)
                     
+                    if handler is None:
+                        raise NotImplementedError(u"Type %s used for %s not supported" % (attribute_field_type, attribute_name))
+                    
                     attributes[attribute_name] = handler.read(attribute_element)
                     
                 else:
