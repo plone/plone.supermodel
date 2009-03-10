@@ -6,7 +6,7 @@ from zope.component import queryUtility
 import zope.schema
 
 from zope.schema.interfaces import IField, ICollection, IDict
-from zope.schema.interfaces import IVocabularyTokenized, IContextSourceBinder
+from zope.schema.interfaces import IVocabularyTokenized
 
 from plone.supermodel.interfaces import IFieldNameExtractor
 from plone.supermodel.interfaces import IFieldExportImportHandler, IToUnicode
@@ -221,26 +221,29 @@ class ObjectHandler(BaseHandler):
     Field to describe its schema
     """
     
+    # We can't serialise the value or missing_value of an object field.
+    
+    filtered_attributes = BaseHandler.filtered_attributes.copy()
+    filtered_attributes.update({'default': 'w', 'missing_value': 'w'})
+    
     def __init__(self, klass):
         super(ObjectHandler, self).__init__(klass)
-        self.field_attributes['schema'] = zope.schema.InterfaceField(__name__='schema')
 
-    def write(self, field, name, type, element_name='field'):
-        raise NotImplementedError, u"Serialisation of object fields is not supported"
+        # This is not correctly set in the interface
+        self.field_attributes['schema'] = zope.schema.InterfaceField(__name__='schema')
+        
 
 class ChoiceHandler(BaseHandler):
     """Special handling for the Choice field
     """
     
+    filtered_attributes = BaseHandler.filtered_attributes.copy()
+    filtered_attributes.update({'vocabulary': 'w', 'values': 'w', 'source': 'w'})
+    
     def __init__(self, klass):
         super(ChoiceHandler, self).__init__(klass)
         
-        
         # Special options for the constructor. These are not automatically written.
-        
-        self.filtered_attributes.update({'vocabulary': 'w', 
-                                         'values': 'w',
-                                         'source': 'w'})
         
         self.field_attributes['vocabulary'] = \
             zope.schema.TextLine(__name__='vocabulary', title=u"Named vocabulary")

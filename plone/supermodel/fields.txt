@@ -2,7 +2,19 @@
 plone.supermodel: field handlers
 ================================
 
-This file tests the various field handlers.
+This file tests the various field handlers. Please note the following known
+limitations:
+
+  * `Timedelta` fields are not supported.
+  * When an `Object` field is serialised, the `default` and `missing_value`
+    attributes are ignored.
+  * `Choice` fields can only be serialised if were created from a simple list
+    of values (the `values` constructor parameter) or use a named vocabulary.
+    It is possible to import a Choice field with a source that is either an
+    `ISource` or an `IContextSourceBinder`, but only if such instances can be
+    imported from a given dotted name. Finally, `Choice` fields imported with
+    a `values` list as a vocabulary or with the `default` or `missing_value`
+    set, are assumed store a unicode string.
 
 First, let's wire up the package.
 
@@ -1058,9 +1070,8 @@ Dict
 Object
 ------
 
-Note: Writing of object fields is not supported: if we have an object in
-memory, there is no way to safely write a string version (unless we resort
-to pickling).
+Note: when an object field is written, the 'default' and 'missing_value'
+fields will be omitted, as there is no way to write these reliably.
     
     >>> dummy1 = plone.supermodel.tests.Dummy()
     >>> dummy2 = plone.supermodel.tests.Dummy()
@@ -1071,10 +1082,15 @@ to pickling).
     ...     schema=plone.supermodel.tests.IDummy)
     >>> field_type = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=field_type)
-    >>> handler.write(field, u'dummy', field_type) #doctest: +ELLIPSIS
-    Traceback (most recent call last):
-    ...
-    NotImplementedError: Serialisation of object fields is not supported
+    >>> element = handler.write(field, u'dummy', field_type) #doctest: +ELLIPSIS
+    >>> print pretty_xml(element)
+    <field name="dummy" type="zope.schema.Object">
+      <description>Test desc</description>
+      <readonly>True</readonly>
+      <required>False</required>
+      <schema>plone.supermodel.tests.IDummy</schema>
+      <title>Test</title>
+    </field>
     
 However, we support reading an object dotted name for an
 object field that references a particular dotted name.
