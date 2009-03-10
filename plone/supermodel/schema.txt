@@ -504,7 +504,7 @@ and each field, respectively.
     'horizontal'
 
     >>> model.schema.getTaggedValue('acme.widgets')
-    {'title': 'largetype'}
+    {u'title': 'largetype'}
 
 Of course, we can also serialize the schema back to XML. Here, the 'prefix'
 set in the utility (if any) will be used by default.

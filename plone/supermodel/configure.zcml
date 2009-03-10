@@ -6,12 +6,16 @@
     <!-- Unicode converters -->
 
     <adapter factory=".converters.DefaultFromUnicode" />
+    <adapter factory=".converters.DefaultToUnicode" />
+    
     <adapter factory=".converters.DateFromUnicode" />
     <adapter factory=".converters.DatetimeFromUnicode" />
+    
     <adapter factory=".converters.InterfaceFieldFromUnicode" />
-
-    <adapter factory=".converters.DefaultToUnicode" />
     <adapter factory=".converters.InterfaceFieldToUnicode" />
+    
+    <adapter factory=".converters.ObjectFromUnicode" />
+    
 
     <!-- Field handlers for all of zope.schema -->
     
@@ -88,10 +92,6 @@
         name="zope.schema.SourceText"
         />
     <utility
-        component=".fields.ObjectHandler"
-        name="zope.schema.Object"
-        />
-    <utility
         component=".fields.URIHandler"
         name="zope.schema.URI"
         />
@@ -107,7 +107,11 @@
         component=".fields.InterfaceFieldHandler"
         name="zope.schema.InterfaceField"
         />
-    
+    <utility
+        component=".fields.ObjectHandler"
+        name="zope.schema.Object"
+        />
+            
     <!-- Field name extractors -->
     <adapter factory=".serializer.DefaultFieldNameExtractor" />
     

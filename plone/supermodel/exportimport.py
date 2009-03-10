@@ -5,7 +5,7 @@ from zope.component import queryUtility
 
 import zope.schema
 
-from zope.schema.interfaces import IField, ICollection
+from zope.schema.interfaces import IField, ICollection, IDict
 
 from plone.supermodel.interfaces import IFieldNameExtractor
 from plone.supermodel.interfaces import IFieldExportImportHandler, IToUnicode
@@ -75,7 +75,11 @@ class BaseHandler(object):
                     attributes[attribute_name] = \
                         self.read_attribute(attribute_element, attribute_field)
         
-        field_instance = self.klass(__name__=element.get('name'), **attributes)
+        name = element.get('name')
+        if name is not None:
+            name = unicode(name)
+        
+        field_instance = self.klass(__name__=name, **attributes)
         
         # Handle those elements that can only be set up once the field is
         # constructed, in the preferred order.
@@ -130,11 +134,17 @@ class BaseHandler(object):
         a type described by the given Field object.
         """
         
+        key_type = None
         value_type = None
+        
         if ICollection.providedBy(attribute_field):
             value_type = attribute_field.value_type
+        elif IDict.providedBy(attribute_field):
+            key_type = attribute_field.key_type
+            value_type = attribute_field.value_type
         
-        return element_to_value(attribute_field, element, value_type=value_type)
+        return element_to_value(attribute_field, element, 
+                                    key_type=key_type, value_type=value_type)
         
     def write_attribute(self, attribute_field, field, ignore_default=True):
         """Create and return a element that describes the given attribute
@@ -160,14 +170,21 @@ class BaseHandler(object):
             
             return handler.write(value, None, value_field_type, element_name=attribute_field_name)
         
-        # The value is a list. Write elements.
+        # The value is a list of the field's value_type. Write elements.
         elif isinstance(value, (tuple, list, set, frozenset,)) and \
                 ICollection.providedBy(field) and \
                 (attribute_field_name in self.field_type_attributes or
                  attribute_field_name in self.nonvalidated_field_type_attributes):
             
             return value_to_element(attribute_field, value, value_type=field.value_type)
-            
+        
+        # The value is a dict of the field's key_type/value_type. Write elements with keys.
+        elif isinstance(value, (dict,)) and IDict.providedBy(field) and \
+                (attribute_field_name in self.field_type_attributes or
+                 attribute_field_name in self.nonvalidated_field_type_attributes):
+            return value_to_element(attribute_field, value,
+                                        key_type=field.key_type, value_type=field.value_type)
+
         # The value is a 'primitive'. Convert to unicode and place in element.
         else:
             converter = None
@@ -177,3 +194,25 @@ class BaseHandler(object):
                 converter = IToUnicode(field)
         
             return value_to_element(attribute_field, value, converter=converter)
+
+class DictHandler(BaseHandler):
+    """Special handling for the Dict field, which uses Attribute instead of
+    Field to describe its key_type and value_type.
+    """
+    
+    def __init__(self, klass):
+        super(DictHandler, self).__init__(klass)
+        self.field_attributes['key_type'] = zope.schema.Field(__name__='key_type', title=u"Key type")
+        self.field_attributes['value_type'] = zope.schema.Field(__name__='value_type', title=u"Value type")
+
+class ObjectHandler(BaseHandler):
+    """Special handling for the Object field, which uses Attribute instead of
+    Field to describe its schema
+    """
+    
+    def __init__(self, klass):
+        super(ObjectHandler, self).__init__(klass)
+        self.field_attributes['schema'] = zope.schema.InterfaceField(__name__='schema')
+
+    def write(self, field, name, type, element_name='field'):
+        raise NotImplementedError, u"Serialisation of object fields is not supported"

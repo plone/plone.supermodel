@@ -4,7 +4,7 @@ from zope.interface import implements
 from zope.component import adapts
 
 from zope.schema.interfaces import IField, IFromUnicode
-from zope.schema.interfaces import IDate, IDatetime, IInterfaceField
+from zope.schema.interfaces import IDate, IDatetime, IInterfaceField, IObject
 
 from zope.dottedname.resolve import resolve
 
@@ -88,3 +88,19 @@ class InterfaceFieldToUnicode(object):
         
     def toUnicode(self, value):
         return unicode(value.__identifier__)
+
+# Object fields - we can read, but not write, as there is no way to know
+# the original dotted name of an object in memory (and the id() is not
+# particularly useful)
+
+class ObjectFromUnicode(object):
+    implements(IFromUnicode)
+    adapts(IObject)
+    
+    def __init__(self, context):
+        self.context = context
+        
+    def fromUnicode(self, value):
+        obj = resolve(value)
+        self.context.validate(obj)
+        return obj

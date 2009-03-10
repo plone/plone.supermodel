@@ -1,7 +1,7 @@
 import unittest
 import zope.app.testing.placelesssetup
 
-from zope.interface import Interface
+from zope.interface import Interface, implements
 
 import zope.component.testing
 from zope.testing import doctest
@@ -15,6 +15,17 @@ class IBase(Interface):
     title = schema.TextLine(title=u"Title")
     description = schema.TextLine(title=u"Description")
     name = schema.TextLine(title=u"Name")
+
+class IDummy(Interface):
+    title = schema.TextLine(title=u"Title")
+    
+class Dummy(object):
+    implements(IDummy)
+    
+    def __init__(self):
+        self.title = u''
+
+dummy1 = Dummy()
 
 class TestUtils(unittest.TestCase):
     

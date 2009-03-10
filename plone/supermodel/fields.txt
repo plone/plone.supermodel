@@ -35,6 +35,8 @@ Then, let's test each field in turn.
     >>> import datetime
     >>> import plone.supermodel.tests
 
+    >>> from elementtree import ElementTree
+
 Bytes
 -----
 
@@ -743,16 +745,16 @@ InterfaceField
 
     >>> field = schema.InterfaceField(__name__=u"name", title=u"Test", 
     ...     description=u"Test desc", required=False, readonly=True,
-    ...     default=plone.supermodel.tests.IBase,
-    ...     missing_value=plone.supermodel.tests.IBase)
+    ...     default=plone.supermodel.tests.IDummy,
+    ...     missing_value=plone.supermodel.tests.IDummy)
     >>> field_type = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=field_type)
     >>> element = handler.write(field, u'dummy', field_type)
     >>> print pretty_xml(element)
     <field name="dummy" type="zope.schema.InterfaceField">
-      <default>plone.supermodel.tests.IBase</default>
+      <default>plone.supermodel.tests.IDummy</default>
       <description>Test desc</description>
-      <missing_value>plone.supermodel.tests.IBase</missing_value>
+      <missing_value>plone.supermodel.tests.IDummy</missing_value>
       <readonly>True</readonly>
       <required>False</required>
       <title>Test</title>
@@ -772,9 +774,9 @@ InterfaceField
     >>> reciprocal.readonly
     True
     >>> reciprocal.default
-    <InterfaceClass plone.supermodel.tests.IBase>
+    <InterfaceClass plone.supermodel.tests.IDummy>
     >>> reciprocal.missing_value
-    <InterfaceClass plone.supermodel.tests.IBase>
+    <InterfaceClass plone.supermodel.tests.IDummy>
 
 Tuple
 -----
@@ -995,8 +997,117 @@ FrozenSet
 Dict
 ----
 
+    >>> field = schema.Dict(__name__=u"name", title=u"Test", 
+    ...     description=u"Test desc", required=False, readonly=True,
+    ...     default={'a':1, 'b':2}, missing_value={},
+    ...     min_length=2, max_length=10,
+    ...     key_type=schema.ASCIILine(title=u"Key"),
+    ...     value_type=schema.Int(title=u"Val"))
+    >>> field_type = IFieldNameExtractor(field)()
+    >>> handler = getUtility(IFieldExportImportHandler, name=field_type)
+    >>> element = handler.write(field, u'dummy', field_type)
+    >>> print pretty_xml(element)
+    <field name="dummy" type="zope.schema.Dict">
+      <default>
+        <element key="a">1</element>
+        <element key="b">2</element>
+      </default><description>Test desc</description>
+      <key_type type="zope.schema.ASCIILine">
+        <title>Key</title>
+      </key_type><max_length>10</max_length>
+      <min_length>2</min_length>
+      <missing_value />
+      <readonly>True</readonly>
+      <required>False</required>
+      <title>Test</title>
+      <value_type type="zope.schema.Int">
+        <title>Val</title>
+      </value_type>
+    </field>
+    
+    >>> reciprocal = handler.read(element)
+    >>> reciprocal.__class__
+    <class 'zope.schema._field.Dict'>
+    >>> reciprocal.__name__
+    u'dummy'
+    >>> reciprocal.title
+    u'Test'
+    >>> reciprocal.description
+    u'Test desc'
+    >>> reciprocal.required
+    False
+    >>> reciprocal.readonly
+    True
+    >>> reciprocal.default
+    {'a': 1, 'b': 2}
+    >>> reciprocal.missing_value
+    {}
+    >>> reciprocal.min_length
+    2
+    >>> reciprocal.max_length
+    10
+    >>> reciprocal.key_type.__class__
+    <class 'zope.schema._field.ASCIILine'>
+    >>> reciprocal.key_type.title
+    u'Key'
+    >>> reciprocal.value_type.__class__
+    <class 'zope.schema._bootstrapfields.Int'>
+    >>> reciprocal.value_type.title
+    u'Val'
+
 Object
 ------
+
+Note: Writing of object fields is not supported: if we have an object in
+memory, there is no way to safely write a string version (unless we resort
+to pickling).
+    
+    >>> dummy1 = plone.supermodel.tests.Dummy()
+    >>> dummy2 = plone.supermodel.tests.Dummy()
+
+    >>> field = schema.Object(__name__=u"name", title=u"Test", 
+    ...     description=u"Test desc", required=False, readonly=True,
+    ...     default=dummy1, missing_value=dummy2,
+    ...     schema=plone.supermodel.tests.IDummy)
+    >>> field_type = IFieldNameExtractor(field)()
+    >>> handler = getUtility(IFieldExportImportHandler, name=field_type)
+    >>> handler.write(field, u'dummy', field_type) #doctest: +ELLIPSIS
+    Traceback (most recent call last):
+    ...
+    NotImplementedError: Serialisation of object fields is not supported
+    
+However, we support reading an object dotted name for an
+object field that references a particular dotted name.
+
+    >>> element = ElementTree.XML("""\
+    ... <field name="dummy" type="zope.schema.Object">
+    ...   <default>plone.supermodel.tests.dummy1</default>
+    ...   <description>Test desc</description>
+    ...   <missing_value />
+    ...   <readonly>True</readonly>
+    ...   <required>False</required>
+    ...   <schema>plone.supermodel.tests.IDummy</schema>
+    ...   <title>Test</title>
+    ... </field>
+    ... """)
+    
+    >>> reciprocal = handler.read(element)
+    >>> reciprocal.__class__
+    <class 'zope.schema._field.Object'>
+    >>> reciprocal.__name__
+    u'dummy'
+    >>> reciprocal.title
+    u'Test'
+    >>> reciprocal.description
+    u'Test desc'
+    >>> reciprocal.required
+    False
+    >>> reciprocal.readonly
+    True
+    >>> reciprocal.default is plone.supermodel.tests.dummy1
+    True
+    >>> reciprocal.missing_value is None
+    True
 
 Choice
 ------

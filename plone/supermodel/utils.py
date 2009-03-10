@@ -53,52 +53,97 @@ def field_typecast(field, value):
                     pass
     return value
 
-def element_to_value(field, element, default=_marker, converter=None, value_type=None):
+def element_to_value(field, element, default=_marker, converter=None, key_type=None, value_type=None):
     """Read the contents of an element that is assumed to represent a value
-    allowable by the given field. If converter is given, it should
-    be an IFromUnicode instance. If not, the field will be adapted to this
-    interface to obtain a converter. If value_type is given, the value will
-    be assumed to be an iterable, and the converter will operate on each
-    value element.
+    allowable by the given field. 
+    
+    If value_type is given, the value is assumed to be iterable, with elements
+    described by the field value_type.
+    
+    If key_type is given, the value is assumed to be a dict, with keys
+    described by key_type and values described by value_type.
+    
+    If converter is given, it should be an IToUnicode instance.
+    
+    If not, the field will be adapted to this interface to obtain a converter.
     """
     
     value = default
+    
+    # Dict
+    if key_type is not None and value_type is not None:
+        key_converter = IFromUnicode(key_type)
+        value_converter = IFromUnicode(value_type)
         
-    if value_type is not None:
-        if converter is None:
-            converter = IFromUnicode(value_type)
+        value = {}
+        for child in element:
+            if child.tag.lower() != 'element':
+                continue
+            k = key_converter.fromUnicode(unicode(child.attrib['key']))
+            v = value_converter.fromUnicode(unicode(child.text))
+            value[k] = v
+        value = field_typecast(field, value)
+    
+    # List
+    elif value_type is not None:
+        value_converter = IFromUnicode(value_type)
         value = []
         for child in element:
-            if child.tag != 'element':
+            if child.tag.lower() != 'element':
                 continue
-            value.append(converter.fromUnicode(unicode(child.text)))
+            value.append(value_converter.fromUnicode(unicode(child.text)))
         value = field_typecast(field, value)
+    
+    # Unicode
     else:
-        if converter is None:
-            converter = IFromUnicode(field)
-        value = converter.fromUnicode(unicode(element.text))
+        text = element.text
+        if text is None:
+            value = field.missing_value
+        else:
+            if converter is None:
+                converter = IFromUnicode(field)
+            value = converter.fromUnicode(unicode(text))
       
     return value
     
-def value_to_element(field, value, converter=None, value_type=None):
+def value_to_element(field, value, converter=None, key_type=None, value_type=None):
     """Create and return an element that describes the given value, which is
-    assumed to be valid for the given field. If converter is given, it should
-    be an IToUnicode instance. If not, the field will be adapted to this
-    interface to obtain a converter. If value_type is given, the value will
-    be assumed to be an iterable, and the converter will operate on each
-    value element.
+    assumed to be valid for the given field.
+    
+    If value_type is given, the value is assumed to be iterable, with elements
+    described by the field value_type.
+    
+    If key_type is given, the value is assumed to be a dict, with keys
+    described by key_type and values described by value_type.
+    
+    If converter is given, it should be an IToUnicode instance.
+    
+    If not, the field will be adapted to this interface to obtain a converter.
     """
     
     child = ElementTree.Element(field.__name__)
     
     if value is not None:
-        if value_type is not None:
-            if converter is None:
-                converter = IToUnicode(value_type)
-            for e in value:
+        
+        # Dict
+        if key_type is not None and value_type is not None:
+            key_converter = IToUnicode(key_type)
+            value_converter = IToUnicode(value_type)
+            for k, v in value.items():
                 list_element = ElementTree.Element('element')
-                list_element.text = converter.toUnicode(e)
+                list_element.attrib['key'] = key_converter.toUnicode(k)
+                list_element.text = value_converter.toUnicode(v)
                 child.append(list_element)
+        
+        # List
+        elif value_type is not None:
+            value_converter = IToUnicode(value_type)
+            for v in value:
+                list_element = ElementTree.Element('element')
+                list_element.text = value_converter.toUnicode(v)
+                child.append(list_element)
+        
+        # Unicode
         else:
             if converter is None:
                 converter = IToUnicode(field)
