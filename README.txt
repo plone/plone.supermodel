@@ -63,3 +63,4 @@ Some of the key differences between the two packages are:
     
 In the future, it may be possible to make userschema re-use part of
 plone.supermodel or vice-a-versa, with more refactoring.
+
