@@ -1,6 +1,12 @@
 Changelog
 =========
 
+1.0b2 - Unreleased
+------------------
+
+* No longer include name kwarg to Field constructor if no name was set
+[MatthewWilkes]
+
 1.0b1 - 2009-04-17
 ------------------
 

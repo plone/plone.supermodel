@@ -92,8 +92,9 @@ class BaseHandler(object):
         name = element.get('name')
         if name is not None:
             name = unicode(name)
+            attributes['__name__'] = name
         
-        field_instance = self.klass(__name__=name, **attributes)
+        field_instance = self.klass(**attributes)
         
         # some fields can't validate fully until they're finished setting up
         field_instance._init_field = True
