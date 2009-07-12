@@ -13,13 +13,13 @@ from plone.supermodel import model
 # Cache models by absolute filename
 _model_cache = {}
 
-def xml_schema(filename, schema=u"", policy=u"", _frame=2):
-    model = load_file(filename, policy=policy, _frame=_frame+1)
+def xmlSchema(filename, schema=u"", policy=u"", _frame=2):
+    model = loadFile(filename, policy=policy, _frame=_frame+1)
     return model.schemata[schema]
 
-def load_file(filename, reload=False, policy=u"", _frame=2):
+def loadFile(filename, reload=False, policy=u"", _frame=2):
     global _model_cache
-    path = utils.relative_to_calling_package(filename, _frame)
+    path = utils.relativeToCallingPackage(filename, _frame)
     if reload or path not in _model_cache:
         parsed_model = parser.parse(path, policy=policy)
         for schema in parsed_model.schemata.values():
@@ -27,15 +27,15 @@ def load_file(filename, reload=False, policy=u"", _frame=2):
         _model_cache[path] = parsed_model
     return _model_cache[path]
 
-def load_string(model, policy=u""):
+def loadString(model, policy=u""):
     return parser.parse(StringIO(model), policy=policy)
     
-def serialize_schema(schema, name=u""):
-    return serialize_model(model.Model({name: schema}))
+def serializeSchema(schema, name=u""):
+    return serializeModel(model.Model({name: schema}))
     
-def serialize_model(model):
+def serializeModel(model):
     return serializer.serialize(model)
 
 moduleProvides(IXMLToSchema)
 
-__all__ = ('xml_schema', 'load_file', 'load_string', 'serialize_schema', 'serialize_model',)
+__all__ = ('xmlSchema', 'loadFile', 'loadString', 'serializeSchema', 'serializeModel',)

@@ -24,14 +24,14 @@ from elementtree import ElementTree
 class DefaultSchemaPolicy(object):
     implements(ISchemaPolicy)
     
-    def module(self, schema_name, tree):
+    def module(self, schemaName, tree):
         return 'plone.supermodel.generated'
         
-    def bases(self, schema_name, tree):
+    def bases(self, schemaName, tree):
         return ()
         
-    def name(self, schema_name, tree):
-        return schema_name
+    def name(self, schemaName, tree):
+        return schemaName
 
 # Algorithm
 
@@ -47,56 +47,56 @@ def parse(source, policy=u""):
     
     policy_util = getUtility(ISchemaPolicy, name=policy)
     
-    def read_field(field_element, schema_attributes, field_elements, base_fields):
+    def readField(fieldElement, schemaAttributes, fieldElements, baseFields):
         
         # Parse field attributes
-        field_name = field_element.get('name')
-        field_type = field_element.get('type')
+        fieldName = fieldElement.get('name')
+        fieldType = fieldElement.get('type')
     
-        if field_name is None or field_type is None:
+        if fieldName is None or fieldType is None:
             raise ValueError("The attributes 'name' and 'type' are required for each <field /> element")
     
-        handler = handlers.get(field_type, None)
+        handler = handlers.get(fieldType, None)
         if handler is None:
-            handler = handlers[field_type] = queryUtility(IFieldExportImportHandler, name=field_type)
+            handler = handlers[fieldType] = queryUtility(IFieldExportImportHandler, name=fieldType)
             if handler is None:
-                raise ValueError("Field type %s specified for field %s is not supported" % (field_type, field_name,))
+                raise ValueError("Field type %s specified for field %s is not supported" % (fieldType, fieldName,))
     
-        field = handler.read(field_element)
+        field = handler.read(fieldElement)
         
         # Preserve order from base interfaces if this field is an override
         # of a field with the same name in a base interface
-        base_field = base_fields.get(field_name, None)
+        base_field = baseFields.get(fieldName, None)
         if base_field is not None:
             field.order = base_field.order
         
         # Save for the schema
-        schema_attributes[field_name] = field
-        field_elements[field_name] = field_element
+        schemaAttributes[fieldName] = field
+        fieldElements[fieldName] = fieldElement
         
-        return field_name
+        return fieldName
     
     for schema_element in root.findall(ns('schema')):
-        schema_attributes = {}
+        schemaAttributes = {}
         schema_metadata = {}
         
-        schema_name = schema_element.get('name')
-        if schema_name is None:
-            schema_name = u""
+        schemaName = schema_element.get('name')
+        if schemaName is None:
+            schemaName = u""
         
         bases = ()
-        base_fields = {}
+        baseFields = {}
         based_on = schema_element.get('based-on')
         if based_on is not None:
             bases = tuple([resolve(dotted) for dotted in based_on.split()])
             for base_schema in bases:
-                base_fields.update(getFields(base_schema))
+                baseFields.update(getFields(base_schema))
         
-        field_elements = {}
+        fieldElements = {}
         
         # Read global fields
-        for field_element in schema_element.findall(ns('field')):
-            read_field(field_element, schema_attributes, field_elements, base_fields)
+        for fieldElement in schema_element.findall(ns('field')):
+            readField(fieldElement, schemaAttributes, fieldElements, baseFields)
     
         # Read fieldsets and their fields
         fieldsets = []
@@ -105,12 +105,12 @@ def parse(source, policy=u""):
         for subelement in schema_element:
             
             if subelement.tag == ns('field'):
-                read_field(subelement, schema_attributes, field_elements, base_fields)
+                readField(subelement, schemaAttributes, fieldElements, baseFields)
             elif subelement.tag == ns('fieldset'):
                 
                 fieldset_name = subelement.get('name')
                 if fieldset_name is None:
-                    raise ValueError(u"Fieldset in schema %s has no name" % (schema_name))
+                    raise ValueError(u"Fieldset in schema %s has no name" % (schemaName))
                 
                 fieldset = fieldsets_by_name.get(fieldset_name, None)
                 if fieldset is None:
@@ -122,15 +122,15 @@ def parse(source, policy=u""):
                     fieldsets_by_name[fieldset_name] = fieldset
                     fieldsets.append(fieldset)
                 
-                for field_element in subelement.findall(ns('field')):
-                    parsed_field_name = read_field(field_element, schema_attributes, field_elements, base_fields)
-                    if parsed_field_name:
-                        fieldset.fields.append(parsed_field_name)
+                for fieldElement in subelement.findall(ns('field')):
+                    parsed_fieldName = readField(fieldElement, schemaAttributes, fieldElements, baseFields)
+                    if parsed_fieldName:
+                        fieldset.fields.append(parsed_fieldName)
     
-        schema = InterfaceClass(name=policy_util.name(schema_name, tree),
-                                bases=bases + policy_util.bases(schema_name, tree),
-                                __module__=policy_util.module(schema_name, tree),
-                                attrs=schema_attributes)
+        schema = InterfaceClass(name=policy_util.name(schemaName, tree),
+                                bases=bases + policy_util.bases(schemaName, tree),
+                                __module__=policy_util.module(schemaName, tree),
+                                attrs=schemaAttributes)
         
         schema.setTaggedValue(FIELDSETS_KEY, fieldsets)
         
@@ -138,14 +138,14 @@ def parse(source, policy=u""):
         
         # Let metadata handlers write metadata
         for handler_name, metadata_handler in field_metadata_handlers:
-            for field_name in schema:
-                if field_name in field_elements:
-                    metadata_handler.read(field_elements[field_name], schema, schema[field_name])
+            for fieldName in schema:
+                if fieldName in fieldElements:
+                    metadata_handler.read(fieldElements[fieldName], schema, schema[fieldName])
         
         for handler_name, metadata_handler in schema_metadata_handlers:
             metadata_handler.read(schema_element, schema)
 
-        model.schemata[schema_name] = schema
+        model.schemata[schemaName] = schema
     
     return model
 

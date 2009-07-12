@@ -7,16 +7,16 @@ zope.schema fields. The principal use cases are:
  1. Define a schema interface in code based on an XML file. This can be done
  with syntax like::
  
-  >>> from plone.supermodel import xml_schema
-  >>> IMySchema = xml_schema("myschema.xml")
+  >>> from plone.supermodel import xmlSchema
+  >>> IMySchema = xmlSchema("myschema.xml")
       
  2. Save and load interface definitions via an XML format. To turn a schema
  interface into XML, you can do::
  
-  >>> from plone.supermodel import serialize_schema
-  >>> xml_string = serialize_schema(IMySchema)
+  >>> from plone.supermodel import serializeSchema
+  >>> xml_string = serializeSchema(IMySchema)
 
-To get a schema from an XML file, you can use the xml_schema() function above,
+To get a schema from an XML file, you can use the xmlSchema() function above,
 or you can use the more powerful spec() function, which turns a dict of all
 schemata and widget hints in a given XML file.
 

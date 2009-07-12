@@ -9,7 +9,7 @@ from zope.schema.interfaces import IDate, IDatetime, IInterfaceField, IObject
 from zope.dottedname.resolve import resolve
 
 from plone.supermodel.interfaces import IToUnicode
-from plone.supermodel.utils import field_typecast
+from plone.supermodel.utils import fieldTypecast
 
 # Defaults
 
@@ -21,7 +21,7 @@ class DefaultFromUnicode(object):
         self.context = context
         
     def fromUnicode(self, value):
-        return field_typecast(self.context, value)
+        return fieldTypecast(self.context, value)
 
 class DefaultToUnicode(object):
     implements(IToUnicode)

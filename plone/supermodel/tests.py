@@ -45,7 +45,7 @@ dummy_vocabulary_instance = SimpleVocabulary.fromItems([(1,'a'), (2,'c')])
 
 class TestUtils(unittest.TestCase):
     
-    def test_sync_schema(self):
+    def test_syncSchema(self):
         
         class ISource(Interface):
             one = schema.TextLine(title=u"A") # order: 0
@@ -59,7 +59,7 @@ class TestUtils(unittest.TestCase):
         ISource.setTaggedValue("tag2", "tag two")
         IDest.setTaggedValue("tag1", "first tag")
         
-        utils.sync_schema(ISource, IDest)
+        utils.syncSchema(ISource, IDest)
         
         self.assertEquals(u"C", IDest['one'].title)
         
@@ -69,7 +69,7 @@ class TestUtils(unittest.TestCase):
         self.assertEquals("first tag", IDest.getTaggedValue("tag1"))
         self.assertEquals("tag two", IDest.getTaggedValue("tag2"))
     
-    def test_sync_schema_overwrite(self):
+    def test_syncSchema_overwrite(self):
         
         class ISource(Interface):
             one = schema.TextLine(title=u"A")
@@ -83,7 +83,7 @@ class TestUtils(unittest.TestCase):
         ISource.setTaggedValue("tag2", "tag two")
         IDest.setTaggedValue("tag1", "first tag")
         
-        utils.sync_schema(ISource, IDest, overwrite=True)
+        utils.syncSchema(ISource, IDest, overwrite=True)
         
         self.assertEquals(u"A", IDest['one'].title)
         
@@ -93,7 +93,7 @@ class TestUtils(unittest.TestCase):
         self.assertEquals("tag one", IDest.getTaggedValue("tag1"))
         self.assertEquals("tag two", IDest.getTaggedValue("tag2"))
     
-    def test_sync_schema_overwrite_no_bases(self):
+    def test_syncSchema_overwrite_no_bases(self):
         
         class IBase(Interface):
             base = schema.TextLine(title=u"Base")
@@ -106,12 +106,12 @@ class TestUtils(unittest.TestCase):
             one = schema.TextLine(title=u"C")
             three = schema.Int(title=u"D")
         
-        utils.sync_schema(ISource, IDest, overwrite=False, sync_bases=False)
+        utils.syncSchema(ISource, IDest, overwrite=False, sync_bases=False)
         
         self.assertEquals((Interface,), IDest.__bases__)
         self.assertEquals(['two', 'one', 'three'], getFieldNamesInOrder(IDest))
         
-    def test_sync_schema_overwrite_with_bases(self):
+    def test_syncSchema_overwrite_with_bases(self):
         
         class IBase(Interface):
             base = schema.TextLine(title=u"Base")
@@ -127,12 +127,12 @@ class TestUtils(unittest.TestCase):
             one = schema.TextLine(title=u"C")
             three = schema.Int(title=u"D")
         
-        utils.sync_schema(ISource, IDest, overwrite=True, sync_bases=True)
+        utils.syncSchema(ISource, IDest, overwrite=True, sync_bases=True)
         
         self.assertEquals((IBase,), IDest.__bases__)
         self.assertEquals(['base', 'one', 'two'], getFieldNamesInOrder(IDest))
     
-    def test_sync_schema_overwrite_with_bases_and_no_overwrite(self):
+    def test_syncSchema_overwrite_with_bases_and_no_overwrite(self):
         
         class IBase(Interface):
             base = schema.TextLine(title=u"Base")
@@ -148,12 +148,12 @@ class TestUtils(unittest.TestCase):
             one = schema.TextLine(title=u"C")
             three = schema.Int(title=u"D")
         
-        utils.sync_schema(ISource, IDest, overwrite=False, sync_bases=True)
+        utils.syncSchema(ISource, IDest, overwrite=False, sync_bases=True)
         
         self.assertEquals((IBase, IOtherBase,), IDest.__bases__)
         self.assertEquals(['base', 'foo', 'two', 'one', 'three'], getFieldNamesInOrder(IDest))
         
-    def test_sync_schema_overwrite_with_bases_and_no_overwrite_with_old_bases(self):
+    def test_syncSchema_overwrite_with_bases_and_no_overwrite_with_old_bases(self):
         
         class IBase(Interface):
             base = schema.TextLine(title=u"Base")
@@ -169,12 +169,12 @@ class TestUtils(unittest.TestCase):
             one = schema.TextLine(title=u"C")
             three = schema.Int(title=u"D")
         
-        utils.sync_schema(ISource, IDest, overwrite=False, sync_bases=True)
+        utils.syncSchema(ISource, IDest, overwrite=False, sync_bases=True)
         
         self.assertEquals((IBase, IOtherBase,), IDest.__bases__)
         self.assertEquals(['base', 'foo', 'two', 'one', 'three'], getFieldNamesInOrder(IDest))
 
-    def test_merged_tagged_value_list(self):
+    def test_mergedTaggedValueList(self):
         
         class IBase1(Interface):
             pass
@@ -189,9 +189,9 @@ class TestUtils(unittest.TestCase):
         IBase3.setTaggedValue(u"foo",  [3,4])  # least specific of the bases
         ISchema.setTaggedValue(u"foo", [4,5])  # most specific
         
-        self.assertEquals([3,4, 1,2, 4,5], utils.merged_tagged_value_list(ISchema, u"foo"))
+        self.assertEquals([3,4, 1,2, 4,5], utils.mergedTaggedValueList(ISchema, u"foo"))
 
-    def test_merged_tagged_value_dict(self):
+    def test_mergedTaggedValueDict(self):
         
         class IBase1(Interface):
             pass
@@ -206,7 +206,7 @@ class TestUtils(unittest.TestCase):
         IBase3.setTaggedValue(u"foo",  {3:3, 2:3, 4:3}) # least specific of the bases
         ISchema.setTaggedValue(u"foo", {4:4, 5:4})      # most specific
         
-        self.assertEquals({1:1, 2:1, 3:3, 4:4, 5:4}, utils.merged_tagged_value_dict(ISchema, u"foo"))
+        self.assertEquals({1:1, 2:1, 3:3, 4:4, 5:4}, utils.mergedTaggedValueDict(ISchema, u"foo"))
 
 def test_suite():
     return unittest.TestSuite((

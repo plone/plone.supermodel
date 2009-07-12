@@ -44,14 +44,14 @@ class IXMLToSchema(Interface):
     
     A file can be parsed purely for a schema. This allows syntax like:
     
-        schema = xml_schema('schema.xml')
+        schema = xmlSchema('schema.xml')
         
     If a file contains multiple schemata, you can load them all using:
     
-        model = load_file('schema.xml')
+        model = loadFile('schema.xml')
     """
     
-    def xml_schema(filename, schema=u"", policy=u""):
+    def xmlSchema(filename, schema=u"", policy=u""):
         """Given a filename relative to the current module, return an
         interface representing the schema contained in that file. If there
         are multiple <schema /> blocks, return the unnamed one, unless 
@@ -66,7 +66,7 @@ class IXMLToSchema(Interface):
         Raises an IOError if the file cannot be opened.
         """
     
-    def load_file(filename, reload=False, policy=u""):
+    def loadFile(filename, reload=False, policy=u""):
         """Return an IModel as contained in the given XML file, which is read
         relative to the current module (unless it is an absolute path).
         
@@ -76,18 +76,18 @@ class IXMLToSchema(Interface):
         ISchemaPolicy.
         """
     
-    def load_string(model, policy=u""):
+    def loadString(model, policy=u""):
         """Load a model from a string rather than a file.
         """
     
-    def serialize_schema(schema, name=u""):
+    def serializeSchema(schema, name=u""):
         """Return an XML string representing the given schema interface. This
-        is a convenience method around the serialize_model() method, below.
+        is a convenience method around the serializeModel() method, below.
         """
 
-    def serialize_model(model):
+    def serializeModel(model):
         """Return an XML string representing the given model, as returned by
-        the load_file() or load_string() method.
+        the loadFile() or loadString() method.
         """
 
 class ISchemaPolicy(Interface):
@@ -96,15 +96,15 @@ class ISchemaPolicy(Interface):
     generated schemata live, what bases they have and how they are named.
     """
 
-    def module(schema_name, tree):
+    def module(schemaName, tree):
         """Return the module name to use.
         """
         
-    def bases(schema_name, tree):
+    def bases(schemaName, tree):
         """Return the bases to use.
         """
         
-    def name(schema_name, tree):
+    def name(schemaName, tree):
         """Return the schema name to use
         """
         
@@ -118,7 +118,7 @@ class IFieldExportImportHandler(Interface):
         """Read a field from the node and return a new instance
         """
         
-    def write(field, field_name, field_type, element_name='field'):
+    def write(field, fieldName, fieldType, elementName='field'):
         """Create and return a new node representing the given field
         """
         
@@ -131,14 +131,14 @@ class ISchemaMetadataHandler(Interface):
     namespace = zope.schema.URI(title=u"XML namespace used by this handler", required=False)
     prefix = zope.schema.ASCII(title=u"Preferred XML schema namespace for serialisation", required=False)
     
-    def read(schema_node, schema):
+    def read(schemaNode, schema):
         """Called once the schema in the given <schema /> node has been
         read. schema is the schema interface that was read.
         """
 
-    def write(schema_node, schema):
+    def write(schemaNode, schema):
         """Write the metadata contained in the given schema, to the
-        schema_node. The node will already exist and be populated with
+        schemaNode. The node will already exist and be populated with
         standard data.
         """
 
@@ -151,15 +151,15 @@ class IFieldMetadataHandler(Interface):
     namespace = zope.schema.URI(title=u"XML namespace used by this handler", required=False)
     prefix = zope.schema.ASCII(title=u"Preferred XML schema namespace for serialisation", required=False)
     
-    def read(field_node, schema, field):
+    def read(fieldNode, schema, field):
         """Called once the field in the given <field /> node has been
         read. field is the field instance that was read. schema is the schema
         it is a part of.
         """
     
-    def write(field_node, schema, field):
+    def write(fieldNode, schema, field):
         """Write the metadata for the field in the given schema to the
-        field_node. The node will already exist and be populated with
+        fieldNode. The node will already exist and be populated with
         standard data.
         """
 

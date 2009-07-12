@@ -9,7 +9,7 @@ from zope.schema.interfaces import IField, IFromUnicode, IDict, ICollection
 from plone.supermodel.interfaces import XML_NAMESPACE, IToUnicode
 
 _marker = object()
-no_ns_re = re.compile('^{\S+}')
+noNS_re = re.compile('^{\S+}')
 
 def ns(name, prefix=XML_NAMESPACE):
     """Return the element or attribute name with the given prefix
@@ -17,10 +17,10 @@ def ns(name, prefix=XML_NAMESPACE):
     
     return u"{%s}%s" % (prefix, name)
 
-def no_ns(name):
+def noNS(name):
     """Return the tag with no namespace
     """
-    return no_ns_re.sub('', name)
+    return noNS_re.sub('', name)
 
 def indent(node, level=0):
     
@@ -48,11 +48,11 @@ def indent(node, level=0):
                 if not child.tail or not child.tail.strip():
                     child.tail = "\n" + node_indent
 
-def pretty_xml(tree):
+def prettyXML(tree):
     indent(tree)
     return ElementTree.tostring(tree)
 
-def field_typecast(field, value):
+def fieldTypecast(field, value):
     typecast = getattr(field, '_type', None)
     if typecast is not None:
         if not isinstance(typecast, (list, tuple)):
@@ -66,7 +66,7 @@ def field_typecast(field, value):
                     pass
     return value
 
-def element_to_value(field, element, default=_marker):
+def elementToValue(field, element, default=_marker):
     """Read the contents of an element that is assumed to represent a value
     allowable by the given field. 
     
@@ -99,7 +99,7 @@ def element_to_value(field, element, default=_marker):
                 v= value_converter.fromUnicode(unicode(value_text))
             
             value[k] = v
-        value = field_typecast(field, value)
+        value = fieldTypecast(field, value)
     
     elif ICollection.providedBy(field):
         value_converter = IFromUnicode(field.value_type)
@@ -112,7 +112,7 @@ def element_to_value(field, element, default=_marker):
                 value.append(None)
             else:
                 value.append(value_converter.fromUnicode(unicode(text)))
-        value = field_typecast(field, value)
+        value = fieldTypecast(field, value)
     
     # Unicode
     else:
@@ -125,7 +125,7 @@ def element_to_value(field, element, default=_marker):
       
     return value
     
-def value_to_element(field, value, name=None, force=False):
+def valueToElement(field, value, name=None, force=False):
     """Create and return an element that describes the given value, which is
     assumed to be valid for the given field.
     
@@ -166,15 +166,15 @@ def value_to_element(field, value, name=None, force=False):
 
     return child
 
-def relative_to_calling_package(filename, calling_frame=2):
+def relativeToCallingPackage(filename, callingFrame=2):
     """If the filename is not an absolute path, make it into an absolute path
     by calculating the relative path from the module that called the function
-    at 'calling_frame' steps down the stack.
+    at 'callingFrame' steps down the stack.
     """
     if os.path.isabs(filename):
         return filename
     else:
-        name = sys._getframe(calling_frame).f_globals['__name__']
+        name = sys._getframe(callingFrame).f_globals['__name__']
         module = sys.modules[name]
         if hasattr(module, '__path__'):
             directory = module.__path__[0]
@@ -186,7 +186,7 @@ def relative_to_calling_package(filename, calling_frame=2):
         directory = os.path.abspath(directory)
         return os.path.abspath(os.path.join(directory, filename))
 
-def sorted_fields(schema):
+def sortedFields(schema):
     """Like getFieldsInOrder, but does not include fields from bases
     """
     fields = []
@@ -197,7 +197,7 @@ def sorted_fields(schema):
     fields.sort(key=lambda item: item[1].order)
     return fields
 
-def merged_tagged_value_dict(schema, name):
+def mergedTaggedValueDict(schema, name):
     """Look up the tagged value 'name' in schema and all its bases, assuming
     that the value under 'name' is a dict. Return a dict that consists of
     all dict items, with those from more-specific interfaces overriding those
@@ -208,7 +208,7 @@ def merged_tagged_value_dict(schema, name):
         tv.update(iface.queryTaggedValue(name, {}))
     return tv
 
-def merged_tagged_value_list(schema, name):
+def mergedTaggedValueList(schema, name):
     """Look up the tagged value 'name' in schema and all its bases, assuming
     that the value under 'name' is a list. Return a list that consists of
     all elements from all interfaces and base interfaces, with values from
@@ -219,7 +219,7 @@ def merged_tagged_value_list(schema, name):
         tv.extend(iface.queryTaggedValue(name, []))
     return tv
 
-def sync_schema(source, dest, overwrite=False, sync_bases=False):
+def syncSchema(source, dest, overwrite=False, sync_bases=False):
     """Copy attributes and tagged values from the source to the destination.
     If overwrite is False, do not overwrite attributes or tagged values that
     already exist or delete ones that don't exist in source.
@@ -229,7 +229,7 @@ def sync_schema(source, dest, overwrite=False, sync_bases=False):
         to_delete = set()
     
         # Delete fields in dest, but not in source
-        for name, field in sorted_fields(dest):
+        for name, field in sortedFields(dest):
             if name not in source:
                 to_delete.add(name)
     
@@ -241,7 +241,7 @@ def sync_schema(source, dest, overwrite=False, sync_bases=False):
 
     # Add fields that are in source, but not in dest
     
-    for name, field in sorted_fields(source):
+    for name, field in sortedFields(source):
         if overwrite or name not in dest:
             
             clone = field.__class__.__new__(field.__class__)

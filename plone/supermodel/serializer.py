@@ -13,7 +13,7 @@ from plone.supermodel.interfaces import XML_NAMESPACE
 from plone.supermodel.interfaces import FIELDSETS_KEY
 from plone.supermodel.interfaces import IFieldNameExtractor
 
-from plone.supermodel.utils import sorted_fields, pretty_xml
+from plone.supermodel.utils import sortedFields, prettyXML
 
 from elementtree import ElementTree
 
@@ -63,22 +63,22 @@ def serialize(model):
             used_prefixes.add(prefix)
             ElementTree._namespace_map[namespace] = prefix
     
-    def write_field(field, parent_element):
+    def writeField(field, parentElement):
         name_extractor = IFieldNameExtractor(field)
-        field_type = name_extractor()
-        handler = handlers.get(field_type, None)
+        fieldType = name_extractor()
+        handler = handlers.get(fieldType, None)
         if handler is None:
-            handler = handlers[field_type] = queryUtility(IFieldExportImportHandler, name=field_type)
+            handler = handlers[fieldType] = queryUtility(IFieldExportImportHandler, name=fieldType)
             if handler is None:
-                raise ValueError("Field type %s specified for field %s is not supported" % (field_type, field_name,))
-        field_element = handler.write(field, field_name, field_type)
-        if field_element is not None:
-            parent_element.append(field_element)
+                raise ValueError("Field type %s specified for field %s is not supported" % (fieldType, fieldName,))
+        fieldElement = handler.write(field, fieldName, fieldType)
+        if fieldElement is not None:
+            parentElement.append(fieldElement)
             
             for handler_name, metadata_handler in field_metadata_handlers:
-                metadata_handler.write(field_element, schema, field)
+                metadata_handler.write(fieldElement, schema, field)
     
-    for schema_name, schema in model.schemata.items():
+    for schemaName, schema in model.schemata.items():
         
         fieldsets = schema.queryTaggedValue(FIELDSETS_KEY, [])
         
@@ -86,20 +86,20 @@ def serialize(model):
         for fieldset in fieldsets:
             fieldset_fields.update(fieldset.fields)
         
-        non_fieldset_fields = [name for name, field in sorted_fields(schema)
+        non_fieldset_fields = [name for name, field in sortedFields(schema)
                                 if name not in fieldset_fields]
         
         schema_element = ElementTree.Element('schema')
-        if schema_name:
-            schema_element.set('name', schema_name)
+        if schemaName:
+            schema_element.set('name', schemaName)
         
         bases = [b.__identifier__ for b in schema.__bases__]
         if bases:
             schema_element.set('based-on', ' '.join(bases))
         
-        for field_name in non_fieldset_fields:
-            field = schema[field_name]
-            write_field(field, schema_element)
+        for fieldName in non_fieldset_fields:
+            field = schema[fieldName]
+            writeField(field, schema_element)
         
         for fieldset in fieldsets:
             
@@ -110,9 +110,9 @@ def serialize(model):
             if fieldset.description:
                 fieldset_element.set('description', fieldset.description)
             
-            for field_name in fieldset.fields:
-                field = schema[field_name]
-                write_field(field, fieldset_element)
+            for fieldName in fieldset.fields:
+                field = schema[fieldName]
+                writeField(field, fieldset_element)
         
             schema_element.append(fieldset_element)
         
@@ -121,6 +121,6 @@ def serialize(model):
         
         xml.append(schema_element)
 
-    return pretty_xml(xml)
+    return prettyXML(xml)
 
 __all__ = ('serialize',)
