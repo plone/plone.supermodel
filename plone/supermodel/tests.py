@@ -1,7 +1,7 @@
 import unittest
 import zope.app.testing.placelesssetup
 
-from zope.interface import Interface, implements
+from zope.interface import Interface, implements, alsoProvides
 
 import zope.component.testing
 from zope.testing import doctest
@@ -173,7 +173,54 @@ class TestUtils(unittest.TestCase):
         
         self.assertEquals((IBase, IOtherBase,), IDest.__bases__)
         self.assertEquals(['base', 'foo', 'two', 'one', 'three'], getFieldNamesInOrder(IDest))
+    
+    def test_syncSchema_with_markers_no_overwrite(self):
+        
+        class IMarker(Interface):
+            pass
+        
+        class ISource(Interface):
+            one = schema.TextLine(title=u"A")
+            two = schema.Int(title=u"B")
+            four = schema.Text(title=u"C")
+            
+        alsoProvides(ISource['one'], IMarker)
+        alsoProvides(ISource['four'], IMarker)
+        
+        class IDest(Interface):
+            one = schema.TextLine(title=u"C")
+            three = schema.Int(title=u"D")
+        
+        utils.syncSchema(ISource, IDest)
+        
+        self.failIf(IMarker.providedBy(IDest['one']))
+        self.failIf(IMarker.providedBy(IDest['two']))
+        self.failIf(IMarker.providedBy(IDest['three']))
+        self.failUnless(IMarker.providedBy(IDest['four']))
 
+    def test_syncSchema_with_markers_overwrite(self):
+        
+        class IMarker(Interface):
+            pass
+        
+        class ISource(Interface):
+            one = schema.TextLine(title=u"A")
+            two = schema.Int(title=u"B")
+            four = schema.Text(title=u"C")
+            
+        alsoProvides(ISource['one'], IMarker)
+        alsoProvides(ISource['four'], IMarker)
+        
+        class IDest(Interface):
+            one = schema.TextLine(title=u"C")
+            three = schema.Int(title=u"D")
+        
+        utils.syncSchema(ISource, IDest, overwrite=True)
+        
+        self.failUnless(IMarker.providedBy(IDest['one']))
+        self.failIf(IMarker.providedBy(IDest['two']))
+        self.failUnless(IMarker.providedBy(IDest['four']))
+    
     def test_mergedTaggedValueList(self):
         
         class IBase1(Interface):

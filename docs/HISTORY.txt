@@ -1,6 +1,13 @@
 Changelog
 =========
 
+1.0b3 - 2009-09-28
+------------------
+
+* Add support for synchronising marker interfaces found on source fields
+  to syncSchema().
+  [optilude]
+
 1.0b2 - 2009-07-12
 ------------------
 

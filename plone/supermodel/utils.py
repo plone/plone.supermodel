@@ -4,6 +4,7 @@ import re
 
 from elementtree import ElementTree
 
+from zope.interface import directlyProvidedBy, directlyProvides
 from zope.schema.interfaces import IField, IFromUnicode, IDict, ICollection
 
 from plone.supermodel.interfaces import XML_NAMESPACE, IToUnicode
@@ -238,7 +239,7 @@ def syncSchema(source, dest, overwrite=False, sync_bases=False):
             del dest._InterfaceClass__attrs[name]
             if hasattr(dest, '_v_attrs'):
                 del dest._v_attrs[name]
-
+    
     # Add fields that are in source, but not in dest
     
     for name, field in sortedFields(source):
@@ -249,10 +250,15 @@ def syncSchema(source, dest, overwrite=False, sync_bases=False):
             clone.interface = dest
             clone.__name__ = name
             
+            # copy any marker interfaces
+            directlyProvides(clone, *directlyProvidedBy(field))
+            
             # setattr(dest, name, clone)
             dest._InterfaceClass__attrs[name] = clone
             if hasattr(dest, '_v_attrs'):
                 dest._v_attrs[name] = clone
+            
+            
 
     # Copy tagged values
     
@@ -270,3 +276,4 @@ def syncSchema(source, dest, overwrite=False, sync_bases=False):
                 if base not in bases:
                     bases.append(base)
         dest.__bases__ = tuple(bases)
+    
