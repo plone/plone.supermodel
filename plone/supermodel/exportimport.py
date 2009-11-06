@@ -217,7 +217,7 @@ class ChoiceHandler(BaseHandler):
     """
     
     filteredAttributes = BaseHandler.filteredAttributes.copy()
-    filteredAttributes.update({'vocabulary': 'w', 'values': 'w', 'source': 'w'})
+    filteredAttributes.update({'vocabulary': 'w', 'values': 'w', 'source': 'w', 'vocabularyName': 'rw'})
     
     def __init__(self, klass):
         super(ChoiceHandler, self).__init__(klass)

@@ -1,6 +1,15 @@
 Changelog
 =========
 
+1.0b4 -
+------------------
+
+* Ignored vocabularyName property when writing Choice fields. The constructor
+  still uses they 'vocabulary' key in an overloaded capacity. We only support
+  'vocabulary' with a named vocabulary, or 'values' with a list of values.
+  This fixes test failures on Zope 2.12 / zope.schema 3.5.4.
+  [optilude]
+
 1.0b3 - 2009-09-28
 ------------------
 
