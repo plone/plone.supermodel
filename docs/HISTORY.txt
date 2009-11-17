@@ -1,7 +1,7 @@
 Changelog
 =========
 
-1.0b4 -
+1.0b4 - 2009-11-17
 ------------------
 
 * Ignored vocabularyName property when writing Choice fields. The constructor
