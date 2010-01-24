@@ -12,6 +12,7 @@ TextLineHandler = plone.supermodel.exportimport.BaseHandler(zope.schema.TextLine
 BoolHandler = plone.supermodel.exportimport.BaseHandler(zope.schema.Bool)
 IntHandler = plone.supermodel.exportimport.BaseHandler(zope.schema.Int)
 FloatHandler = plone.supermodel.exportimport.BaseHandler(zope.schema.Float)
+DecimalHandler = plone.supermodel.exportimport.BaseHandler(zope.schema.Decimal)
 TupleHandler = plone.supermodel.exportimport.BaseHandler(zope.schema.Tuple)
 ListHandler = plone.supermodel.exportimport.BaseHandler(zope.schema.List)
 SetHandler = plone.supermodel.exportimport.BaseHandler(zope.schema.Set)

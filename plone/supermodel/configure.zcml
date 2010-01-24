@@ -56,6 +56,10 @@
         name="zope.schema.Float"
         />
     <utility
+        component=".fields.DecimalHandler"
+        name="zope.schema.Decimal"
+        />
+    <utility
         component=".fields.TupleHandler"
         name="zope.schema.Tuple"
         />

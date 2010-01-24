@@ -664,6 +664,51 @@ Float
     >>> reciprocal.max
     99.5
 
+Decimal
+-------
+    
+    >>> import decimal
+    >>> field = schema.Decimal(__name__=u"dummy", title=u"Test", 
+    ...     description=u"Test desc", required=False, readonly=True,
+    ...     default=decimal.Decimal("12.1"), missing_value=decimal.Decimal("-1.0"),
+    ...     min=decimal.Decimal("1.123"), max=decimal.Decimal("99.5"))
+    >>> fieldType = IFieldNameExtractor(field)()
+    >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
+    >>> element = handler.write(field, u'dummy', fieldType)
+    >>> print prettyXML(element)
+    <field name="dummy" type="zope.schema.Decimal">
+      <default>12.1</default>
+      <description>Test desc</description>
+      <max>99.5</max>
+      <min>1.123</min>
+      <missing_value>-1.0</missing_value>
+      <readonly>True</readonly>
+      <required>False</required>
+      <title>Test</title>
+    </field>
+    
+    >>> reciprocal = handler.read(element)
+    >>> reciprocal.__class__
+    <class 'zope.schema._field.Decimal'>
+    >>> reciprocal.__name__
+    u'dummy'
+    >>> reciprocal.title
+    u'Test'
+    >>> reciprocal.description
+    u'Test desc'
+    >>> reciprocal.required
+    False
+    >>> reciprocal.readonly
+    True
+    >>> reciprocal.default
+    Decimal('12.1')
+    >>> reciprocal.missing_value
+    Decimal('-1.0')
+    >>> reciprocal.min
+    Decimal('1.123')
+    >>> reciprocal.max
+    Decimal('99.5')
+
 Date
 ----
 
