@@ -700,14 +700,14 @@ Decimal
     False
     >>> reciprocal.readonly
     True
-    >>> reciprocal.default
-    Decimal('12.1')
-    >>> reciprocal.missing_value
-    Decimal('-1.0')
-    >>> reciprocal.min
-    Decimal('1.123')
-    >>> reciprocal.max
-    Decimal('99.5')
+    >>> reciprocal.default == decimal.Decimal('12.1')
+    True
+    >>> reciprocal.missing_value == decimal.Decimal('-1.0')
+    True
+    >>> reciprocal.min == decimal.Decimal('1.123')
+    True
+    >>> reciprocal.max == decimal.Decimal('99.5')
+    True
 
 Date
 ----
