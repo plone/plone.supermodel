@@ -84,7 +84,7 @@ def elementToValue(field, element, default=_marker):
         
         value = {}
         for child in element:
-            if child.tag.lower() != 'element':
+            if noNS(child.tag.lower()) != 'element':
                 continue
             
             key_text = child.attrib.get('key', None)
@@ -106,7 +106,7 @@ def elementToValue(field, element, default=_marker):
         value_converter = IFromUnicode(field.value_type)
         value = []
         for child in element:
-            if child.tag.lower() != 'element':
+            if noNS(child.tag.lower()) != 'element':
                 continue
             text = child.text
             if text is None:

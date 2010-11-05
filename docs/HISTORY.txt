@@ -4,6 +4,9 @@ Changelog
 1.0b6 - unreleased
 ------------------
 
+* Fix namespace bug which could prevent loading Dict and Collection elements.
+  [davisagli]
+
 1.0b5 - 2010-04-19
 ------------------
 

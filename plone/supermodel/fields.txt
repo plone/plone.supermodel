@@ -1279,6 +1279,16 @@ a unicode string when importing.
     >>> reciprocal.vocabularyName is None
     True
 
+There was a bug when the XML namespace was specified explicitly; let's make
+sure it hasn't regressed.
+
+    >>> from plone.supermodel.interfaces import XML_NAMESPACE
+    >>> element.set('xmlns', XML_NAMESPACE)
+    >>> element = ElementTree.parse(StringIO(prettyXML(element))).getroot()
+    >>> reciprocal = handler.read(element)
+    >>> [t.value for t in reciprocal.vocabulary]
+    [u'a', u'b', u'c']
+
 3. Sources and source binders
 
 We cannot export choice fields with a source or context source binder:
