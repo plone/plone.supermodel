@@ -3,6 +3,8 @@ Changelog
 
 1.0b6 - unreleased
 ------------------
+* Declare zope.app.testing as a test dependency for Zope 2.13 compatibility.
+  [esteele]
 
 * Fix namespace bug which could prevent loading Dict and Collection elements.
   [davisagli]

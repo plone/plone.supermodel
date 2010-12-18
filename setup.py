@@ -33,6 +33,9 @@ setup(name='plone.supermodel',
           'elementtree',
           # -*- Extra requirements: -*-
       ],
+      extras_require = {
+        'test': ['zope.app.testing']
+      },
       entry_points="""
       # -*- Entry points: -*-
       """,
