@@ -1,7 +1,7 @@
 Changelog
 =========
 
-1.0b6 - unreleased
+1.0b6 - 2011-01-04
 ------------------
 * Declare zope.app.testing as a test dependency for Zope 2.13 compatibility.
   [esteele]
