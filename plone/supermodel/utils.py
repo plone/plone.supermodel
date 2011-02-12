@@ -84,7 +84,7 @@ def elementToValue(field, element, default=_marker):
         
         value = {}
         for child in element:
-            if noNS(child.tag.lower()) != 'element':
+            if child.tag.lower() != 'element':
                 continue
             
             key_text = child.attrib.get('key', None)
@@ -93,9 +93,15 @@ def elementToValue(field, element, default=_marker):
             else:
                 k = key_converter.fromUnicode(unicode(key_text))
             
-            value_text = child.text
+            if child.getchildren() and IDict.providedBy(field.value_type):
+                value_text = elementToValue(field.value_type, child, default=default)
+            else:
+                value_text = child.text
+                
             if value_text is None:
                 v = None
+            elif isinstance(value_text,dict):
+                v = value_text
             else:
                 v= value_converter.fromUnicode(unicode(value_text))
             
@@ -106,7 +112,7 @@ def elementToValue(field, element, default=_marker):
         value_converter = IFromUnicode(field.value_type)
         value = []
         for child in element:
-            if noNS(child.tag.lower()) != 'element':
+            if child.tag.lower() != 'element':
                 continue
             text = child.text
             if text is None:
