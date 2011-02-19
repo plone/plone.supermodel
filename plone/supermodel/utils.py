@@ -80,9 +80,8 @@ def elementToValue(field, element, default=_marker):
     
     if IDict.providedBy(field):
         key_converter = IFromUnicode(field.key_type)
-        value_converter = None
-        if IFromUnicode.providedBy(field.value_type):
-            value_converter = IFromUnicode(field.value_type)
+        value_converter = IFromUnicode(field.value_type, None) 
+        #value_converter = IFromUnicode(field.value_type)
         
         value = {}
         for child in element:
