@@ -256,7 +256,7 @@ class TestUtils(unittest.TestCase):
         
         self.assertEquals({1:1, 2:1, 3:3, 4:4, 5:4}, utils.mergedTaggedValueDict(ISchema, u"foo"))
         
-    def test_elementToValue_nestedDict(self):
+    def test_elementToValue_nested_dict(self):
     
         field = schema.Dict(
             title=u'Nested dict field',
@@ -284,6 +284,102 @@ class TestUtils(unittest.TestCase):
         expected_value = {
             u'key1' : { u'foo' : u'foo value', u'boo' : u'boo value' },
             u'key2' : { u'baz' : u'baz value', u'xyz' : u'xyz value' },
+        }
+        result = utils.elementToValue(field,element)
+        self.assertEquals(result,expected_value)
+        
+    def test_elementToValue_nested_list(self):
+    
+        field = schema.List(
+            title=u'Nested List field',
+            value_type = schema.List(
+                title=u'Another list',
+                value_type = schema.TextLine(title=u'A string value'),
+            ),
+        )
+        
+        xml_string = """
+        <value>
+            <element>
+                <element>foo</element>
+                <element>baz</element>
+                <element>boo</element>
+            </element>
+            <element>
+                <element>foo1</element>
+                <element>baz1</element>
+                <element>boo1</element>
+            </element>
+        </value>
+        """
+        element = ET.fromstring(xml_string)
+        expected_value = [
+            [u'foo',u'baz',u'boo'],
+            [u'foo1',u'baz1',u'boo1'],
+        ]
+        result = utils.elementToValue(field,element)
+        self.assertEquals(result,expected_value)
+    
+    def test_elementToValue_list_of_dict(self):
+    
+        field = schema.List(
+            title=u'Nested List field',
+            value_type = schema.Dict(
+                title=u'A dict',
+                key_type = schema.TextLine(title=u'A string key'),
+                value_type = schema.TextLine(title=u'A string value'),
+            ),
+        )
+        
+        xml_string = """
+        <value>
+            <element>
+                <element key="foo">foo value</element>
+                <element key="boo">boo value</element>
+            </element>
+            <element>
+                <element key="foo1">foo1 value</element>
+                <element key="boo1">boo1 value</element>
+            </element>
+        </value>
+        """
+        element = ET.fromstring(xml_string)
+        expected_value = [
+            { u'foo' : u'foo value', u'boo' : u'boo value' },
+            { u'foo1' : u'foo1 value', u'boo1' : u'boo1 value' },
+        ]
+        result = utils.elementToValue(field,element)
+        self.assertEquals(result,expected_value)
+        
+    def test_elementToValue_list_into_dict(self):
+    
+        field = schema.Dict(
+            title=u'A dict containg lists',
+            key_type = schema.TextLine(title=u'A string key'),
+            value_type = schema.List(
+                title=u'A list',
+                value_type = schema.TextLine(title=u'A string value'),
+            ),
+        )
+        
+        xml_string = """
+        <value>
+            <element key="key1">
+                <element>foo1</element>
+                <element>boo1</element>
+                <element>baz1</element>
+            </element>
+            <element key="key2">
+                <element>foo2</element>
+                <element>boo2</element>
+                <element>baz2</element>
+            </element>
+        </value>
+        """
+        element = ET.fromstring(xml_string)
+        expected_value = {
+            u'key1' : [ u'foo1', u'boo1', u'baz1' ],
+            u'key2' : [ u'foo2', u'boo2', u'baz2' ],
         }
         result = utils.elementToValue(field,element)
         self.assertEquals(result,expected_value)

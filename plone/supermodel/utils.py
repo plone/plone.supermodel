@@ -81,7 +81,6 @@ def elementToValue(field, element, default=_marker):
     if IDict.providedBy(field):
         key_converter = IFromUnicode(field.key_type)
         value_converter = IFromUnicode(field.value_type, None) 
-        #value_converter = IFromUnicode(field.value_type)
         
         value = {}
         for child in element:
@@ -94,33 +93,33 @@ def elementToValue(field, element, default=_marker):
             else:
                 k = key_converter.fromUnicode(unicode(key_text))
             
-            if child.getchildren() and IDict.providedBy(field.value_type):
-                value_text = elementToValue(field.value_type, child, default=default)
+            if child.getchildren():
+                v = elementToValue(field.value_type, child, default=default)
             else:
-                value_text = child.text
+                v = child.text
                 
-            if value_text is None:
-                v = None
-            elif isinstance(value_text,dict):
-                v = value_text
-            else:
-                if value_converter is not None:
-                    v= value_converter.fromUnicode(unicode(value_text))
-            
+            if v is not None and value_converter is not None:
+                v= value_converter.fromUnicode(unicode(v))
             value[k] = v
+            
         value = fieldTypecast(field, value)
     
     elif ICollection.providedBy(field):
-        value_converter = IFromUnicode(field.value_type)
+        value_converter = IFromUnicode(field.value_type, None)
         value = []
         for child in element:
             if noNS(child.tag.lower()) != 'element':
                 continue
-            text = child.text
-            if text is None:
-                value.append(None)
+
+            if child.getchildren():
+                v = elementToValue(field.value_type, child, default=default)
             else:
-                value.append(value_converter.fromUnicode(unicode(text)))
+                v = child.text
+            
+            if v is not None and value_converter is not None:
+                v = value_converter.fromUnicode(unicode(v))
+            value.append(v)
+            
         value = fieldTypecast(field, value)
     
     # Unicode
