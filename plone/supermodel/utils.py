@@ -80,7 +80,9 @@ def elementToValue(field, element, default=_marker):
     
     if IDict.providedBy(field):
         key_converter = IFromUnicode(field.key_type)
-        value_converter = IFromUnicode(field.value_type)
+        value_converter = None
+        if IFromUnicode.providedBy(field.value_type):
+            value_converter = IFromUnicode(field.value_type)
         
         value = {}
         for child in element:
@@ -103,7 +105,8 @@ def elementToValue(field, element, default=_marker):
             elif isinstance(value_text,dict):
                 v = value_text
             else:
-                v= value_converter.fromUnicode(unicode(value_text))
+                if value_converter is not None:
+                    v= value_converter.fromUnicode(unicode(value_text))
             
             value[k] = v
         value = fieldTypecast(field, value)

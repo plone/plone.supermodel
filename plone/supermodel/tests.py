@@ -1,3 +1,4 @@
+from elementtree import ElementTree as ET
 import unittest
 import zope.app.testing.placelesssetup
 
@@ -254,6 +255,38 @@ class TestUtils(unittest.TestCase):
         ISchema.setTaggedValue(u"foo", {4:4, 5:4})      # most specific
         
         self.assertEquals({1:1, 2:1, 3:3, 4:4, 5:4}, utils.mergedTaggedValueDict(ISchema, u"foo"))
+        
+    def test_elementToValue_nestedDict(self):
+    
+        field = schema.Dict(
+            title=u'Nested dict field',
+            key_type = schema.TextLine(title=u'A string key'),
+            value_type = schema.Dict(
+                title=u'Another dict',
+                key_type = schema.TextLine(title=u'A string key'),
+                value_type = schema.TextLine(title=u'A string value'),
+            ),
+        )
+        
+        xml_string = """
+        <value>
+            <element key="key1">
+                <element key="foo">foo value</element>
+                <element key="boo">boo value</element>
+            </element>
+            <element key="key2">
+                <element key="baz">baz value</element>
+                <element key="xyz">xyz value</element>
+            </element>
+        </value>
+        """
+        element = ET.fromstring(xml_string)
+        expected_value = {
+            u'key1' : { u'foo' : u'foo value', u'boo' : u'boo value' },
+            u'key2' : { u'baz' : u'baz value', u'xyz' : u'xyz value' },
+        }
+        result = utils.elementToValue(field,element)
+        self.assertEquals(result,expected_value)
 
 def test_suite():
     return unittest.TestSuite((
