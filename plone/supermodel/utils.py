@@ -79,9 +79,7 @@ def elementToValue(field, element, default=_marker):
     value = default
     
     if IDict.providedBy(field):
-        key_converter = IFromUnicode(field.key_type)
-        value_converter = IFromUnicode(field.value_type)
-        
+        key_converter = IFromUnicode(field.key_type)        
         value = {}
         for child in element:
             if noNS(child.tag.lower()) != 'element':
@@ -93,26 +91,16 @@ def elementToValue(field, element, default=_marker):
             else:
                 k = key_converter.fromUnicode(unicode(key_text))
             
-            value_text = child.text
-            if value_text is None:
-                v = None
-            else:
-                v= value_converter.fromUnicode(unicode(value_text))
-            
-            value[k] = v
+            value[k] = elementToValue(field.value_type, child)
         value = fieldTypecast(field, value)
     
     elif ICollection.providedBy(field):
-        value_converter = IFromUnicode(field.value_type)
         value = []
         for child in element:
             if noNS(child.tag.lower()) != 'element':
                 continue
-            text = child.text
-            if text is None:
-                value.append(None)
-            else:
-                value.append(value_converter.fromUnicode(unicode(text)))
+            v = elementToValue(field.value_type, child)
+            value.append(v)
         value = fieldTypecast(field, value)
     
     # Unicode
@@ -149,16 +137,14 @@ def valueToElement(field, value, name=None, force=False):
             value_converter = IToUnicode(field.value_type)
 
             for k, v in value.items():
-                list_element = ElementTree.Element('element')
+                list_element = valueToElement(field.value_type, v, 'element', force)
                 list_element.attrib['key'] = key_converter.toUnicode(k)
-                list_element.text = value_converter.toUnicode(v)
                 child.append(list_element)
 
         elif ICollection.providedBy(field):
             value_converter = IToUnicode(field.value_type)
             for v in value:
-                list_element = ElementTree.Element('element')
-                list_element.text = value_converter.toUnicode(v)
+                list_element = valueToElement(field.value_type, v, 'element', force)
                 child.append(list_element)
 
         else:

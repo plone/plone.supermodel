@@ -4,6 +4,9 @@ Changelog
 1.0b7 - Unreleased
 ------------------
 
+* Support serialization of nested dicts/lists.
+  [elro]
+
 1.0b6 - 2011-01-04
 ------------------
 
