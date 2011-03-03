@@ -134,15 +134,12 @@ def valueToElement(field, value, name=None, force=False):
 
         if IDict.providedBy(field):
             key_converter = IToUnicode(field.key_type)
-            value_converter = IToUnicode(field.value_type)
-
             for k, v in value.items():
                 list_element = valueToElement(field.value_type, v, 'element', force)
                 list_element.attrib['key'] = key_converter.toUnicode(k)
                 child.append(list_element)
 
         elif ICollection.providedBy(field):
-            value_converter = IToUnicode(field.value_type)
             for v in value:
                 list_element = valueToElement(field.value_type, v, 'element', force)
                 child.append(list_element)

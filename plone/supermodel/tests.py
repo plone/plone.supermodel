@@ -1,3 +1,5 @@
+from cStringIO import StringIO 
+from elementtree import ElementTree as etree
 import unittest
 import zope.app.testing.placelesssetup
 
@@ -255,9 +257,97 @@ class TestUtils(unittest.TestCase):
         
         self.assertEquals({1:1, 2:1, 3:3, 4:4, 5:4}, utils.mergedTaggedValueDict(ISchema, u"foo"))
 
+
+class TestValueToElement(unittest.TestCase):
+    
+    def setUp(self):
+        zope.app.testing.placelesssetup.setUp()
+        configuration = """\
+        <configure
+             xmlns="http://namespaces.zope.org/zope"
+             i18n_domain="plone.supermodel.tests">
+             
+            <include package="zope.component" file="meta.zcml" />
+            <include package="zope.app.component" file="meta.zcml" />
+            
+            <include package="plone.supermodel" />
+            
+        </configure>
+        """        
+        from zope.configuration import xmlconfig
+        xmlconfig.xmlconfig(StringIO(configuration))
+        
+        
+    tearDown = zope.app.testing.placelesssetup.tearDown
+    
+    def _assertSerialized(self, field, value, expected):
+        element = utils.valueToElement(field, value, 'value')
+        sio = StringIO()
+        etree.ElementTree(element).write(sio)
+        self.assertEquals(sio.getvalue(), expected)
+        unserialized = utils.elementToValue(field, element)
+        self.assertEquals(value, unserialized)
+
+    def test_lists(self):
+        field = schema.List(value_type=schema.Int())
+        value = []
+        self._assertSerialized(field, value, '<value />')
+        value = [1, 2]
+        self._assertSerialized(field, value,
+            '<value>'
+            '<element>1</element>'
+            '<element>2</element>'
+            '</value>'
+            )
+    
+    def test_nested_lists(self):
+        field = schema.List(value_type=schema.List(value_type=schema.Int()))
+        value = []
+        self._assertSerialized(field, value, '<value />')
+        value = [[1],[1, 2],[]]
+        self._assertSerialized(field, value,
+            '<value>'
+            '<element><element>1</element></element>'
+            '<element><element>1</element><element>2</element></element>'
+            '<element />'
+            '</value>'
+            )
+
+    def test_dicts(self):
+        field = schema.Dict(key_type=schema.Int(), value_type=schema.TextLine())
+        value = {}
+        self._assertSerialized(field, value, '<value />')
+        value = {1: 'one', 2: 'two'}
+        self._assertSerialized(field, value,
+            '<value>'
+            '<element key="1">one</element>'
+            '<element key="2">two</element>'
+            '</value>'
+            )
+    
+    def test_nested_dicts(self):
+        field = schema.Dict(key_type=schema.Int(),
+            value_type=schema.Dict(
+                key_type=schema.Int(),
+                value_type=schema.TextLine(),
+                ),
+            )
+        value = {}
+        self._assertSerialized(field, value, '<value />')
+        value = {1: {2:'two'}, 3: {4:'four', 5:'five'}, 6: {}}
+        self._assertSerialized(field, value,
+            '<value>'
+            '<element key="1"><element key="2">two</element></element>'
+            '<element key="3"><element key="4">four</element><element key="5">five</element></element>'
+            '<element key="6" />'
+            '</value>'
+            )
+
+
 def test_suite():
     return unittest.TestSuite((
         unittest.makeSuite(TestUtils),
+        unittest.makeSuite(TestValueToElement),
         doctest.DocFileSuite('schema.txt',
             setUp=zope.app.testing.placelesssetup.setUp,
             tearDown=zope.app.testing.placelesssetup.tearDown),
