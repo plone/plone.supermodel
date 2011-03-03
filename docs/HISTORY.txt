@@ -1,7 +1,7 @@
 Changelog
 =========
 
-1.0b7 - Unreleased
+1.0b7 - 2011-03-03
 ------------------
 
 * Support serialization of nested dicts/lists.
