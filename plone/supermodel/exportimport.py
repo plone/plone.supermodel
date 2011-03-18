@@ -91,7 +91,7 @@ class BaseHandler(object):
         
         name = element.get('name')
         if name is not None:
-            name = unicode(name)
+            name = str(name)
             attributes['__name__'] = name
         
         field_instance = self.klass(**attributes)
