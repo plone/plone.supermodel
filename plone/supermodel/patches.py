@@ -3,10 +3,11 @@ import zope.schema.interfaces
 
 import zope.schema
 
+
 class IDottedName(zope.interface.Interface):
     """A dotted name identifier.
     """
-    
+
     min_dots = zope.schema.Int(title=u"Minimum number of dots", min=0, required=False)
     max_dots = zope.schema.Int(title=u"Maximum number of dots", min=0, required=False)
 
