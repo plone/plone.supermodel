@@ -1,66 +1,76 @@
 Changelog
 =========
 
+
 1.0b8 - 2011-03-18
 ------------------
 
-* Field names should be strings, not unicode.
+- Add MANIFEST.in.
+  [WouterVH]
+
+- Field names should be strings, not unicode.
   [elro]
+
 
 1.0b7 - 2011-03-03
 ------------------
 
-* Support serialization of nested dicts/lists.
+- Support serialization of nested dicts/lists.
   [elro]
+
 
 1.0b6 - 2011-01-04
 ------------------
 
-* Declare zope.app.testing as a test dependency for Zope 2.13 compatibility.
+- Declare zope.app.testing as a test dependency for Zope 2.13 compatibility.
   [esteele]
 
-* Fix namespace bug which could prevent loading Dict and Collection elements.
+- Fix namespace bug which could prevent loading Dict and Collection elements.
   [davisagli]
+
 
 1.0b5 - 2010-04-19
 ------------------
 
-* Added support for zope.schema.Decimal fields.
+- Added support for zope.schema.Decimal fields.
   [optilude]
+
 
 1.0b4 - 2009-11-17
 ------------------
 
-* Ignored vocabularyName property when writing Choice fields. The constructor
+- Ignored vocabularyName property when writing Choice fields. The constructor
   still uses they 'vocabulary' key in an overloaded capacity. We only support
   'vocabulary' with a named vocabulary, or 'values' with a list of values.
   This fixes test failures on Zope 2.12 / zope.schema 3.5.4.
   [optilude]
 
+
 1.0b3 - 2009-09-28
 ------------------
 
-* Add support for synchronising marker interfaces found on source fields
+- Add support for synchronising marker interfaces found on source fields
   to syncSchema().
   [optilude]
+
 
 1.0b2 - 2009-07-12
 ------------------
 
-* Changed API methods and arguments to mixedCase to be more consistent with
+- Changed API methods and arguments to mixedCase to be more consistent with
   the rest of Zope. This is a non-backwards-compatible change. Our profuse
   apologies, but it's now or never. :-/
-  
+
   If you find that you get import errors or unknown keyword arguments in your
   code, please change names from foo_bar too fooBar, e.g. load_file() becomes
   loadFile().
   [optilude]
 
-* No longer include name kwarg to Field constructor if no name was set
+- No longer include name kwarg to Field constructor if no name was set
   [MatthewWilkes]
+
 
 1.0b1 - 2009-04-17
 ------------------
 
-* Initial release
-
+- Initial release
