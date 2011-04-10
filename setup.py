@@ -1,13 +1,23 @@
-from setuptools import setup, find_packages
 import os
+from setuptools import setup, find_packages
+
+
+def read(*rnames):
+    return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
 
 version = '1.0b8'
+
+long_description = (
+    read('README.txt')
+    + '\n' +
+    read('CHANGES.txt')
+    + '\n'
+    )
 
 setup(name='plone.supermodel',
       version=version,
       description="Integration layer making it possible to load schema definitions from XML",
-      long_description=open("README.txt").read() + "\n" +
-                       open(os.path.join("docs", "HISTORY.txt")).read(),
+      long_description=long_description,
       # Get more strings from http://www.python.org/pypi?%3Aaction=list_classifiers
       classifiers=[
         "Framework :: Plone",
