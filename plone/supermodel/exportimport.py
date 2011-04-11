@@ -7,6 +7,7 @@ import zope.schema
 
 from zope.schema.interfaces import IField
 from zope.schema.interfaces import IVocabularyTokenized
+from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
 
 from plone.supermodel.interfaces import IFieldNameExtractor
 from plone.supermodel.interfaces import IFieldExportImportHandler
@@ -54,6 +55,9 @@ class BaseHandler(object):
         for schema in implementedBy(self.klass).flattened():
             self.fieldAttributes.update(zope.schema.getFields(schema))
 
+    def _constructField(self, attributes):
+        return self.klass(**attributes)
+
     def read(self, element):
         """Read a field from the element and return a new instance
         """
@@ -96,7 +100,7 @@ class BaseHandler(object):
             name = str(name)
             attributes['__name__'] = name
 
-        field_instance = self.klass(**attributes)
+        field_instance = self._constructField(attributes)
 
         # some fields can't validate fully until they're finished setting up
         field_instance._init_field = True
@@ -241,6 +245,17 @@ class ChoiceHandler(BaseHandler):
         self.fieldAttributes['source'] = \
             zope.schema.Object(__name__='source', title=u"Source", schema=Interface)
 
+    def _constructField(self, attributes):
+        if 'values' in attributes:
+            terms = []
+            for value in attributes.pop('values'):
+                term = SimpleTerm(token = value.encode('utf8'),
+                                  value = value,
+                                  title = value)
+                terms.append(term)
+            attributes['vocabulary'] = SimpleVocabulary(terms)
+        return super(ChoiceHandler, self)._constructField(attributes)
+
     def write(self, field, name, type, elementName='field'):
 
         element = super(ChoiceHandler, self).write(field, name, type, elementName)
@@ -257,7 +272,7 @@ class ChoiceHandler(BaseHandler):
         elif field.vocabularyName is None and IVocabularyTokenized.providedBy(field.vocabulary):
             value = []
             for term in field.vocabulary:
-                if not isinstance(term.value, (str, unicode), ) or term.token != str(term.value):
+                if not isinstance(term.value, (str, unicode), ) or term.token != term.value.encode('utf8'):
                     raise NotImplementedError(u"Cannot export a vocabulary that is not "
                                                "based on a simple list of values")
                 value.append(term.value)

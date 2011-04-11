@@ -1289,6 +1289,39 @@ sure it hasn't regressed.
     >>> [t.value for t in reciprocal.vocabulary]
     [u'a', u'b', u'c']
 
+Also, make sure we can handle terms with unicode values (as long as their
+tokens are the utf8-encoded values).
+
+    >>> from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
+    >>> vocab = SimpleVocabulary([
+    ...     SimpleTerm(token='a', value=u'a', title=u'a'),
+    ...     SimpleTerm(token='\xc3\xa7', value=u'\xe7', title=u'\xe7'), # c with cedilla
+    ...     ])
+    >>> field = schema.Choice(__name__="dummy", title=u"Test", 
+    ...     description=u"Test desc", required=False, readonly=True,
+    ...     default='a', missing_value='', vocabulary=vocab)
+
+    >>> fieldType = IFieldNameExtractor(field)()
+    >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
+    >>> element = handler.write(field, 'dummy', fieldType)
+    >>> print prettyXML(element)
+    <field name="dummy" type="zope.schema.Choice">
+      <default>a</default>
+      <description>Test desc</description>
+      <missing_value />
+      <readonly>True</readonly>
+      <required>False</required>
+      <title>Test</title>
+      <values>
+        <element>a</element>
+        <element>&#231;</element>
+      </values>
+    </field>
+
+    >>> reciprocal = handler.read(element)
+    >>> [t.value for t in reciprocal.vocabulary]
+    [u'a', u'\xe7']
+
 3. Sources and source binders
 
 We cannot export choice fields with a source or context source binder:
