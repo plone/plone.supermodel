@@ -1295,7 +1295,7 @@ tokens are the utf8-encoded values).
     >>> from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
     >>> vocab = SimpleVocabulary([
     ...     SimpleTerm(token='a', value=u'a', title=u'a'),
-    ...     SimpleTerm(token='\xc3\xa7', value=u'\xe7', title=u'\xe7'), # c with cedilla
+    ...     SimpleTerm(token=r'\xe7', value=u'\xe7', title=u'\xe7'), # c with cedilla
     ...     ])
     >>> field = schema.Choice(__name__="dummy", title=u"Test", 
     ...     description=u"Test desc", required=False, readonly=True,

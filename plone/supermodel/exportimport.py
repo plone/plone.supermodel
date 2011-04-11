@@ -249,7 +249,7 @@ class ChoiceHandler(BaseHandler):
         if 'values' in attributes:
             terms = []
             for value in attributes.pop('values'):
-                term = SimpleTerm(token = value.encode('utf8'),
+                term = SimpleTerm(token = value.encode('unicode_escape'),
                                   value = value,
                                   title = value)
                 terms.append(term)
@@ -272,7 +272,8 @@ class ChoiceHandler(BaseHandler):
         elif field.vocabularyName is None and IVocabularyTokenized.providedBy(field.vocabulary):
             value = []
             for term in field.vocabulary:
-                if not isinstance(term.value, (str, unicode), ) or term.token != term.value.encode('utf8'):
+                if (not isinstance(term.value, (str, unicode), )
+                    or term.token != term.value.encode('unicode_escape')):
                     raise NotImplementedError(u"Cannot export a vocabulary that is not "
                                                "based on a simple list of values")
                 value.append(term.value)
