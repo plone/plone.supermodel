@@ -1,5 +1,4 @@
 from zope.interface import implements
-from zope.interface.interface import InterfaceClass
 from zope.component import getUtility, queryUtility, getUtilitiesFor
 
 from zope.schema import getFields
@@ -14,7 +13,7 @@ from plone.supermodel.interfaces import IFieldMetadataHandler
 
 from plone.supermodel.utils import ns
 
-from plone.supermodel.model import Model, Fieldset
+from plone.supermodel.model import Model, Fieldset, SchemaClass
 from plone.supermodel.interfaces import FIELDSETS_KEY
 
 from elementtree import ElementTree
@@ -129,7 +128,7 @@ def parse(source, policy=u""):
                     if parsed_fieldName:
                         fieldset.fields.append(parsed_fieldName)
 
-        schema = InterfaceClass(name=policy_util.name(schemaName, tree),
+        schema = SchemaClass(name=policy_util.name(schemaName, tree),
                                 bases=bases + policy_util.bases(schemaName, tree),
                                 __module__=policy_util.module(schemaName, tree),
                                 attrs=schemaAttributes)

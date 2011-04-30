@@ -4,6 +4,8 @@ Changelog
 1.0.2 - unreleased
 ------------------
 
+- Add model.Schema and directives to avoid grok dependency.
+  [elro]
 
 1.0.1 - 2011-04-30
 ------------------

@@ -367,6 +367,9 @@ def test_suite():
         doctest.DocFileSuite('fields.txt',
             setUp=zope.app.testing.placelesssetup.setUp,
             tearDown=zope.app.testing.placelesssetup.tearDown),
+        doctest.DocFileSuite('directives.txt',
+            setUp=zope.app.testing.placelesssetup.setUp,
+            tearDown=zope.app.testing.placelesssetup.tearDown),
         ))
 
 

@@ -1,7 +1,25 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
     xmlns:five="http://namespaces.zope.org/five"
+    xmlns:zcml="http://namespaces.zope.org/zcml"
     i18n_domain="plone.supermodel">
+
+    <include package="z3c.zcmlhook" file="meta.zcml" />
+
+    <zcml:customAction
+        handler=".model.finalizeSchemas"
+        order="1"
+        />
+
+    <adapter
+        factory=".directives.FieldsetCheckerPlugin"
+        name="plone.supermodel.directives.FieldsetCheckerPlugin"
+        />
+
+    <adapter
+        factory=".directives.SupermodelSchemaPlugin"
+        name="plone.supermodel.directives.SupermodelSchemaPlugin"
+        />
 
     <!-- Unicode converters -->
 

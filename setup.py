@@ -41,7 +41,7 @@ setup(name='plone.supermodel',
           'zope.deferredimport',
           'zope.dottedname',
           'elementtree',
-          # -*- Extra requirements: -*-
+          'z3c.zcmlhook',
       ],
       extras_require = {
         'test': ['zope.app.testing']
