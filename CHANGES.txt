@@ -1,6 +1,12 @@
 Changelog
 =========
 
+1.0.1 - 2011-04-30
+------------------
+
+- Adjust manifest to exclude .pyc files.
+  [davisagli]
+
 1.0 - 2011-04-30
 ----------------
 
