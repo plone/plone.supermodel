@@ -1,12 +1,13 @@
 Changelog
 =========
 
-1.0b9 - unreleased
-------------------
+1.0 - 2011-04-30
+----------------
 
 - Handle serializing tokenized vocabularies with unicode values as long as the
   terms' tokens are equal to the utf8-encoded values.
   [davisagli]
+
 
 1.0b8 - 2011-03-18
 ------------------

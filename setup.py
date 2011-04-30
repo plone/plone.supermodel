@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 def read(*rnames):
     return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
 
-version = '1.0b8'
+version = '1.0'
 
 long_description = (
     read('README.txt')
@@ -16,7 +16,7 @@ long_description = (
 
 setup(name='plone.supermodel',
       version=version,
-      description="Integration layer making it possible to load schema definitions from XML",
+      description="Serialize Zope schema definitions to and from XML",
       long_description=long_description,
       # Get more strings from http://www.python.org/pypi?%3Aaction=list_classifiers
       classifiers=[

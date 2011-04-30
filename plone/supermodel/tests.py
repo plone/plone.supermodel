@@ -1,12 +1,12 @@
 from cStringIO import StringIO
 from elementtree import ElementTree as etree
+import doctest
 import unittest
 import zope.app.testing.placelesssetup
 
 from zope.interface import Interface, implements, alsoProvides
 
 import zope.component.testing
-from zope.testing import doctest
 
 from zope.schema import getFieldNamesInOrder
 from zope.schema.interfaces import IContextSourceBinder
