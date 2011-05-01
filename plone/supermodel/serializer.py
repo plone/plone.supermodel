@@ -13,6 +13,8 @@ from plone.supermodel.interfaces import XML_NAMESPACE
 from plone.supermodel.interfaces import FIELDSETS_KEY
 from plone.supermodel.interfaces import IFieldNameExtractor
 
+from plone.supermodel.model import Schema
+
 from plone.supermodel.utils import sortedFields, prettyXML
 
 from elementtree import ElementTree
@@ -96,7 +98,7 @@ def serialize(model):
         if schemaName:
             schema_element.set('name', schemaName)
 
-        bases = [b.__identifier__ for b in schema.__bases__]
+        bases = [b.__identifier__ for b in schema.__bases__ if b is not Schema]
         if bases:
             schema_element.set('based-on', ' '.join(bases))
 

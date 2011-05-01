@@ -52,34 +52,10 @@ class Model(object):
 class SchemaClass(InterfaceClass):
     implements(ISchema)
 
-    _SchemaClass_configured = False
-    _SchemaClass_deferred = weakref.WeakKeyDictionary()
-
     def __init__(self, name, bases=(), attrs=None, __doc__=None,
                  __module__=None):
-        # Execute part of InterfaceClass.__init__ in correct frame.
-        if attrs is None:
-            attrs = {}
-
-        if __module__ is None:
-            __module__ = attrs.get('__module__')
-            if isinstance(__module__, str):
-                del attrs['__module__']
-            else:
-                try:
-                    # Figure out what module defined the interface.
-                    # This is how cPython figures out the module of
-                    # a class, but of course it does it in C. :-/
-                    __module__ = sys._getframe(1).f_globals['__name__']
-                except (AttributeError, KeyError):
-                    pass
-
         InterfaceClass.__init__(self, name, bases, attrs, __doc__, __module__)
-
-        if SchemaClass._SchemaClass_configured:
-            self._SchemaClass_finalize()
-        else:
-            SchemaClass._SchemaClass_deferred[self] = None
+        self._SchemaClass_finalize()
 
     def _SchemaClass_finalize(self):
         adapters = [(getattr(adapter, 'order', 0), name, adapter)
@@ -91,25 +67,14 @@ class SchemaClass(InterfaceClass):
 Schema = SchemaClass("Schema", (Interface,), __module__='plone.supermodel.model')
 
 
-def finalizeSchemas():
+def finalizeSchemas(parent=Schema):
     """Configuration action called after plone.supermodel is configured.
     """
-    # As finalizeSchemas is called as a configurationa action this should be
-    # thread safe.
-    SchemaClass._SchemaClass_configured = True
-    schemas = SchemaClass._SchemaClass_deferred.keys()
-    SchemaClass._SchemaClass_deferred = None
+    def iterDependents(parent):
+        yield  parent
+        for child in parent.dependents.keys():
+            for s in iterDependents(child):
+                yield s
+    schemas = set(iterDependents(parent))
     for schema in schemas:
         schema._SchemaClass_finalize()
-
-try:
-    from zope.testing.cleanup import addCleanUp
-except ImportError:
-    pass
-else:
-    def cleanup():
-        SchemaClass._SchemaClass_deferred = weakref.WeakKeyDictionary()
-        SchemaClass._SchemaClass_configured = False
-    addCleanUp(cleanup)
-    del addCleanUp
-    del cleanup

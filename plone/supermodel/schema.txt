@@ -254,7 +254,7 @@ generated interface contains the base schema.
 
     >>> model = loadString(schema)
     >>> model.schema.__bases__
-    (<InterfaceClass plone.supermodel.tests.IBase>,)
+    (<InterfaceClass plone.supermodel.tests.IBase>, <SchemaClass plone.supermodel.model.Schema>)
     
 The fields of the base interface will also be replicated in the new schema.
 

@@ -13,7 +13,7 @@ from plone.supermodel.interfaces import IFieldMetadataHandler
 
 from plone.supermodel.utils import ns
 
-from plone.supermodel.model import Model, Fieldset, SchemaClass
+from plone.supermodel.model import Model, Fieldset, Schema, SchemaClass
 from plone.supermodel.interfaces import FIELDSETS_KEY
 
 from elementtree import ElementTree
@@ -129,7 +129,7 @@ def parse(source, policy=u""):
                         fieldset.fields.append(parsed_fieldName)
 
         schema = SchemaClass(name=policy_util.name(schemaName, tree),
-                                bases=bases + policy_util.bases(schemaName, tree),
+                                bases=bases + policy_util.bases(schemaName, tree) + (Schema,),
                                 __module__=policy_util.module(schemaName, tree),
                                 attrs=schemaAttributes)
 

@@ -28,7 +28,7 @@ class DirectiveClass(type):
         value = instance.factory(*args, **kw)
         instance.store(tags, value)
 
-Directive = DirectiveClass('Directive', (), dict(__module__='plone.supermodel.directives'))
+Directive = DirectiveClass('Directive', (), dict(__module__='plone.supermodel.directives',),)
 
 
 class load(Directive):
@@ -60,15 +60,19 @@ class SupermodelSchemaPlugin(object):
         schema = interface.queryTaggedValue(SCHEMA_NAME_KEY, u"")
 
         moduleName = interface.__module__
-        module = sys.modules[moduleName]
+        module = sys.modules.get(moduleName, None)
 
         directory = moduleName
 
         if hasattr(module, '__path__'):
             directory = module.__path__[0]
-        elif "." in moduleName:
-            parentModuleName, _ = moduleName.rsplit('.', 1)
-            directory = sys.modules[parentModuleName].__path__[0]
+        else:
+            while "." in moduleName:
+                moduleName, _ = moduleName.rsplit('.', 1)
+                module = sys.modules.get(moduleName, None)
+                if hasattr(module, '__path__'):
+                    directory = module.__path__[0]
+                    break
 
         directory = os.path.abspath(directory)
         # Let / act as path separator on all platforms
@@ -84,22 +88,20 @@ class SupermodelSchemaPlugin(object):
         syncSchema(model.schemata[schema], interface, overwrite=False)
 
 
-class MetadataListStorage(object):
+class MetadataListDirective(Directive):
     """Store a list value in the TEMP_KEY tagged value, under the key in
     directive.key
     """
+    key = None
 
-    def __init__(self, key):
-        self.key = key
-
-    def __call__(self, tags, value):
+    def store(self, tags, value):
         tags.setdefault(self.key, []).extend(value)
 
 
-class fieldset(Directive):
+class fieldset(MetadataListDirective):
     """Directive used to create fieldsets
     """
-    store = MetadataListStorage(FIELDSETS_KEY)
+    key = FIELDSETS_KEY
 
     def factory(self, name, label=None, description=None, fields=None, **kw):
         fieldset=Fieldset(name, label=label, description=description, fields=fields)
