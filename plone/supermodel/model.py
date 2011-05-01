@@ -1,5 +1,4 @@
 import sys
-import weakref
 
 import zope.deferredimport
 from zope.component import getAdapters
