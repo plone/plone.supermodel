@@ -2,13 +2,14 @@ import os.path
 import sys
 
 from zope.component import adapts
+from zope.interface import alsoProvides
 from zope.interface import implements
 from zope.interface.interface import TAGGED_DATA
 
 from plone.supermodel import loadFile
 from plone.supermodel.interfaces import ISchema
 from plone.supermodel.interfaces import ISchemaPlugin
-from plone.supermodel.interfaces import FILENAME_KEY, SCHEMA_NAME_KEY, FIELDSETS_KEY
+from plone.supermodel.interfaces import FILENAME_KEY, SCHEMA_NAME_KEY, FIELDSETS_KEY, PRIMARY_FIELDS_KEY
 from plone.supermodel.model import Fieldset
 from plone.supermodel.utils import syncSchema
 
@@ -111,6 +112,9 @@ class fieldset(MetadataListDirective):
 
 
 class CheckerPlugin(object):
+    adapts(ISchema)
+    implements(ISchemaPlugin)
+
     key = None
 
     def __init__(self, schema):
@@ -118,11 +122,9 @@ class CheckerPlugin(object):
         self.value = schema.queryTaggedValue(self.key, None)
 
     def fieldsNames(self):
-        if self.value is None:
-            return []
-        return self.value.keys()
+        raise NotImplementedError()
 
-    def __call__(self):
+    def check(self):
         schema = self.schema
         for fieldName in self.fieldNames():
             if fieldName not in schema:
@@ -130,11 +132,31 @@ class CheckerPlugin(object):
                     u"The directive %s applied to interface %s "
                     u"refers to unknown field name %s" % (self.key, schema.__identifier__, fieldName)
                     )
+            yield fieldName
+
+    def __call__(self):
+        for fieldName in self.check():
+            pass
+
+
+class DictCheckerPlugin(CheckerPlugin):
+
+    def fieldsNames(self):
+        if self.value is None:
+            return []
+        return self.value.keys()
+
+
+class ListCheckerPlugin(CheckerPlugin):
+
+    def fieldNames(self):
+        if self.value is None:
+            return
+        for fieldName in self.value:
+            yield fieldName
 
 
 class FieldsetCheckerPlugin(CheckerPlugin):
-    adapts(ISchema)
-    implements(ISchemaPlugin)
 
     key = FIELDSETS_KEY
 
@@ -144,3 +166,27 @@ class FieldsetCheckerPlugin(CheckerPlugin):
         for fieldset in self.value:
             for fieldName in fieldset.fields:
                 yield fieldName
+
+try:
+    from plone.rfc822.interfaces import IPrimaryField
+except ImportError:
+    pass
+else:
+    class primary(MetadataListDirective):
+        """Directive used to mark one or more fields as 'primary'
+        """
+        key = PRIMARY_FIELDS_KEY
+
+        def factory(self, *args):
+            return args
+
+    class PrimaryFieldsPlugin(ListCheckerPlugin):
+
+        key = PRIMARY_FIELDS_KEY
+
+        def __call__(self):
+            schema = self.schema
+            for fieldName in self.check():
+                alsoProvides(schema[fieldName], IPrimaryField)
+
+        

@@ -44,7 +44,11 @@ setup(name='plone.supermodel',
           'z3c.zcmlhook',
       ],
       extras_require = {
-        'test': ['zope.app.testing']
+        'plone.rfc822': ['plone.rfc822'],
+        'test': [
+            'plone.rfc822',
+            'zope.app.testing',
+            ],
       },
       entry_points="""
       # -*- Entry points: -*-

@@ -167,6 +167,23 @@ accessible as attributes on the fieldset:
     >>> metadata = IGrouped.getTaggedValue(FIELDSETS_KEY)[1]
     >>> metadata.layout
     'concise'
+
+
+Primary field support
+---------------------
+
+In combination with plone.rfc822, primary fields may be marked:
+
+    >>> class IFields(model.Schema):
+    ...     title = zope.schema.TextLine(title=u"Title")
+    ...     description = zope.schema.TextLine(title=u"Description")
+    ...     
+    ...     model.primary('body')
+    ...     body = zope.schema.Text(title=u"Body")
+    
+    >>> from plone.rfc822.interfaces import IPrimaryField
+    >>> IPrimaryField.providedBy(IFields['body'])
+    True
     
 Cleanup
 -------

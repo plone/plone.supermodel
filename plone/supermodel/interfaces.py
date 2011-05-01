@@ -7,6 +7,7 @@ import zope.schema
 FILENAME_KEY = 'plone.supermodel.filename'    # absolute file name of model file
 SCHEMA_NAME_KEY = 'plone.supermodel.schemaname'  # name of schema that was loaded from the model
 FIELDSETS_KEY = 'plone.supermodel.fieldsets'   # list of fieldsets
+PRIMARY_FIELDS_KEY = 'plone.supermodel.primary' # Primary fields (requires plone.rfc822)
 
 # The namespace for the default supermodel schema/field parser
 

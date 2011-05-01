@@ -13,12 +13,18 @@
 
     <adapter
         factory=".directives.FieldsetCheckerPlugin"
-        name="plone.supermodel.directives.FieldsetCheckerPlugin"
+        name="plone.supermodel.fieldset"
         />
 
     <adapter
         factory=".directives.SupermodelSchemaPlugin"
-        name="plone.supermodel.directives.SupermodelSchemaPlugin"
+        name="plone.supermodel.load"
+        />
+
+    <adapter
+        zcml:condition="installed plone.rfc822"
+        factory=".directives.PrimaryFieldsPlugin"
+        name="plone.supermodel.primary"
         />
 
     <!-- Unicode converters -->

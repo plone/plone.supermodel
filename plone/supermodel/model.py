@@ -16,6 +16,13 @@ zope.deferredimport.defineFrom('plone.supermodel.directives',
     'fieldset',
 )
 
+try:
+    from plone.rfc822.interfaces import IPrimaryField
+except ImportError:
+    pass
+else:
+    zope.deferredimport.defineFrom('plone.supermodel.directives', 'primary')
+
 class Fieldset(object):
     implements(IFieldset)
 
