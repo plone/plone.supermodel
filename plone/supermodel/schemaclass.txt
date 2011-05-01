@@ -23,18 +23,23 @@ an order attribute, which defaults to 0.
 
 Schema plugins are executed at schema declaration.
 
-    >>> class IA(Schema): pass
-    ... 
+    >>> class IA(Schema):
+    ...     pass
     TestPlugin: <SchemaClass __builtin__.IA>
 
 Any class descending from Schema becomes an instance of SchemaClass and has any
 schema plugins called.
 
-    >>> class ISomeInterface(Interface): pass
-    ... 
-    >>> class IB(ISomeInterface, IA): pass
-    ... 
+    >>> class ISomeInterface(Interface):
+    ...     pass
+
+    >>> class IB(ISomeInterface, IA):
+    ...     pass
     TestPlugin: <SchemaClass __builtin__.IB>
+
+    >>> class IC(IB):
+    ...     pass
+    TestPlugin: <SchemaClass __builtin__.IC>
 
 To support the registration of schema plugins in ZCML, plugins are
 additionally executed at zope.configuration time with a ZCML order of 1000. To
@@ -43,7 +48,7 @@ directly.
 
     >>> class TestPlugin2(TestPlugin):
     ...     order = 0
-    ... 
+
     >>> provideAdapter(TestPlugin2, name=u"plone.supermodel.tests.TestPlugin2")
     >>> from plone.supermodel.model import finalizeSchemas
     >>> finalizeSchemas(IA)
@@ -51,3 +56,5 @@ directly.
     TestPlugin: <SchemaClass __builtin__.IA>
     TestPlugin2: <SchemaClass __builtin__.IB>
     TestPlugin: <SchemaClass __builtin__.IB>
+    TestPlugin2: <SchemaClass __builtin__.IC>
+    TestPlugin: <SchemaClass __builtin__.IC>

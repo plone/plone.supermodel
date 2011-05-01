@@ -69,11 +69,11 @@ Schema = SchemaClass("Schema", (Interface,), __module__='plone.supermodel.model'
 def finalizeSchemas(parent=Schema):
     """Configuration action called after plone.supermodel is configured.
     """
-    def iterDependents(parent):
-        yield  parent
-        for child in parent.dependents.keys():
-            for s in iterDependents(child):
+    def walk(schema):
+        yield  schema
+        for child in schema.dependents.keys():
+            for s in walk(child):
                 yield s
-    schemas = set(iterDependents(parent))
+    schemas = set(walk(parent))
     for schema in schemas:
         schema._SchemaClass_finalize()
