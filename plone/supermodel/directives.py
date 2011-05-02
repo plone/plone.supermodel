@@ -13,6 +13,8 @@ from plone.supermodel.interfaces import FILENAME_KEY, SCHEMA_NAME_KEY, FIELDSETS
 from plone.supermodel.model import Fieldset
 from plone.supermodel.utils import syncSchema
 
+# Directive
+
 class DirectiveClass(type):
     """A Directive is used to apply tagged values to a Schema
     """
@@ -31,6 +33,82 @@ class DirectiveClass(type):
 
 Directive = DirectiveClass('Directive', (), dict(__module__='plone.supermodel.directives',),)
 
+
+class MetadataListDirective(Directive):
+    """Store a list value in the tagged value under the key.
+    """
+    key = None
+
+    def store(self, tags, value):
+        tags.setdefault(self.key, []).extend(value)
+
+
+class MetadataDictDirective(Directive):
+    """Store a dict value in the tagged value under the key.
+    """
+    key = None
+
+    def store(self, tags, value):
+        tags.setdefault(self.key, {}).update(value)
+
+# Plugin
+
+class CheckerPlugin(object):
+    adapts(ISchema)
+    implements(ISchemaPlugin)
+
+    key = None
+
+    def __init__(self, schema):
+        self.schema = schema
+        self.value = schema.queryTaggedValue(self.key, None)
+
+    def fieldsNames(self):
+        raise NotImplementedError()
+
+    def check(self):
+        schema = self.schema
+        for fieldName in self.fieldNames():
+            if fieldName not in schema:
+                raise ValueError(
+                    u"The directive %s applied to interface %s "
+                    u"refers to unknown field name %s" % (self.key, schema.__identifier__, fieldName)
+                    )
+            yield fieldName
+
+    def __call__(self):
+        for fieldName in self.check():
+            pass
+
+
+class DictCheckerPlugin(CheckerPlugin):
+
+    def fieldNames(self):
+        if self.value is None:
+            return []
+        return self.value.keys()
+
+
+class ListCheckerPlugin(CheckerPlugin):
+
+    def fieldNames(self):
+        if self.value is None:
+            return
+        for fieldName in self.value:
+            yield fieldName
+
+class ListPositionCheckerPlugin(CheckerPlugin):
+
+    position = None
+
+    def fieldNames(self):
+        if self.value is None:
+            return
+        for item in self.value:
+            yield item[self.position]
+
+
+# Implementations
 
 class load(Directive):
     """Directive used to specify the XML model file
@@ -89,16 +167,6 @@ class SupermodelSchemaPlugin(object):
         syncSchema(model.schemata[schema], interface, overwrite=False)
 
 
-class MetadataListDirective(Directive):
-    """Store a list value in the TEMP_KEY tagged value, under the key in
-    directive.key
-    """
-    key = None
-
-    def store(self, tags, value):
-        tags.setdefault(self.key, []).extend(value)
-
-
 class fieldset(MetadataListDirective):
     """Directive used to create fieldsets
     """
@@ -109,51 +177,6 @@ class fieldset(MetadataListDirective):
         for (key,value) in kw.items():
             setattr(fieldset, key, value)
         return [fieldset]
-
-
-class CheckerPlugin(object):
-    adapts(ISchema)
-    implements(ISchemaPlugin)
-
-    key = None
-
-    def __init__(self, schema):
-        self.schema = schema
-        self.value = schema.queryTaggedValue(self.key, None)
-
-    def fieldsNames(self):
-        raise NotImplementedError()
-
-    def check(self):
-        schema = self.schema
-        for fieldName in self.fieldNames():
-            if fieldName not in schema:
-                raise ValueError(
-                    u"The directive %s applied to interface %s "
-                    u"refers to unknown field name %s" % (self.key, schema.__identifier__, fieldName)
-                    )
-            yield fieldName
-
-    def __call__(self):
-        for fieldName in self.check():
-            pass
-
-
-class DictCheckerPlugin(CheckerPlugin):
-
-    def fieldsNames(self):
-        if self.value is None:
-            return []
-        return self.value.keys()
-
-
-class ListCheckerPlugin(CheckerPlugin):
-
-    def fieldNames(self):
-        if self.value is None:
-            return
-        for fieldName in self.value:
-            yield fieldName
 
 
 class FieldsetCheckerPlugin(CheckerPlugin):
@@ -167,6 +190,7 @@ class FieldsetCheckerPlugin(CheckerPlugin):
             for fieldName in fieldset.fields:
                 yield fieldName
 
+
 try:
     from plone.rfc822.interfaces import IPrimaryField
 except ImportError:
@@ -178,7 +202,10 @@ else:
         key = PRIMARY_FIELDS_KEY
 
         def factory(self, *args):
+            if not args:
+                raise TypeError('The primary directive expects at least one argument.')
             return args
+
 
     class PrimaryFieldsPlugin(ListCheckerPlugin):
 
@@ -188,5 +215,4 @@ else:
             schema = self.schema
             for fieldName in self.check():
                 alsoProvides(schema[fieldName], IPrimaryField)
-
-        
+       
