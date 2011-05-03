@@ -4,6 +4,10 @@ Changelog
 1.0.2 - unreleased
 ------------------
 
+- Only convert Choice field ``values`` attribute into a vocabulary when it is
+  necessary to handle unicode values. This fixes a regression in compatibility
+  with plone.registry.
+  [davisagli]
 
 1.0.1 - 2011-04-30
 ------------------
