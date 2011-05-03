@@ -44,7 +44,8 @@ setup(name='plone.supermodel',
           # -*- Extra requirements: -*-
       ],
       extras_require = {
-        'test': ['zope.app.testing']
+        'test': ['zope.app.testing'],
+        'lxml': ['lxml'],
       },
       entry_points="""
       # -*- Entry points: -*-

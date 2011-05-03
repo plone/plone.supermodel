@@ -10,6 +10,8 @@ from plone.supermodel import serializer
 from plone.supermodel import utils
 from plone.supermodel import model
 
+from plone.supermodel.exceptions import parse_info
+
 # Cache models by absolute filename
 _model_cache = {}
 
@@ -21,7 +23,11 @@ def loadFile(filename, reload=False, policy=u"", _frame=2):
     global _model_cache
     path = utils.relativeToCallingPackage(filename, _frame)
     if reload or path not in _model_cache:
-        parsed_model = parser.parse(path, policy=policy)
+        parse_info.fname = filename
+        try:
+            parsed_model = parser.parse(path, policy=policy)
+        finally:
+            del parse_info.fname
         for schema in parsed_model.schemata.values():
             schema.setTaggedValue(FILENAME_KEY, path)
         _model_cache[path] = parsed_model

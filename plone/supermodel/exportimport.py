@@ -11,6 +11,7 @@ from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
 
 from plone.supermodel.interfaces import IFieldNameExtractor
 from plone.supermodel.interfaces import IFieldExportImportHandler
+from plone.supermodel.exceptions import SupermodelImportException
 
 from plone.supermodel.utils import noNS, valueToElement, elementToValue
 
@@ -86,8 +87,8 @@ class BaseHandler(object):
                     handler = queryUtility(IFieldExportImportHandler, name=attributeField_type)
 
                     if handler is None:
-                        raise NotImplementedError(u"Type %s used for %s not supported" %
-                            (attributeField_type, attribute_name))
+                        raise SupermodelImportException(u"Type %s used for %s not supported" %
+                            (attributeField_type, attribute_name), attribute_element)
 
                     attributes[attribute_name] = handler.read(attribute_element)
 

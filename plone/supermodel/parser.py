@@ -1,3 +1,5 @@
+import sys
+
 from zope.interface import implements
 from zope.interface.interface import InterfaceClass
 from zope.component import getUtility, queryUtility, getUtilitiesFor
@@ -11,13 +13,17 @@ from plone.supermodel.interfaces import IFieldExportImportHandler
 
 from plone.supermodel.interfaces import ISchemaMetadataHandler
 from plone.supermodel.interfaces import IFieldMetadataHandler
+from plone.supermodel.exceptions import SupermodelImportException
 
 from plone.supermodel.utils import ns
 
 from plone.supermodel.model import Model, Fieldset
 from plone.supermodel.interfaces import FIELDSETS_KEY
 
-from elementtree import ElementTree
+try:
+    from lxml import etree
+except ImportError:
+    from elementtree import ElementTree as etree
 
 # Helper adapters
 
@@ -38,7 +44,7 @@ class DefaultSchemaPolicy(object):
 
 
 def parse(source, policy=u""):
-    tree = ElementTree.parse(source)
+    tree = etree.parse(source)
     root = tree.getroot()
 
     model = Model()
@@ -80,7 +86,6 @@ def parse(source, policy=u""):
 
     for schema_element in root.findall(ns('schema')):
         schemaAttributes = {}
-        schema_metadata = {}
 
         schemaName = schema_element.get('name')
         if schemaName is None:
@@ -98,7 +103,11 @@ def parse(source, policy=u""):
 
         # Read global fields
         for fieldElement in schema_element.findall(ns('field')):
-            readField(fieldElement, schemaAttributes, fieldElements, baseFields)
+            try:
+                readField(fieldElement, schemaAttributes, fieldElements, baseFields)
+            except:
+                t, v, tb = sys.exc_info()
+                raise SupermodelImportException(str(v), fieldElement), None, tb
 
         # Read fieldsets and their fields
         fieldsets = []
@@ -112,7 +121,7 @@ def parse(source, policy=u""):
 
                 fieldset_name = subelement.get('name')
                 if fieldset_name is None:
-                    raise ValueError(u"Fieldset in schema %s has no name" % (schemaName))
+                    raise SupermodelImportException(u"Fieldset in schema %s has no name" % (schemaName), subelement)
 
                 fieldset = fieldsets_by_name.get(fieldset_name, None)
                 if fieldset is None:
