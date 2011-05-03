@@ -1,7 +1,7 @@
 Changelog
 =========
 
-1.0.2 - unreleased
+1.0.2 - 2011-05-02
 ------------------
 
 - Only convert Choice field ``values`` attribute into a vocabulary when it is
