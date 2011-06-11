@@ -1,5 +1,4 @@
-import sys
-
+import logging
 import zope.deferredimport
 from zope.component import getAdapters
 from zope.interface import Interface
@@ -22,6 +21,9 @@ except ImportError:
     pass
 else:
     zope.deferredimport.defineFrom('plone.supermodel.directives', 'primary')
+
+logger = logging.getLogger('plone.supermodel')
+
 
 class Fieldset(object):
     implements(IFieldset)
@@ -83,4 +85,9 @@ def finalizeSchemas(parent=Schema):
                 yield s
     schemas = set(walk(parent))
     for schema in schemas:
-        schema._SchemaClass_finalize()
+        if hasattr(schema, '_SchemaClass_finalize'):
+            schema._SchemaClass_finalize()
+        else:
+            logger.warn('Schema subclass is not an instance of SchemaClass. '
+                'This can happen if the first base class of a schema is not a '
+                'SchemaClass. See https://bugs.launchpad.net/zope.interface/+bug/791218')
