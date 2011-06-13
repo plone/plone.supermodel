@@ -79,7 +79,7 @@ def finalizeSchemas(parent=Schema):
     """Configuration action called after plone.supermodel is configured.
     """
     if not isinstance(parent, SchemaClass):
-        raise ValueError('Only instances of plone.supermodel.model.SchemaClass can be finalized.')
+        raise TypeError('Only instances of plone.supermodel.model.SchemaClass can be finalized.')
     def walk(schema):
         yield  schema
         for child in schema.dependents.keys():
