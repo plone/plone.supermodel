@@ -8,7 +8,7 @@
 
     <zcml:customAction
         handler=".model.finalizeSchemas"
-        order="1000"
+        order="9999999"
         />
 
     <adapter
