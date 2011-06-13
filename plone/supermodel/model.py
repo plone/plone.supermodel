@@ -89,7 +89,8 @@ def finalizeSchemas(parent=Schema):
     for schema in schemas:
         if hasattr(schema, '_SchemaClass_finalize'):
             schema._SchemaClass_finalize()
-        else:
-            logger.warn('Schema subclass is not an instance of SchemaClass. '
+        elif isinstance(schema, InterfaceClass):
+            logger.warn('%s is not an instance of SchemaClass. '
                 'This can happen if the first base class of a schema is not a '
-                'SchemaClass. See https://bugs.launchpad.net/zope.interface/+bug/791218')
+                'SchemaClass. See https://bugs.launchpad.net/zope.interface/+bug/791218'
+                % ('%s.%s' % (schema.__module__, schema.__name__)))
