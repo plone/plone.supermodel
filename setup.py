@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 def read(*rnames):
     return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
 
-version = '2.0dev'
+version = '1.1dev'
 
 long_description = (
     read('README.txt')
@@ -23,12 +23,13 @@ setup(name='plone.supermodel',
         "Framework :: Plone",
         "Programming Language :: Python",
         "Topic :: Software Development :: Libraries :: Python Modules",
+        "License :: OSI Approved :: BSD License",
         ],
       keywords='Plone XML schema',
       author='Martin Aspeli',
       author_email='optilude@gmail.com',
       url='http://code.google.com/p/dexterity',
-      license='LGPL',
+      license='BSD',
       packages=find_packages(exclude=['ez_setup']),
       namespace_packages=['plone'],
       include_package_data=True,
