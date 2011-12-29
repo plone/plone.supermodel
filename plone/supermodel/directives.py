@@ -63,7 +63,7 @@ class CheckerPlugin(object):
         self.schema = schema
         self.value = schema.queryTaggedValue(self.key, None)
 
-    def fieldsNames(self):
+    def fieldNames(self):
         raise NotImplementedError()
 
     def check(self):
