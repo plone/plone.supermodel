@@ -230,6 +230,21 @@ class TestUtils(unittest.TestCase):
         self.failIf(IMarker.providedBy(IDest['two']))
         self.failUnless(IMarker.providedBy(IDest['four']))
 
+    def test_syncSchema_always_overwrites_fields_from_bases(self):
+
+        class IBase(Interface):
+            one = schema.TextLine(title=u'A')
+
+        class ISource(Interface):
+            one = schema.TextLine(title=u'B')
+
+        class IDest(IBase):
+            pass
+
+        utils.syncSchema(ISource, IDest, overwrite=False)
+
+        self.assertTrue(IDest['one'].interface is IDest)
+
     def test_mergedTaggedValueList(self):
 
         class IBase1(Interface):

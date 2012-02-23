@@ -4,6 +4,10 @@ Changelog
 1.0.4 - unreleased
 ------------------
 
+- When syncing to a schema that inherits fields from a base, include fields
+  with the same names as the inherited fields even when overwrite is False.
+  This fixes http://code.google.com/p/dexterity/issues/detail?id=253
+  [davisagli]
 
 1.0.3 - 2011-05-20
 ------------------

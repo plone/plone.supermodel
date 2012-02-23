@@ -238,7 +238,7 @@ def syncSchema(source, dest, overwrite=False, sync_bases=False):
     # Add fields that are in source, but not in dest
 
     for name, field in sortedFields(source):
-        if overwrite or name not in dest:
+        if overwrite or name not in dest or dest[name].interface is not dest:
 
             clone = field.__class__.__new__(field.__class__)
             clone.__dict__.update(field.__dict__)
