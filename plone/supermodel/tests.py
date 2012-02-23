@@ -281,7 +281,6 @@ class TestValueToElement(unittest.TestCase):
              i18n_domain="plone.supermodel.tests">
 
             <include package="zope.component" file="meta.zcml" />
-            <include package="zope.app.component" file="meta.zcml" />
 
             <include package="plone.supermodel" />
 
