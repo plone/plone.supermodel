@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 def read(*rnames):
     return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
 
-version = '1.0.4dev'
+version = '1.1dev'
 
 long_description = (
     read('README.txt')
@@ -42,10 +42,14 @@ setup(name='plone.supermodel',
           'zope.deferredimport',
           'zope.dottedname',
           'elementtree',
-          # -*- Extra requirements: -*-
+          'z3c.zcmlhook',
       ],
       extras_require = {
-        'test': ['zope.app.testing']
+        'plone.rfc822': ['plone.rfc822'],
+        'test': [
+            'plone.rfc822',
+            'zope.app.testing',
+            ],
       },
       entry_points="""
       # -*- Entry points: -*-

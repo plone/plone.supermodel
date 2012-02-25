@@ -1,7 +1,13 @@
 Changelog
 =========
 
-1.0.4 - unreleased
+1.1 - unreleased
+----------------
+
+- Add model.Schema and directives to avoid grok dependency.
+  [elro]
+
+1.0.4 - 2012-02-20
 ------------------
 
 - When syncing to a schema that inherits fields from a base, include fields

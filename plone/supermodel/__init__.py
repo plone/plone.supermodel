@@ -38,4 +38,4 @@ def serializeModel(model):
 
 moduleProvides(IXMLToSchema)
 
-__all__ = ('xmlSchema', 'loadFile', 'loadString', 'serializeSchema', 'serializeModel',)
+__all__ = ('xmlSchema', 'loadFile', 'loadString', 'serializeSchema', 'serializeModel')
