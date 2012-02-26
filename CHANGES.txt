@@ -4,6 +4,12 @@ Changelog
 1.1 - unreleased
 ----------------
 
+- When an error is encountered while parsing a supermodel, the exception
+  now provides the filename, line number, and source of the part of the
+  model that was being processed. Inclusion of the line number and source
+  requires lxml.
+  [davisagli]
+
 - Add model.Schema and directives to avoid grok dependency.
   [elro]
 
