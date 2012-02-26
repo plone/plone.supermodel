@@ -83,7 +83,26 @@ attributes corresponding to the values set in XML.
     >>> schema['description'].min_length
     10
 
-Similarly, we can serialize a model to an XML representation:
+If we try to parse a schema that has errors, we'll get a useful
+SupermodelParseError that includes contextual information. (This requires
+lxml.)
+
+    >>> schema = """\
+    ... <?xml version="1.0" encoding="UTF-8"?>
+    ... <model xmlns="http://namespaces.plone.org/supermodel/schema">
+    ...     <schema>
+    ...         <field type="aint_gonna_exist" name="title">
+    ...         </field>
+    ...     </schema>
+    ... </model>
+    ... """
+    >>> loadString(schema)
+    Traceback (most recent call last):
+    ...
+    SupermodelParseError: Field type aint_gonna_exist specified for field title is not supported
+      File "<unknown>", line ...
+
+In addition to parsing, we can serialize a model to an XML representation:
 
     >>> from plone.supermodel import serializeModel
     >>> print serializeModel(model) # doctest: +NORMALIZE_WHITESPACE
