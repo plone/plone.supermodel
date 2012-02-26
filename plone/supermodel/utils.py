@@ -8,6 +8,7 @@ from zope.interface import directlyProvidedBy, directlyProvides
 from zope.schema.interfaces import IField, IFromUnicode, IDict, ICollection
 
 from plone.supermodel.interfaces import XML_NAMESPACE, IToUnicode
+from plone.supermodel.debug import debuginfo
 
 _marker = object()
 noNS_re = re.compile('^{\S+}')
@@ -81,7 +82,6 @@ def elementToValue(field, element, default=_marker):
 
     If not, the field will be adapted to this interface to obtain a converter.
     """
-
     value = default
 
     if IDict.providedBy(field):
@@ -90,6 +90,7 @@ def elementToValue(field, element, default=_marker):
         for child in element:
             if noNS(child.tag.lower()) != 'element':
                 continue
+            debuginfo.stack.append(child)
 
             key_text = child.attrib.get('key', None)
             if key_text is None:
@@ -98,6 +99,7 @@ def elementToValue(field, element, default=_marker):
                 k = key_converter.fromUnicode(unicode(key_text))
 
             value[k] = elementToValue(field.value_type, child)
+            debuginfo.stack.pop()
         value = fieldTypecast(field, value)
 
     elif ICollection.providedBy(field):
@@ -105,8 +107,10 @@ def elementToValue(field, element, default=_marker):
         for child in element:
             if noNS(child.tag.lower()) != 'element':
                 continue
+            debuginfo.stack.append(child)
             v = elementToValue(field.value_type, child)
             value.append(v)
+            debuginfo.stack.pop()
         value = fieldTypecast(field, value)
 
     # Unicode

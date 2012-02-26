@@ -1,3 +1,6 @@
+import sys
+import linecache
+
 from zope.interface import implements
 from zope.component import getUtility, queryUtility, getUtilitiesFor
 
@@ -15,11 +18,36 @@ from plone.supermodel.utils import ns
 
 from plone.supermodel.model import Model, Fieldset, Schema, SchemaClass
 from plone.supermodel.interfaces import FIELDSETS_KEY
+from plone.supermodel.debug import debuginfo
 
-from elementtree import ElementTree
+# Prefer lxml because it can give us line numbers on error.
+try:
+    from lxml import etree
+except ImportError:
+    from elementtree import ElementTree as etree
+
+
+# Exception
+
+class SupermodelParseError(Exception):
+
+    def __init__(self, orig_exc, fname, element):
+        msg = str(orig_exc)
+
+        lineno = None
+        if hasattr(orig_exc, 'lineno'):
+            lineno = orig_exc.lineno
+        elif element is not None:
+            lineno = getattr(element, 'sourceline', 'unknown')
+
+        if fname or lineno != 'unknown':
+            msg += '\n  File "%s", line %s' % (fname or '<unknown>', lineno)
+        if fname and lineno:
+            line = linecache.getline(fname, lineno).strip()
+            msg += '\n    %s' % line
+        self.args = [msg]
 
 # Helper adapters
-
 
 class DefaultSchemaPolicy(object):
     implements(ISchemaPolicy)
@@ -37,7 +65,22 @@ class DefaultSchemaPolicy(object):
 
 
 def parse(source, policy=u""):
-    tree = ElementTree.parse(source)
+    fname = None
+    if isinstance(source, basestring):
+        fname = source
+
+    try:
+        return _parse(source, policy)
+    except Exception, e:
+        # Re-package the exception as a parse error that will get rendered with
+        # the filename and line number of the element that caused the problem.
+        # Keep the original traceback so the developer can debug where the problem
+        # happened.
+        raise SupermodelParseError(e, fname, debuginfo.stack[-1]), None, sys.exc_info()[2]
+
+
+def _parse(source, policy):
+    tree = etree.parse(source)
     root = tree.getroot()
 
     model = Model()
@@ -78,6 +121,7 @@ def parse(source, policy=u""):
         return fieldName
 
     for schema_element in root.findall(ns('schema')):
+        debuginfo.stack.append(schema_element)
         schemaAttributes = {}
         schema_metadata = {}
 
@@ -97,13 +141,16 @@ def parse(source, policy=u""):
 
         # Read global fields
         for fieldElement in schema_element.findall(ns('field')):
+            debuginfo.stack.append(fieldElement)
             readField(fieldElement, schemaAttributes, fieldElements, baseFields)
+            debuginfo.stack.pop()
 
         # Read fieldsets and their fields
         fieldsets = []
         fieldsets_by_name = {}
 
         for subelement in schema_element:
+            debuginfo.stack.append(subelement)
 
             if subelement.tag == ns('field'):
                 readField(subelement, schemaAttributes, fieldElements, baseFields)
@@ -124,9 +171,12 @@ def parse(source, policy=u""):
                     fieldsets.append(fieldset)
 
                 for fieldElement in subelement.findall(ns('field')):
+                    debuginfo.stack.append(fieldElement)
                     parsed_fieldName = readField(fieldElement, schemaAttributes, fieldElements, baseFields)
                     if parsed_fieldName:
                         fieldset.fields.append(parsed_fieldName)
+                    debuginfo.stack.pop()
+            debuginfo.stack.pop()
 
         schema = SchemaClass(name=policy_util.name(schemaName, tree),
                                 bases=bases + policy_util.bases(schemaName, tree) + (Schema,),
@@ -147,6 +197,7 @@ def parse(source, policy=u""):
             metadata_handler.read(schema_element, schema)
 
         model.schemata[schemaName] = schema
+        debuginfo.stack.pop()
 
     return model
 

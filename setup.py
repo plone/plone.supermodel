@@ -45,6 +45,7 @@ setup(name='plone.supermodel',
           'z3c.zcmlhook',
       ],
       extras_require = {
+        'lxml': 'lxml',
         'plone.rfc822': ['plone.rfc822'],
         'test': [
             'plone.rfc822',
