@@ -4,6 +4,9 @@ Changelog
 1.1 - unreleased
 ----------------
 
+- Support i18n:domain and i18n:translate for internationalization.
+  [davisagli]
+
 - When an error is encountered while parsing a supermodel, the exception
   now provides the filename, line number, and source of the part of the
   model that was being processed. Inclusion of the line number and source

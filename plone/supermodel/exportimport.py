@@ -13,7 +13,7 @@ from plone.supermodel.interfaces import IFieldNameExtractor
 from plone.supermodel.interfaces import IFieldExportImportHandler
 
 from plone.supermodel.utils import noNS, valueToElement, elementToValue
-from plone.supermodel.debug import debuginfo
+from plone.supermodel.debug import parseinfo
 
 
 class BaseHandler(object):
@@ -67,7 +67,7 @@ class BaseHandler(object):
         deferred_nonvalidated = {}
 
         for attribute_element in element:
-            debuginfo.stack.append(attribute_element)
+            parseinfo.stack.append(attribute_element)
             attribute_name = noNS(attribute_element.tag)
 
             if 'r' in self.filteredAttributes.get(attribute_name, ''):
@@ -96,7 +96,7 @@ class BaseHandler(object):
                 else:
                     attributes[attribute_name] = \
                         self.readAttribute(attribute_element, attributeField)
-            debuginfo.stack.pop()
+            parseinfo.stack.pop()
 
         name = element.get('name')
         if name is not None:
@@ -113,10 +113,10 @@ class BaseHandler(object):
         for attribute_name in self.fieldTypeAttributes:
             if attribute_name in deferred:
                 attribute_element = deferred[attribute_name]
-                debuginfo.stack.append(attribute_element)
+                parseinfo.stack.append(attribute_element)
                 value = self.readAttribute(attribute_element, field_instance)
                 setattr(field_instance, attribute_name, value)
-                debuginfo.stack.pop()
+                parseinfo.stack.pop()
 
         for attribute_name in self.nonValidatedfieldTypeAttributes:
             if attribute_name in deferred_nonvalidated:
@@ -130,10 +130,10 @@ class BaseHandler(object):
                 clone.__dict__['validate'] = lambda value: True
 
                 attribute_element = deferred_nonvalidated[attribute_name]
-                debuginfo.stack.append(attribute_element)
+                parseinfo.stack.append(attribute_element)
                 value = self.readAttribute(attribute_element, clone)
                 setattr(field_instance, attribute_name, value)
-                debuginfo.stack.pop()
+                parseinfo.stack.pop()
 
         field_instance._init_field = True
         return field_instance

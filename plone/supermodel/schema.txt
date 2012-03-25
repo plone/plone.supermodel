@@ -444,6 +444,36 @@ fieldset.
       </schema>
     </model>
 
+Internationalization
+--------------------
+
+Translation domains and message ids can be specified for text
+that is interpreted as unicode. This will result in deserialization
+as a zope.i18nmessageid message id rather than a basic Unicode string::
+
+    >>> schema = """\
+    ... <?xml version="1.0" encoding="UTF-8"?>
+    ... <model xmlns="http://namespaces.plone.org/supermodel/schema"
+    ...        xmlns:i18n="http://namespaces.zope.org/i18n"
+    ...        i18n:domain="plone.supermodel">
+    ...     <schema>
+    ...     
+    ...         <field type="zope.schema.TextLine" name="title">
+    ...             <title i18n:translate="supermodel_test_title">Title</title>
+    ...         </field>
+    ...     
+    ...     </schema>
+    ... </model>
+    ... """
+    >>> model = loadString(schema)
+    >>> msgid = model.schema['title'].title
+    >>> msgid
+    u'supermodel_test_title'
+    >>> type(msgid)
+    <type 'zope.i18nmessageid.message.Message'>
+    >>> msgid.default
+    u'Title'
+
 Creating custom metadata handlers
 ---------------------------------
 

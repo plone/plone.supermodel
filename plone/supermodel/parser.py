@@ -18,7 +18,8 @@ from plone.supermodel.utils import ns
 
 from plone.supermodel.model import Model, Fieldset, Schema, SchemaClass
 from plone.supermodel.interfaces import FIELDSETS_KEY
-from plone.supermodel.debug import debuginfo
+from plone.supermodel.interfaces import I18N_NAMESPACE
+from plone.supermodel.debug import parseinfo
 
 # Prefer lxml because it can give us line numbers on error.
 try:
@@ -76,12 +77,14 @@ def parse(source, policy=u""):
         # the filename and line number of the element that caused the problem.
         # Keep the original traceback so the developer can debug where the problem
         # happened.
-        raise SupermodelParseError(e, fname, debuginfo.stack[-1]), None, sys.exc_info()[2]
+        raise SupermodelParseError(e, fname, parseinfo.stack[-1]), None, sys.exc_info()[2]
 
 
 def _parse(source, policy):
     tree = etree.parse(source)
     root = tree.getroot()
+
+    parseinfo.i18n_domain = root.attrib.get(ns('domain', prefix=I18N_NAMESPACE))
 
     model = Model()
 
@@ -121,7 +124,7 @@ def _parse(source, policy):
         return fieldName
 
     for schema_element in root.findall(ns('schema')):
-        debuginfo.stack.append(schema_element)
+        parseinfo.stack.append(schema_element)
         schemaAttributes = {}
         schema_metadata = {}
 
@@ -141,16 +144,16 @@ def _parse(source, policy):
 
         # Read global fields
         for fieldElement in schema_element.findall(ns('field')):
-            debuginfo.stack.append(fieldElement)
+            parseinfo.stack.append(fieldElement)
             readField(fieldElement, schemaAttributes, fieldElements, baseFields)
-            debuginfo.stack.pop()
+            parseinfo.stack.pop()
 
         # Read fieldsets and their fields
         fieldsets = []
         fieldsets_by_name = {}
 
         for subelement in schema_element:
-            debuginfo.stack.append(subelement)
+            parseinfo.stack.append(subelement)
 
             if subelement.tag == ns('field'):
                 readField(subelement, schemaAttributes, fieldElements, baseFields)
@@ -171,12 +174,12 @@ def _parse(source, policy):
                     fieldsets.append(fieldset)
 
                 for fieldElement in subelement.findall(ns('field')):
-                    debuginfo.stack.append(fieldElement)
+                    parseinfo.stack.append(fieldElement)
                     parsed_fieldName = readField(fieldElement, schemaAttributes, fieldElements, baseFields)
                     if parsed_fieldName:
                         fieldset.fields.append(parsed_fieldName)
-                    debuginfo.stack.pop()
-            debuginfo.stack.pop()
+                    parseinfo.stack.pop()
+            parseinfo.stack.pop()
 
         schema = SchemaClass(name=policy_util.name(schemaName, tree),
                                 bases=bases + policy_util.bases(schemaName, tree) + (Schema,),
@@ -197,7 +200,7 @@ def _parse(source, policy):
             metadata_handler.read(schema_element, schema)
 
         model.schemata[schemaName] = schema
-        debuginfo.stack.pop()
+        parseinfo.stack.pop()
 
     return model
 

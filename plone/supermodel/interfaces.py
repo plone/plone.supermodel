@@ -12,6 +12,7 @@ PRIMARY_FIELDS_KEY = 'plone.supermodel.primary' # Primary fields (requires plone
 # The namespace for the default supermodel schema/field parser
 
 XML_NAMESPACE = u"http://namespaces.plone.org/supermodel/schema"
+I18N_NAMESPACE = u'http://namespaces.zope.org/i18n'
 
 
 class ISchema(IInterface):

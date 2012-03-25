@@ -1,12 +1,12 @@
 import threading
 
 
-class SupermodelDebugInfo(threading.local):
+class SupermodelParseInfo(threading.local):
 
     def __getattr__(self, name):
         if name == 'stack':
             self.stack = [None]
             return self.stack
-        return super(SupermodelDebugInfo, self).__getattr__(name)
+        return self.__dict__.get(name)
 
-debuginfo = SupermodelDebugInfo()
+parseinfo = SupermodelParseInfo()
