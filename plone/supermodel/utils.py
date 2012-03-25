@@ -124,12 +124,13 @@ def elementToValue(field, element, default=_marker):
             value = converter.fromUnicode(unicode(text))
 
         # handle i18n
-        i18n_domain = parseinfo.i18n_domain
-        if i18n_domain and isinstance(value, unicode):
-            msgid = element.attrib.get(ns('translate', I18N_NAMESPACE))
-            if msgid is None:
-                msgid = value
-            value = Message(msgid, domain = i18n_domain, default=value)
+        if isinstance(value, unicode) and parseinfo.i18n_domain is not None:
+            translate_attr = ns('translate', I18N_NAMESPACE)
+            msgid = element.attrib.get(translate_attr)
+            if msgid:
+                value = Message(msgid, domain=parseinfo.i18n_domain, default=value)
+            elif translate_attr in element.attrib:
+                value = Message(value, domain=parseinfo.i18n_domain)
 
     return value
 

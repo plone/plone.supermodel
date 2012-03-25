@@ -202,6 +202,7 @@ def _parse(source, policy):
         model.schemata[schemaName] = schema
         parseinfo.stack.pop()
 
+    parseinfo.i18n_domain = None
     return model
 
 

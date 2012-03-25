@@ -7,6 +7,8 @@ class SupermodelParseInfo(threading.local):
         if name == 'stack':
             self.stack = [None]
             return self.stack
-        return self.__dict__.get(name)
+        if name == 'i18n_domain':
+        	return self.__dict__.get('i18n_domain')
+        return self.__dict__[name]
 
 parseinfo = SupermodelParseInfo()
