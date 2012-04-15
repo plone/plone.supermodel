@@ -1,11 +1,11 @@
 Changelog
 =========
 
-1.1.1 (unreleased)
-----------------
+1.1.1 (2012-04-15)
+------------------
 
-- Nothing changed yet.
-
+- Fix a packaging error.
+  [esteele]
 
 1.1 (2012-04-15)
 ----------------
