@@ -49,7 +49,6 @@ setup(name='plone.supermodel',
         'plone.rfc822': ['plone.rfc822'],
         'test': [
             'plone.rfc822',
-            'zope.app.testing',
             ],
       },
       entry_points="""

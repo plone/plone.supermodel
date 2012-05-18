@@ -2,7 +2,6 @@ from cStringIO import StringIO
 from elementtree import ElementTree as etree
 import doctest
 import unittest
-import zope.app.testing.placelesssetup
 
 from zope.interface import Interface, implements, alsoProvides
 
@@ -289,7 +288,7 @@ class TestUtils(unittest.TestCase):
 class TestValueToElement(unittest.TestCase):
 
     def setUp(self):
-        zope.app.testing.placelesssetup.setUp()
+        zope.component.testing.setUp()
         configuration = """\
         <configure
              xmlns="http://namespaces.zope.org/zope"
@@ -305,7 +304,7 @@ class TestValueToElement(unittest.TestCase):
         xmlconfig.xmlconfig(StringIO(configuration))
 
 
-    tearDown = zope.app.testing.placelesssetup.tearDown
+    tearDown = zope.component.testing.tearDown
 
     def _assertSerialized(self, field, value, expected):
         element = utils.valueToElement(field, value, 'value')
@@ -376,18 +375,18 @@ def test_suite():
         unittest.makeSuite(TestUtils),
         unittest.makeSuite(TestValueToElement),
         doctest.DocFileSuite('schema.txt',
-            setUp=zope.app.testing.placelesssetup.setUp,
-            tearDown=zope.app.testing.placelesssetup.tearDown,
+            setUp=zope.component.testing.setUp,
+            tearDown=zope.component.testing.tearDown,
             optionflags=doctest.ELLIPSIS),
         doctest.DocFileSuite('fields.txt',
-            setUp=zope.app.testing.placelesssetup.setUp,
-            tearDown=zope.app.testing.placelesssetup.tearDown),
+            setUp=zope.component.testing.setUp,
+            tearDown=zope.component.testing.tearDown),
         doctest.DocFileSuite('schemaclass.txt',
-            setUp=zope.app.testing.placelesssetup.setUp,
-            tearDown=zope.app.testing.placelesssetup.tearDown),
+            setUp=zope.component.testing.setUp,
+            tearDown=zope.component.testing.tearDown),
         doctest.DocFileSuite('directives.txt',
-            setUp=zope.app.testing.placelesssetup.setUp,
-            tearDown=zope.app.testing.placelesssetup.tearDown),
+            setUp=zope.component.testing.setUp,
+            tearDown=zope.component.testing.tearDown),
         ))
 
 
