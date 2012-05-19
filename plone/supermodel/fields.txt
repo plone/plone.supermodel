@@ -46,7 +46,7 @@ Then, let's test each field in turn.
     >>> import datetime
     >>> import plone.supermodel.tests
 
-    >>> from elementtree import ElementTree
+    >>> from lxml import etree
 
 Bytes
 -----
@@ -854,7 +854,7 @@ Tuple
       <description>Test desc</description>
       <max_length>10</max_length>
       <min_length>2</min_length>
-      <missing_value />
+      <missing_value/>
       <readonly>True</readonly>
       <required>False</required>
       <title>Test</title>
@@ -909,7 +909,7 @@ List
       <description>Test desc</description>
       <max_length>10</max_length>
       <min_length>2</min_length>
-      <missing_value />
+      <missing_value/>
       <readonly>True</readonly>
       <required>False</required>
       <title>Test</title>
@@ -964,7 +964,7 @@ Set
       <description>Test desc</description>
       <max_length>10</max_length>
       <min_length>2</min_length>
-      <missing_value />
+      <missing_value/>
       <readonly>True</readonly>
       <required>False</required>
       <title>Test</title>
@@ -1019,7 +1019,7 @@ FrozenSet
       <description>Test desc</description>
       <max_length>10</max_length>
       <min_length>2</min_length>
-      <missing_value />
+      <missing_value/>
       <readonly>True</readonly>
       <required>False</required>
       <title>Test</title>
@@ -1078,7 +1078,7 @@ Dict
       </key_type>
       <max_length>10</max_length>
       <min_length>2</min_length>
-      <missing_value />
+      <missing_value/>
       <readonly>True</readonly>
       <required>False</required>
       <title>Test</title>
@@ -1145,11 +1145,11 @@ fields will be omitted, as there is no way to write these reliably.
 However, we support reading an object dotted name for an
 object field that references a particular dotted name.
 
-    >>> element = ElementTree.XML("""\
+    >>> element = etree.XML("""\
     ... <field name="dummy" type="zope.schema.Object">
     ...   <default>plone.supermodel.tests.dummy1</default>
     ...   <description>Test desc</description>
-    ...   <missing_value />
+    ...   <missing_value/>
     ...   <readonly>True</readonly>
     ...   <required>False</required>
     ...   <schema>plone.supermodel.tests.IDummy</schema>
@@ -1200,7 +1200,7 @@ These can be both exported and imported.
     <field name="dummy" type="zope.schema.Choice">
       <default>a</default>
       <description>Test desc</description>
-      <missing_value />
+      <missing_value></missing_value>
       <readonly>True</readonly>
       <required>False</required>
       <title>Test</title>
@@ -1245,7 +1245,7 @@ a unicode string when importing.
     <field name="dummy" type="zope.schema.Choice">
       <default>a</default>
       <description>Test desc</description>
-      <missing_value />
+      <missing_value></missing_value>
       <readonly>True</readonly>
       <required>False</required>
       <title>Test</title>
@@ -1283,7 +1283,7 @@ sure it hasn't regressed.
 
     >>> from plone.supermodel.interfaces import XML_NAMESPACE
     >>> element.set('xmlns', XML_NAMESPACE)
-    >>> element = ElementTree.parse(StringIO(prettyXML(element))).getroot()
+    >>> element = etree.parse(StringIO(prettyXML(element))).getroot()
     >>> reciprocal = handler.read(element)
     >>> [t.value for t in reciprocal.vocabulary]
     [u'a', u'b', u'c']
@@ -1307,7 +1307,7 @@ tokens are the utf8-encoded values).
     <field name="dummy" type="zope.schema.Choice">
       <default>a</default>
       <description>Test desc</description>
-      <missing_value />
+      <missing_value></missing_value>
       <readonly>True</readonly>
       <required>False</required>
       <title>Test</title>
@@ -1358,11 +1358,11 @@ We cannot export choice fields with a source or context source binder:
 However, we can import a choice field with a source, provided that source can
 be specified via an importable dotted name.
 
-    >>> element = ElementTree.XML("""\
+    >>> element = etree.XML("""\
     ... <field name="dummy" type="zope.schema.Choice">
     ...   <default>a</default>
     ...   <description>Test desc</description>
-    ...   <missing_value />
+    ...   <missing_value/>
     ...   <readonly>True</readonly>
     ...   <required>False</required>
     ...   <title>Test</title>
@@ -1390,11 +1390,11 @@ be specified via an importable dotted name.
     >>> reciprocal.vocabularyName is None
     True
 
-    >>> element = ElementTree.XML("""\
+    >>> element = etree.XML("""\
     ... <field name="dummy" type="zope.schema.Choice">
     ...   <default>a</default>
     ...   <description>Test desc</description>
-    ...   <missing_value />
+    ...   <missing_value/>
     ...   <readonly>True</readonly>
     ...   <required>False</required>
     ...   <title>Test</title>

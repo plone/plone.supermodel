@@ -36,16 +36,16 @@ setup(name='plone.supermodel',
       zip_safe=False,
       install_requires=[
           'setuptools',
+          'lxml',
           'zope.component',
           'zope.interface',
           'zope.schema',
           'zope.deferredimport',
           'zope.dottedname',
-          'elementtree',
           'z3c.zcmlhook',
       ],
       extras_require = {
-        'lxml': 'lxml',
+        'lxml': [], # BBB
         'plone.rfc822': ['plone.rfc822'],
         'test': [
             'plone.rfc822',

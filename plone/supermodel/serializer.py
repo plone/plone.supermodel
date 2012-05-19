@@ -16,8 +16,7 @@ from plone.supermodel.interfaces import IFieldNameExtractor
 from plone.supermodel.model import Schema
 
 from plone.supermodel.utils import sortedFields, prettyXML
-
-from elementtree import ElementTree
+from lxml import etree
 
 
 class DefaultFieldNameExtractor(object):
@@ -52,21 +51,14 @@ def serialize(model):
     schema_metadata_handlers = tuple(getUtilitiesFor(ISchemaMetadataHandler))
     field_metadata_handlers = tuple(getUtilitiesFor(IFieldMetadataHandler))
 
-    xml = ElementTree.Element('model')
-    xml.set('xmlns', XML_NAMESPACE)
-
-    # Let utilities indicate which namespace they prefer.
-
-    # XXX: This is manipulating a global - it's probably safe, though,
-    # since we only add new items, and only add them if they don't conflict
-
-    used_prefixes = set(ElementTree._namespace_map.values())
+    nsmap = {}
     for name, handler in schema_metadata_handlers + field_metadata_handlers:
         namespace, prefix = handler.namespace, handler.prefix
-        if namespace is not None and prefix is not None \
-                and prefix not in used_prefixes and namespace not in ElementTree._namespace_map:
-            used_prefixes.add(prefix)
-            ElementTree._namespace_map[namespace] = prefix
+        if namespace is not None and prefix is not None:
+            nsmap[prefix] = namespace
+
+    xml = etree.Element('model', nsmap=nsmap)
+    xml.set('xmlns', XML_NAMESPACE)
 
     def writeField(field, parentElement):
         name_extractor = IFieldNameExtractor(field)
@@ -94,7 +86,7 @@ def serialize(model):
         non_fieldset_fields = [name for name, field in sortedFields(schema)
                                 if name not in fieldset_fields]
 
-        schema_element = ElementTree.Element('schema')
+        schema_element = etree.Element('schema')
         if schemaName:
             schema_element.set('name', schemaName)
 
@@ -108,7 +100,7 @@ def serialize(model):
 
         for fieldset in fieldsets:
 
-            fieldset_element = ElementTree.Element('fieldset')
+            fieldset_element = etree.Element('fieldset')
             fieldset_element.set('name', fieldset.__name__)
             if fieldset.label:
                 fieldset_element.set('label', fieldset.label)

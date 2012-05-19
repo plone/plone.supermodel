@@ -1,10 +1,10 @@
 from cStringIO import StringIO
-from elementtree import ElementTree as etree
 import doctest
 import unittest
 
-from zope.interface import Interface, implements, alsoProvides
+from lxml import etree
 
+from zope.interface import Interface, implements, alsoProvides
 import zope.component.testing
 
 from zope.schema import getFieldNamesInOrder
@@ -317,7 +317,7 @@ class TestValueToElement(unittest.TestCase):
     def test_lists(self):
         field = schema.List(value_type=schema.Int())
         value = []
-        self._assertSerialized(field, value, '<value />')
+        self._assertSerialized(field, value, '<value/>')
         value = [1, 2]
         self._assertSerialized(field, value,
             '<value>'
@@ -329,20 +329,20 @@ class TestValueToElement(unittest.TestCase):
     def test_nested_lists(self):
         field = schema.List(value_type=schema.List(value_type=schema.Int()))
         value = []
-        self._assertSerialized(field, value, '<value />')
+        self._assertSerialized(field, value, '<value/>')
         value = [[1], [1, 2], []]
         self._assertSerialized(field, value,
             '<value>'
             '<element><element>1</element></element>'
             '<element><element>1</element><element>2</element></element>'
-            '<element />'
+            '<element/>'
             '</value>'
             )
 
     def test_dicts(self):
         field = schema.Dict(key_type=schema.Int(), value_type=schema.TextLine())
         value = {}
-        self._assertSerialized(field, value, '<value />')
+        self._assertSerialized(field, value, '<value/>')
         value = {1: 'one', 2: 'two'}
         self._assertSerialized(field, value,
             '<value>'
@@ -359,13 +359,13 @@ class TestValueToElement(unittest.TestCase):
                 ),
             )
         value = {}
-        self._assertSerialized(field, value, '<value />')
+        self._assertSerialized(field, value, '<value/>')
         value = {1: {2: 'two'}, 3: {4: 'four', 5: 'five'}, 6: {}}
         self._assertSerialized(field, value,
             '<value>'
             '<element key="1"><element key="2">two</element></element>'
             '<element key="3"><element key="4">four</element><element key="5">five</element></element>'
-            '<element key="6" />'
+            '<element key="6"/>'
             '</value>'
             )
 

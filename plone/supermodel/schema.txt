@@ -410,12 +410,12 @@ fieldset.
         </field>
         <field name="body" type="zope.schema.Text">
           <max_length>10000</max_length>
-            <title>Body text</title>
+          <title>Body text</title>
         </field>
         <field name="author" type="zope.schema.TextLine">
           <title>Author</title>
         </field>
-        <fieldset description="Standard dates" label="Dates" name="dates">
+        <fieldset name="dates" label="Dates" description="Standard dates">
           <field name="publication_date" type="zope.schema.Date">
             <title>Publication date</title>
           </field>
@@ -428,19 +428,19 @@ fieldset.
         </fieldset>
       </schema>
       <schema name="metadata">
-        <fieldset label="Standard" name="standard">
+        <fieldset name="standard" label="Standard">
           <field name="creator" type="zope.schema.TextLine">
             <description>Name of the creator</description>
             <title>Creator</title>
           </field>
         </fieldset>
-        <fieldset label="Metadata dates" name="dates">
+        <fieldset name="dates" label="Metadata dates">
           <field name="created" type="zope.schema.Datetime">
             <required>False</required>
             <title>Created date</title>
           </field>
         </fieldset>
-        <fieldset label="Author info" name="author" />
+        <fieldset name="author" label="Author info"/>
       </schema>
     </model>
 
@@ -570,8 +570,8 @@ Of course, we can also serialize the schema back to XML. Here, the 'prefix'
 set in the utility (if any) will be used by default.
 
     >>> print serializeModel(model) # doctest: +NORMALIZE_WHITESPACE
-    <model xmlns="http://namespaces.plone.org/supermodel/schema">
-      <schema ui:layout="horizontal" xmlns:ui="http://namespaces.acme.com/ui">
+    <model xmlns:ui="http://namespaces.acme.com/ui" xmlns="http://namespaces.plone.org/supermodel/schema">
+      <schema ui:layout="horizontal">
         <field name="title" type="zope.schema.TextLine" ui:widget="largetype">
           <title>Title</title>
         </field>

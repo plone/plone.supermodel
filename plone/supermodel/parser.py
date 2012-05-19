@@ -1,6 +1,8 @@
 import sys
 import linecache
 
+from lxml import etree
+
 from zope.interface import implements
 from zope.component import getUtility, queryUtility, getUtilitiesFor
 
@@ -20,12 +22,6 @@ from plone.supermodel.model import Model, Fieldset, Schema, SchemaClass
 from plone.supermodel.interfaces import FIELDSETS_KEY
 from plone.supermodel.interfaces import I18N_NAMESPACE
 from plone.supermodel.debug import parseinfo
-
-# Prefer lxml because it can give us line numbers on error.
-try:
-    from lxml import etree
-except ImportError:
-    from elementtree import ElementTree as etree
 
 
 # Exception

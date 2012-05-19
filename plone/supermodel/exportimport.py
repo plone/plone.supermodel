@@ -1,4 +1,4 @@
-from elementtree import ElementTree
+from lxml import etree
 
 from zope.interface import Interface, implements, implementedBy
 from zope.component import queryUtility
@@ -142,7 +142,7 @@ class BaseHandler(object):
         """Create and return a new element representing the given field
         """
 
-        element = ElementTree.Element(elementName)
+        element = etree.Element(elementName)
 
         if name:
             element.set('name', name)

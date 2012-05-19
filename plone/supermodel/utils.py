@@ -2,7 +2,7 @@ import os.path
 import sys
 import re
 
-from elementtree import ElementTree
+from lxml import etree
 
 from zope.interface import directlyProvidedBy, directlyProvides
 from zope.schema.interfaces import IField, IFromUnicode, IDict, ICollection
@@ -57,7 +57,7 @@ def indent(node, level=0):
 
 def prettyXML(tree):
     indent(tree)
-    return ElementTree.tostring(tree)
+    return etree.tostring(tree)
 
 
 def fieldTypecast(field, value):
@@ -149,7 +149,7 @@ def valueToElement(field, value, name=None, force=False):
     if name is None:
         name = field.__name__
 
-    child = ElementTree.Element(name)
+    child = etree.Element(name)
 
     if value is not None and (force or value != field.missing_value):
 

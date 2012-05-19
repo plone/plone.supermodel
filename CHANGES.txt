@@ -1,8 +1,11 @@
 Changelog
 =========
 
-1.1.2 (unreleased)
-------------------
+1.2 (unreleased)
+----------------
+
+- Use lxml instead of elementtree.
+  [davisagli]
 
 - Avoid a test dependency on zope.app.testing.
   [davisagli]
