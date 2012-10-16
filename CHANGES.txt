@@ -1,7 +1,7 @@
 Changelog
 =========
 
-1.1.3 (unreleased)
+1.1.3 (2012-10-16)
 ------------------
 
 - Use elementtree again. lxml will be used in 1.2.x
