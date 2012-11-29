@@ -41,6 +41,7 @@ Next, let's define a sample model with a single, unnamed schema.
     ...             <required>True</required>
     ...         </field>
     ...         <field type="zope.schema.Text" name="description">
+    ...             <!-- we can also put comments in here -->
     ...             <title>Description</title>
     ...             <description>A short summary</description>
     ...             <required>False</required>
