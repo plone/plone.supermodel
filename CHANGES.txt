@@ -4,8 +4,8 @@ Changelog
 1.2.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
-
+- Allow XML comments in field definitions.
+  [gweis]
 
 1.2.0 (2012-10-17)
 ------------------
