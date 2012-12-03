@@ -1,0 +1,4 @@
+*.py?
+*.sw?
+
+/plone.supermodel.egg-info/
