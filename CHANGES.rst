@@ -1,7 +1,7 @@
 Changelog
 =========
 
-1.2.1 (unreleased)
+1.2.1 (2013-01-01)
 ------------------
 
 - Allow XML comments in field definitions.
