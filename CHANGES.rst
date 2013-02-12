@@ -4,8 +4,9 @@ Changelog
 1.2.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
-
+- Integrated elements from collective.dexteritytextindexer to support searchable text indexes
+[jsnyder]
+[ljb]
 
 1.2.1 (2013-01-01)
 ------------------

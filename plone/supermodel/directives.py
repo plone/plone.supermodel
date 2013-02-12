@@ -4,12 +4,14 @@ import sys
 from zope.component import adapts
 from zope.interface import alsoProvides
 from zope.interface import implements
+from zope.interface import Interface
 from zope.interface.interface import TAGGED_DATA
+from zope.interface.interfaces import IInterface
 
 from plone.supermodel import loadFile
 from plone.supermodel.interfaces import ISchema
 from plone.supermodel.interfaces import ISchemaPlugin
-from plone.supermodel.interfaces import FILENAME_KEY, SCHEMA_NAME_KEY, FIELDSETS_KEY, PRIMARY_FIELDS_KEY
+from plone.supermodel.interfaces import FILENAME_KEY, SCHEMA_NAME_KEY, FIELDSETS_KEY, PRIMARY_FIELDS_KEY, SEARCHABLE_KEY
 from plone.supermodel.model import Fieldset
 from plone.supermodel.utils import syncSchema
 
@@ -190,6 +192,25 @@ class FieldsetCheckerPlugin(CheckerPlugin):
             for fieldName in fieldset.fields:
                 yield fieldName
 
+class searchable(MetadataListDirective):
+    """Directive used to mark a field as searchable
+    """
+
+    key = SEARCHABLE_KEY
+    value = 'true'
+
+    def factory(self, *args):
+        """The searchable directive accepts as arguments one or more
+        fieldnames (string) of fields which should be searchable.
+        """
+        if not args:
+            raise TypeError('The seachable directive expects at least one argument.')
+
+        form_interface = Interface
+        if IInterface.providedBy(args[0]):
+            form_interface = args[0]
+            args = args[1:]
+        return[(form_interface, field, self.value) for field in args]
 
 try:
     from plone.rfc822.interfaces import IPrimaryField

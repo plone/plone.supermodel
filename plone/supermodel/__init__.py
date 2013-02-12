@@ -2,6 +2,7 @@ from StringIO import StringIO
 
 import patches
 
+import zope.deferredimport
 from zope.interface import moduleProvides
 
 from plone.supermodel.interfaces import FILENAME_KEY, IXMLToSchema
@@ -12,6 +13,10 @@ from plone.supermodel import model
 
 # Cache models by absolute filename
 _model_cache = {}
+
+zope.deferredimport.defineFrom(
+    'plone.supermodel.directives',
+    'searchable', 'SEARCHABLE_KEY')
 
 def xmlSchema(filename, schema=u"", policy=u"", _frame=2):
     model = loadFile(filename, policy=policy, _frame=_frame+1)

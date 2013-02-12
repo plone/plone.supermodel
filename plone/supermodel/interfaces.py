@@ -8,6 +8,8 @@ FILENAME_KEY = 'plone.supermodel.filename'    # absolute file name of model file
 SCHEMA_NAME_KEY = 'plone.supermodel.schemaname'  # name of schema that was loaded from the model
 FIELDSETS_KEY = 'plone.supermodel.fieldsets'   # list of fieldsets
 PRIMARY_FIELDS_KEY = 'plone.supermodel.primary' # Primary fields (requires plone.rfc822)
+SEARCHABLE_KEY = 'plone.supermodel.searchable' # Searchable Text
+INDEXER_PREFIX = 'indexer'
 
 # The namespace for the default supermodel schema/field parser
 
@@ -209,3 +211,4 @@ class IToUnicode(Interface):
     def toUnicode(value):
         """Convert the field value to a unicode string.
         """
+

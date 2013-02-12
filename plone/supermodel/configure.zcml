@@ -143,6 +143,11 @@
         component=".fields.ChoiceHandler"
         name="zope.schema.Choice"
         />
+
+    <utility
+        factory="plone.supermodel.indexer.IndexerSchema"
+        name="plone.dexterity.indexer"
+        />
             
     <!-- Field name extractors -->
     <adapter factory=".serializer.DefaultFieldNameExtractor" />
