@@ -4,7 +4,8 @@ Changelog
 1.2.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Avoid trying to process XML comments within field values.
+  [davisagli]
 
 
 1.2.1 (2013-01-01)
