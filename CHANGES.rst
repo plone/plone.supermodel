@@ -1,7 +1,7 @@
 Changelog
 =========
 
-1.2.2 (unreleased)
+1.2.2 (2013-05-23)
 ------------------
 
 - Avoid trying to process XML comments within field values.
