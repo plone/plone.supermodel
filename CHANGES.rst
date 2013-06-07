@@ -4,8 +4,7 @@ Changelog
 1.1.5 (unreleased)
 ------------------
 
-- use lxml if available instead of elementtree
-  [vangheem]
+- Nothing changed yet.
 
 
 1.1.4 (2012-12-09)

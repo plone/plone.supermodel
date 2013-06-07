@@ -2,10 +2,7 @@ import os.path
 import sys
 import re
 
-try:
-    from lxml import etree as ElementTree
-except ImportError:
-    from elementtree import ElementTree
+from elementtree import ElementTree
 
 from zope.interface import directlyProvidedBy, directlyProvides
 from zope.schema.interfaces import IField, IFromUnicode, IDict, ICollection
