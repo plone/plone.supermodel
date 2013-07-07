@@ -1426,7 +1426,7 @@ defaultFactory test
 
     >>> element = etree.XML("""\
     ... <field name="dummy" type="zope.schema.TextLine">
-    ...   <defaultFactory>plone.supermodel.tests.dummy_defaultFactor</defaultFactory>
+    ...   <defaultFactory>plone.supermodel.tests.dummy_defaultFactory</defaultFactory>
     ...   <description>Test desc</description>
     ...   <max_length>10</max_length>
     ...   <min_length>2</min_length>
