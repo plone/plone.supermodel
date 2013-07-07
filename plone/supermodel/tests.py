@@ -4,15 +4,17 @@ import unittest
 
 from lxml import etree
 
-from zope.interface import Interface, implements, alsoProvides
+from zope.interface import Interface, implements, alsoProvides, provider
 import zope.component.testing
 
 from zope.schema import getFieldNamesInOrder
+from zope.schema.interfaces import IContextAwareDefaultFactory
 from zope.schema.interfaces import IContextSourceBinder
 from zope.schema.vocabulary import SimpleVocabulary
 from zope import schema
 
 from plone.supermodel import utils
+from plone.supermodel.interfaces import IDefaultFactory
 
 
 class IBase(Interface):
@@ -51,7 +53,17 @@ dummy_binder = Binder()
 dummy_vocabulary_instance = SimpleVocabulary.fromItems([(1, 'a'), (2, 'c')])
 
 
+@provider(IContextAwareDefaultFactory)
+def dummy_defaultCAFactory(context):
+    return u'b'
+
+
+@provider(IDefaultFactory)
 def dummy_defaultFactory():
+    return u'b'
+
+
+def dummy_defaultBadFactory():
     return u'b'
 
 
@@ -384,7 +396,8 @@ def test_suite():
             optionflags=doctest.ELLIPSIS),
         doctest.DocFileSuite('fields.txt',
             setUp=zope.component.testing.setUp,
-            tearDown=zope.component.testing.tearDown),
+            tearDown=zope.component.testing.tearDown,
+            optionflags=doctest.ELLIPSIS),
         doctest.DocFileSuite('schemaclass.txt',
             setUp=zope.component.testing.setUp,
             tearDown=zope.component.testing.tearDown),

@@ -1421,8 +1421,18 @@ be specified via an importable dotted name.
     >>> reciprocal.vocabularyName is None
     True
 
-defaultFactory test
--------------------
+defaultFactory usage
+--------------------
+
+Fields may specify defaultFactory attributes as dotted interfaces.
+defaultFactory callables should provide either
+zope.schema.interfaces.IContextAwareDefaultFactory or
+plone.supermodel.interfaces.IDefaultFactory.
+
+Note that zope.schema allows callables without any marker
+interface. Our requirements are an extra validation measure.
+
+Try specifying a defaultFactory attribute::
 
     >>> element = etree.XML("""\
     ... <field name="dummy" type="zope.schema.TextLine">
@@ -1437,21 +1447,77 @@ defaultFactory test
     ... </field>
     ... """)
 
+Import it::
     >>> handler = getUtility(IFieldExportImportHandler, name='zope.schema.TextLine')
+
+Sanity checks::
+
     >>> reciprocal = handler.read(element)
     >>> reciprocal.__class__
     <class 'zope.schema._bootstrapfields.TextLine'>
+
+And, look for the specified defaultFactory::
     >>> reciprocal.defaultFactory == plone.supermodel.tests.dummy_defaultFactory
     True
 
-    >>> print prettyXML(element)
-    <field name="dummy" type="zope.schema.TextLine">
-      <defaultFactory>plone.supermodel.tests.dummy_defaultFactory</defaultFactory>
-      <description>Test desc</description>
-      <max_length>10</max_length>
-      <min_length>2</min_length>
-      <missing_value>m</missing_value>
-      <readonly>True</readonly>
-      <required>False</required>
-      <title>Test</title>
-    </field>
+Let's try it with a callable that provides IContextAwareDefaultFactory::
+    >>> element = etree.XML("""\
+    ... <field name="dummy" type="zope.schema.TextLine">
+    ...   <defaultFactory>plone.supermodel.tests.dummy_defaultCAFactory</defaultFactory>
+    ...   <description>Test desc</description>
+    ...   <max_length>10</max_length>
+    ...   <min_length>2</min_length>
+    ...   <missing_value>m</missing_value>
+    ...   <readonly>True</readonly>
+    ...   <required>False</required>
+    ...   <title>Test</title>
+    ... </field>
+    ... """)
+
+    >>> handler = getUtility(IFieldExportImportHandler, name='zope.schema.TextLine')
+    >>> reciprocal = handler.read(element)
+    >>> reciprocal.defaultFactory == plone.supermodel.tests.dummy_defaultCAFactory
+    True
+
+And, check to make sure that we can't use a callable that doesn't have one
+of our marker interfaces::
+
+    >>> element = etree.XML("""\
+    ... <field name="dummy" type="zope.schema.TextLine">
+    ...   <defaultFactory>plone.supermodel.tests.dummy_defaultBadFactory</defaultFactory>
+    ...   <description>Test desc</description>
+    ...   <max_length>10</max_length>
+    ...   <min_length>2</min_length>
+    ...   <missing_value>m</missing_value>
+    ...   <readonly>True</readonly>
+    ...   <required>False</required>
+    ...   <title>Test</title>
+    ... </field>
+    ... """)
+
+    >>> handler = getUtility(IFieldExportImportHandler, name='zope.schema.TextLine')
+    >>> reciprocal = handler.read(element)
+    Traceback (most recent call last):
+    ...
+    ImportError: defaultFactory must provide zope.schema.interfaces.IContextAwareDefaultFactory or plone.supermodel.IDefaultFactory
+
+A non-existent callable should also raise an error::
+
+    >>> element = etree.XML("""\
+    ... <field name="dummy" type="zope.schema.TextLine">
+    ...   <defaultFactory>plone.supermodel.tests.nonExistentFactory</defaultFactory>
+    ...   <description>Test desc</description>
+    ...   <max_length>10</max_length>
+    ...   <min_length>2</min_length>
+    ...   <missing_value>m</missing_value>
+    ...   <readonly>True</readonly>
+    ...   <required>False</required>
+    ...   <title>Test</title>
+    ... </field>
+    ... """)
+
+    >>> handler = getUtility(IFieldExportImportHandler, name='zope.schema.TextLine')
+    >>> reciprocal = handler.read(element)
+    Traceback (most recent call last):
+    ...
+    ImportError: No module named nonExistentFactory
