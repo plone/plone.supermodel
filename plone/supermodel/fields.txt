@@ -22,11 +22,11 @@ First, let's wire up the package.
     ... <configure
     ...      xmlns="http://namespaces.zope.org/zope"
     ...      i18n_domain="plone.behavior.tests">
-    ...      
+    ...
     ...     <include package="zope.component" file="meta.zcml" />
-    ...     
+    ...
     ...     <include package="plone.supermodel" />
-    ...     
+    ...
     ... </configure>
     ... """
 
@@ -51,7 +51,7 @@ Then, let's test each field in turn.
 Bytes
 -----
 
-    >>> field = schema.Bytes(__name__="dummy", title=u"Test", 
+    >>> field = schema.Bytes(__name__="dummy", title=u"Test",
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default='abc', missing_value='m',
     ...     min_length=2, max_length=10)
@@ -69,7 +69,7 @@ Bytes
       <required>False</required>
       <title>Test</title>
     </field>
-    
+
     >>> reciprocal = handler.read(element)
     >>> reciprocal.__class__
     <class 'zope.schema._field.Bytes'>
@@ -95,7 +95,7 @@ Bytes
 BytesLine
 ---------
 
-    >>> field = schema.BytesLine(__name__="dummy", title=u"Test", 
+    >>> field = schema.BytesLine(__name__="dummy", title=u"Test",
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default='abc', missing_value='m',
     ...     min_length=2, max_length=10)
@@ -113,7 +113,7 @@ BytesLine
       <required>False</required>
       <title>Test</title>
     </field>
-    
+
     >>> reciprocal = handler.read(element)
     >>> reciprocal.__class__
     <class 'zope.schema._field.BytesLine'>
@@ -139,7 +139,7 @@ BytesLine
 ASCII
 -----
 
-    >>> field = schema.ASCII(__name__="dummy", title=u"Test", 
+    >>> field = schema.ASCII(__name__="dummy", title=u"Test",
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default='abc', missing_value='m',
     ...     min_length=2, max_length=10)
@@ -157,7 +157,7 @@ ASCII
       <required>False</required>
       <title>Test</title>
     </field>
-    
+
     >>> reciprocal = handler.read(element)
     >>> reciprocal.__class__
     <class 'zope.schema._field.ASCII'>
@@ -183,7 +183,7 @@ ASCII
 ASCIILine
 ---------
 
-    >>> field = schema.ASCIILine(__name__="dummy", title=u"Test", 
+    >>> field = schema.ASCIILine(__name__="dummy", title=u"Test",
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default='abc', missing_value='m',
     ...     min_length=2, max_length=10)
@@ -201,7 +201,7 @@ ASCIILine
       <required>False</required>
       <title>Test</title>
     </field>
-    
+
     >>> reciprocal = handler.read(element)
     >>> reciprocal.__class__
     <class 'zope.schema._field.ASCIILine'>
@@ -227,7 +227,7 @@ ASCIILine
 Text
 ----
 
-    >>> field = schema.Text(__name__="dummy", title=u"Test", 
+    >>> field = schema.Text(__name__="dummy", title=u"Test",
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default=u'abc', missing_value=u'm',
     ...     min_length=2, max_length=10)
@@ -245,7 +245,7 @@ Text
       <required>False</required>
       <title>Test</title>
     </field>
-    
+
     >>> reciprocal = handler.read(element)
     >>> reciprocal.__class__
     <class 'zope.schema._bootstrapfields.Text'>
@@ -271,7 +271,7 @@ Text
 TextLine
 --------
 
-    >>> field = schema.TextLine(__name__="dummy", title=u"Test", 
+    >>> field = schema.TextLine(__name__="dummy", title=u"Test",
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default=u'abc', missing_value=u'm',
     ...     min_length=2, max_length=10)
@@ -289,7 +289,7 @@ TextLine
       <required>False</required>
       <title>Test</title>
     </field>
-    
+
     >>> reciprocal = handler.read(element)
     >>> reciprocal.__class__
     <class 'zope.schema._bootstrapfields.TextLine'>
@@ -315,7 +315,7 @@ TextLine
 SourceText
 ----------
 
-    >>> field = schema.SourceText(__name__="dummy", title=u"Test", 
+    >>> field = schema.SourceText(__name__="dummy", title=u"Test",
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default=u'abc', missing_value=u'm',
     ...     min_length=2, max_length=10)
@@ -333,7 +333,7 @@ SourceText
       <required>False</required>
       <title>Test</title>
     </field>
-    
+
     >>> reciprocal = handler.read(element)
     >>> reciprocal.__class__
     <class 'zope.schema._field.SourceText'>
@@ -359,7 +359,7 @@ SourceText
 URI
 ---
 
-    >>> field = schema.URI(__name__="dummy", title=u"Test", 
+    >>> field = schema.URI(__name__="dummy", title=u"Test",
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default='http://plone.org', missing_value='m',
     ...     min_length=2, max_length=100)
@@ -377,7 +377,7 @@ URI
       <required>False</required>
       <title>Test</title>
     </field>
-    
+
     >>> reciprocal = handler.read(element)
     >>> reciprocal.__class__
     <class 'zope.schema._field.URI'>
@@ -403,7 +403,7 @@ URI
 Id
 --
 
-    >>> field = schema.Id(__name__="dummy", title=u"Test", 
+    >>> field = schema.Id(__name__="dummy", title=u"Test",
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default='a.b.c', missing_value='m',
     ...     min_length=2, max_length=10)
@@ -421,7 +421,7 @@ Id
       <required>False</required>
       <title>Test</title>
     </field>
-    
+
     >>> reciprocal = handler.read(element)
     >>> reciprocal.__class__
     <class 'zope.schema._field.Id'>
@@ -447,7 +447,7 @@ Id
 DottedName
 -----------
 
-    >>> field = schema.DottedName(__name__="dummy", title=u"Test", 
+    >>> field = schema.DottedName(__name__="dummy", title=u"Test",
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default='a.b.c', missing_value='m',
     ...     min_length=2, max_length=10, min_dots=2, max_dots=4)
@@ -467,7 +467,7 @@ DottedName
       <required>False</required>
       <title>Test</title>
     </field>
-    
+
     >>> reciprocal = handler.read(element)
     >>> reciprocal.__class__
     <class 'zope.schema._field.DottedName'>
@@ -497,7 +497,7 @@ DottedName
 Password
 --------
 
-    >>> field = schema.Password(__name__="dummy", title=u"Test", 
+    >>> field = schema.Password(__name__="dummy", title=u"Test",
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default=u'abc', missing_value=u'm',
     ...     min_length=2, max_length=10)
@@ -515,7 +515,7 @@ Password
       <required>False</required>
       <title>Test</title>
     </field>
-    
+
     >>> reciprocal = handler.read(element)
     >>> reciprocal.__class__
     <class 'zope.schema._bootstrapfields.Password'>
@@ -541,7 +541,7 @@ Password
 Bool
 ----
 
-    >>> field = schema.Bool(__name__="dummy", title=u"Test", 
+    >>> field = schema.Bool(__name__="dummy", title=u"Test",
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default=False, missing_value=True)
     >>> fieldType = IFieldNameExtractor(field)()
@@ -556,7 +556,7 @@ Bool
       <required>False</required>
       <title>Test</title>
     </field>
-    
+
     >>> reciprocal = handler.read(element)
     >>> reciprocal.__class__
     <class 'zope.schema._bootstrapfields.Bool'>
@@ -578,7 +578,7 @@ Bool
 Int
 ---
 
-    >>> field = schema.Int(__name__="dummy", title=u"Test", 
+    >>> field = schema.Int(__name__="dummy", title=u"Test",
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default=12, missing_value=-1,
     ...     min=1, max=99)
@@ -596,7 +596,7 @@ Int
       <required>False</required>
       <title>Test</title>
     </field>
-    
+
     >>> reciprocal = handler.read(element)
     >>> reciprocal.__class__
     <class 'zope.schema._bootstrapfields.Int'>
@@ -622,7 +622,7 @@ Int
 Float
 -----
 
-    >>> field = schema.Float(__name__="dummy", title=u"Test", 
+    >>> field = schema.Float(__name__="dummy", title=u"Test",
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default=12.1, missing_value=-1.0,
     ...     min=1.123, max=99.5)
@@ -640,7 +640,7 @@ Float
       <required>False</required>
       <title>Test</title>
     </field>
-    
+
     >>> reciprocal = handler.read(element)
     >>> reciprocal.__class__
     <class 'zope.schema._field.Float'>
@@ -665,9 +665,9 @@ Float
 
 Decimal
 -------
-    
+
     >>> import decimal
-    >>> field = schema.Decimal(__name__="dummy", title=u"Test", 
+    >>> field = schema.Decimal(__name__="dummy", title=u"Test",
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default=decimal.Decimal("12.1"), missing_value=decimal.Decimal("-1.0"),
     ...     min=decimal.Decimal("1.123"), max=decimal.Decimal("99.5"))
@@ -685,7 +685,7 @@ Decimal
       <required>False</required>
       <title>Test</title>
     </field>
-    
+
     >>> reciprocal = handler.read(element)
     >>> reciprocal.__class__
     <class 'zope.schema._field.Decimal'>
@@ -711,7 +711,7 @@ Decimal
 Date
 ----
 
-    >>> field = schema.Date(__name__="dummy", title=u"Test", 
+    >>> field = schema.Date(__name__="dummy", title=u"Test",
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default=datetime.date(2001,1,2), missing_value=datetime.date(2000,1,1),
     ...     min=datetime.date(2000,10,12), max=datetime.date(2099,12,31))
@@ -729,7 +729,7 @@ Date
       <required>False</required>
       <title>Test</title>
     </field>
-    
+
     >>> reciprocal = handler.read(element)
     >>> reciprocal.__class__
     <class 'zope.schema._field.Date'>
@@ -755,7 +755,7 @@ Date
 Datetime
 ---------
 
-    >>> field = schema.Datetime(__name__="dummy", title=u"Test", 
+    >>> field = schema.Datetime(__name__="dummy", title=u"Test",
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default=datetime.datetime(2001,1,2,1,2,3), missing_value=datetime.datetime(2000,1,1,2,3,4),
     ...     min=datetime.datetime(2000,10,12,0,0,2), max=datetime.datetime(2099,12,31,1,2,2))
@@ -773,7 +773,7 @@ Datetime
       <required>False</required>
       <title>Test</title>
     </field>
-    
+
     >>> reciprocal = handler.read(element)
     >>> reciprocal.__class__
     <class 'zope.schema._field.Datetime'>
@@ -799,7 +799,7 @@ Datetime
 InterfaceField
 ---------------
 
-    >>> field = schema.InterfaceField(__name__="dummy", title=u"Test", 
+    >>> field = schema.InterfaceField(__name__="dummy", title=u"Test",
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default=plone.supermodel.tests.IDummy,
     ...     missing_value=plone.supermodel.tests.IDummy)
@@ -815,7 +815,7 @@ InterfaceField
       <required>False</required>
       <title>Test</title>
     </field>
-    
+
     >>> reciprocal = handler.read(element)
     >>> reciprocal.__class__
     <class 'zope.schema._field.InterfaceField'>
@@ -837,7 +837,7 @@ InterfaceField
 Tuple
 -----
 
-    >>> field = schema.Tuple(__name__="dummy", title=u"Test", 
+    >>> field = schema.Tuple(__name__="dummy", title=u"Test",
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default=(1,2), missing_value=(),
     ...     min_length=2, max_length=10,
@@ -862,7 +862,7 @@ Tuple
         <title>Val</title>
       </value_type>
     </field>
-    
+
     >>> reciprocal = handler.read(element)
     >>> reciprocal.__class__
     <class 'zope.schema._field.Tuple'>
@@ -892,7 +892,7 @@ Tuple
 List
 ----
 
-    >>> field = schema.List(__name__="dummy", title=u"Test", 
+    >>> field = schema.List(__name__="dummy", title=u"Test",
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default=[1,2], missing_value=[],
     ...     min_length=2, max_length=10,
@@ -917,7 +917,7 @@ List
         <title>Val</title>
       </value_type>
     </field>
-    
+
     >>> reciprocal = handler.read(element)
     >>> reciprocal.__class__
     <class 'zope.schema._field.List'>
@@ -947,7 +947,7 @@ List
 Set
 ---
 
-    >>> field = schema.Set(__name__="dummy", title=u"Test", 
+    >>> field = schema.Set(__name__="dummy", title=u"Test",
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default=set((1,2)), missing_value=set(),
     ...     min_length=2, max_length=10,
@@ -972,7 +972,7 @@ Set
         <title>Val</title>
       </value_type>
     </field>
-    
+
     >>> reciprocal = handler.read(element)
     >>> reciprocal.__class__
     <class 'zope.schema._field.Set'>
@@ -1002,7 +1002,7 @@ Set
 FrozenSet
 ---------
 
-    >>> field = schema.FrozenSet(__name__="dummy", title=u"Test", 
+    >>> field = schema.FrozenSet(__name__="dummy", title=u"Test",
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default=frozenset((1,2)), missing_value=frozenset(),
     ...     min_length=2, max_length=10,
@@ -1027,7 +1027,7 @@ FrozenSet
         <title>Val</title>
       </value_type>
     </field>
-    
+
     >>> reciprocal = handler.read(element)
     >>> reciprocal.__class__
     <class 'zope.schema._field.FrozenSet'>
@@ -1057,7 +1057,7 @@ FrozenSet
 Dict
 ----
 
-    >>> field = schema.Dict(__name__="dummy", title=u"Test", 
+    >>> field = schema.Dict(__name__="dummy", title=u"Test",
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default={'a':1, 'b':2}, missing_value={},
     ...     min_length=2, max_length=10,
@@ -1086,7 +1086,7 @@ Dict
         <title>Val</title>
       </value_type>
     </field>
-    
+
     >>> reciprocal = handler.read(element)
     >>> reciprocal.__class__
     <class 'zope.schema._field.Dict'>
@@ -1122,11 +1122,11 @@ Object
 
 Note: when an object field is written, the 'default' and 'missing_value'
 fields will be omitted, as there is no way to write these reliably.
-    
+
     >>> dummy1 = plone.supermodel.tests.Dummy()
     >>> dummy2 = plone.supermodel.tests.Dummy()
 
-    >>> field = schema.Object(__name__="dummy", title=u"Test", 
+    >>> field = schema.Object(__name__="dummy", title=u"Test",
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default=dummy1, missing_value=dummy2,
     ...     schema=plone.supermodel.tests.IDummy)
@@ -1141,7 +1141,7 @@ fields will be omitted, as there is no way to write these reliably.
       <schema>plone.supermodel.tests.IDummy</schema>
       <title>Test</title>
     </field>
-    
+
 However, we support reading an object dotted name for an
 object field that references a particular dotted name.
 
@@ -1156,7 +1156,7 @@ object field that references a particular dotted name.
     ...   <title>Test</title>
     ... </field>
     ... """)
-    
+
     >>> reciprocal = handler.read(element)
     >>> reciprocal.__class__
     <class 'zope.schema._field.Object'>
@@ -1182,14 +1182,14 @@ The choice field supports several different modes: a named vocabulary, a list
 of values, a source object, or a source context binder object. However,
 plone.supermodel only supports exporting named vocabularies or lists of
 unicode string values. In addition, it is possible to import (but not export)
-a source or context source binder, provided it can be imported from a 
+a source or context source binder, provided it can be imported from a
 dotted name.
 
 1. Named vocabularies
 
 These can be both exported and imported.
 
-    >>> field = schema.Choice(__name__="dummy", title=u"Test", 
+    >>> field = schema.Choice(__name__="dummy", title=u"Test",
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default='a', missing_value='', vocabulary=u'dummy.vocab')
 
@@ -1206,7 +1206,7 @@ These can be both exported and imported.
       <title>Test</title>
       <vocabulary>dummy.vocab</vocabulary>
     </field>
-    
+
     >>> reciprocal = handler.read(element)
     >>> reciprocal.__class__
     <class 'zope.schema._field.Choice'>
@@ -1228,13 +1228,13 @@ These can be both exported and imported.
     True
     >>> reciprocal.vocabularyName
     u'dummy.vocab'
-    
+
 2. Values vocabularies
 
 These can be both imported and exported, but note that the value is always
 a unicode string when importing.
 
-    >>> field = schema.Choice(__name__="dummy", title=u"Test", 
+    >>> field = schema.Choice(__name__="dummy", title=u"Test",
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default='a', missing_value='', values=['a', 'b', 'c'])
 
@@ -1296,7 +1296,7 @@ tokens are the utf8-encoded values).
     ...     SimpleTerm(token='a', value=u'a', title=u'a'),
     ...     SimpleTerm(token=r'\xe7', value=u'\xe7', title=u'\xe7'), # c with cedilla
     ...     ])
-    >>> field = schema.Choice(__name__="dummy", title=u"Test", 
+    >>> field = schema.Choice(__name__="dummy", title=u"Test",
     ...     description=u"Test desc", required=False, readonly=True,
     ...     default='a', missing_value='', vocabulary=vocab)
 
@@ -1325,7 +1325,7 @@ tokens are the utf8-encoded values).
 
 We cannot export choice fields with a source or context source binder:
 
-    >>> field = schema.Choice(__name__="dummy", title=u"Test", 
+    >>> field = schema.Choice(__name__="dummy", title=u"Test",
     ...     description=u"Test desc", required=False, readonly=True,
     ...     vocabulary=plone.supermodel.tests.dummy_vocabulary_instance)
     >>> fieldType = IFieldNameExtractor(field)()
@@ -1334,8 +1334,8 @@ We cannot export choice fields with a source or context source binder:
     Traceback (most recent call last):
     ...
     NotImplementedError: Cannot export a vocabulary that is not based on a simple list of values
-    
-    >>> field = schema.Choice(__name__="dummy", title=u"Test", 
+
+    >>> field = schema.Choice(__name__="dummy", title=u"Test",
     ...     description=u"Test desc", required=False, readonly=True,
     ...     source=plone.supermodel.tests.dummy_vocabulary_instance)
     >>> fieldType = IFieldNameExtractor(field)()
@@ -1345,7 +1345,7 @@ We cannot export choice fields with a source or context source binder:
     ...
     NotImplementedError: Cannot export a vocabulary that is not based on a simple list of values
 
-    >>> field = schema.Choice(__name__="dummy", title=u"Test", 
+    >>> field = schema.Choice(__name__="dummy", title=u"Test",
     ...     description=u"Test desc", required=False, readonly=True,
     ...     source=plone.supermodel.tests.dummy_binder)
     >>> fieldType = IFieldNameExtractor(field)()
@@ -1369,7 +1369,7 @@ be specified via an importable dotted name.
     ...   <source>plone.supermodel.tests.dummy_binder</source>
     ... </field>
     ... """)
-    
+
     >>> reciprocal = handler.read(element)
     >>> reciprocal.__class__
     <class 'zope.schema._field.Choice'>
@@ -1420,3 +1420,38 @@ be specified via an importable dotted name.
     True
     >>> reciprocal.vocabularyName is None
     True
+
+defaultFactory test
+-------------------
+
+    >>> element = etree.XML("""\
+    ... <field name="dummy" type="zope.schema.TextLine">
+    ...   <defaultFactory>plone.supermodel.tests.dummy_defaultFactory</defaultFactory>
+    ...   <description>Test desc</description>
+    ...   <max_length>10</max_length>
+    ...   <min_length>2</min_length>
+    ...   <missing_value>m</missing_value>
+    ...   <readonly>True</readonly>
+    ...   <required>False</required>
+    ...   <title>Test</title>
+    ... </field>
+    ... """)
+
+    >>> handler = getUtility(IFieldExportImportHandler, name='zope.schema.TextLine')
+    >>> reciprocal = handler.read(element)
+    >>> reciprocal.__class__
+    <class 'zope.schema._bootstrapfields.TextLine'>
+    >>> reciprocal.defaultFactory == plone.supermodel.tests.dummy_defaultFactory
+    True
+
+    >>> print prettyXML(element)
+    <field name="dummy" type="zope.schema.TextLine">
+      <defaultFactory>plone.supermodel.tests.dummy_defaultFactory</defaultFactory>
+      <description>Test desc</description>
+      <max_length>10</max_length>
+      <min_length>2</min_length>
+      <missing_value>m</missing_value>
+      <readonly>True</readonly>
+      <required>False</required>
+      <title>Test</title>
+    </field>

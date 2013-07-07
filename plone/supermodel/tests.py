@@ -51,6 +51,10 @@ dummy_binder = Binder()
 dummy_vocabulary_instance = SimpleVocabulary.fromItems([(1, 'a'), (2, 'c')])
 
 
+def dummy_defaultFactory():
+    return u'b'
+
+
 class TestUtils(unittest.TestCase):
 
     def test_syncSchema(self):

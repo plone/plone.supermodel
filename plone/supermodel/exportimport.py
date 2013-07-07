@@ -30,7 +30,7 @@ class BaseHandler(object):
     # Elements that we will not read/write. 'r' means skip when reading;
     # 'w' means skip when writing; 'rw' means skip always.
 
-    filteredAttributes = {'order': 'rw', 'unique': 'rw'}
+    filteredAttributes = {'order': 'rw', 'unique': 'rw', 'defaultFactory': 'w'}
 
     # Elements that are of the same type as the field itself
     fieldTypeAttributes = ('min', 'max', 'default', )
@@ -55,6 +55,9 @@ class BaseHandler(object):
         # text input to an appropriate object.
         for schema in implementedBy(self.klass).flattened():
             self.fieldAttributes.update(zope.schema.getFields(schema))
+
+        self.fieldAttributes['defaultFactory'] = \
+            zope.schema.Object(__name__='defaultFactory', title=u"defaultFactory", schema=Interface)
 
     def _constructField(self, attributes):
         return self.klass(**attributes)
