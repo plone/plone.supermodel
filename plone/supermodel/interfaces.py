@@ -51,7 +51,7 @@ class IFieldset(Interface):
 class ISchemaPlugin(Interface):
     """A named adapter that provides additional functionality during schema
     construction.
-    
+
     Execution is deferred until the full supermodel environment is available.
     """
 
@@ -209,3 +209,14 @@ class IToUnicode(Interface):
     def toUnicode(value):
         """Convert the field value to a unicode string.
         """
+
+
+class IDefaultFactory(Interface):
+    """A default factory that does not require a context.
+
+    This is a marker for defaultFactory callables that do
+    not need an interface.
+    """
+
+    def __call__():
+        """Returns a default value for the field."""

@@ -5,10 +5,12 @@ from zope.component import queryUtility
 
 import zope.schema
 
+from zope.schema.interfaces import IContextAwareDefaultFactory
 from zope.schema.interfaces import IField
 from zope.schema.interfaces import IVocabularyTokenized
 from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
 
+from plone.supermodel.interfaces import IDefaultFactory
 from plone.supermodel.interfaces import IFieldNameExtractor
 from plone.supermodel.interfaces import IFieldExportImportHandler
 
@@ -139,6 +141,20 @@ class BaseHandler(object):
                 parseinfo.stack.pop()
 
         field_instance._init_field = True
+
+        if field_instance.defaultFactory is not None:
+            # we want to add some additional requirements for defaultFactory.
+            # zope.schema will be happy with any function, we'd like to
+            # restrict to those that provide IContextAwareDefaultFactory
+            # or IDefaultFactory
+            if not (
+                IContextAwareDefaultFactory.providedBy(field_instance.defaultFactory) or
+                IDefaultFactory.providedBy(field_instance.defaultFactory)
+                ):
+                raise ImportError(u"defaultFactory must provide "
+                                           "zope.schema.interfaces.IContextAwareDefaultFactory "
+                                           "or plone.supermodel.IDefaultFactory")
+
         return field_instance
 
     def write(self, field, name, type, elementName='field'):
