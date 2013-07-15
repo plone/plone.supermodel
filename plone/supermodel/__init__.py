@@ -1,7 +1,5 @@
 from StringIO import StringIO
 
-import patches
-
 from zope.interface import moduleProvides
 
 from plone.supermodel.interfaces import FILENAME_KEY, IXMLToSchema
@@ -13,9 +11,11 @@ from plone.supermodel import model
 # Cache models by absolute filename
 _model_cache = {}
 
+
 def xmlSchema(filename, schema=u"", policy=u"", _frame=2):
-    model = loadFile(filename, policy=policy, _frame=_frame+1)
-    return model.schemata[schema]
+    _model = loadFile(filename, policy=policy, _frame=_frame + 1)
+    return _model.schemata[schema]
+
 
 def loadFile(filename, reload=False, policy=u"", _frame=2):
     global _model_cache
@@ -27,14 +27,18 @@ def loadFile(filename, reload=False, policy=u"", _frame=2):
         _model_cache[path] = parsed_model
     return _model_cache[path]
 
+
 def loadString(model, policy=u""):
     return parser.parse(StringIO(model), policy=policy)
-    
+
+
 def serializeSchema(schema, name=u""):
     return serializeModel(model.Model({name: schema}))
-    
+
+
 def serializeModel(model):
     return serializer.serialize(model)
+
 
 moduleProvides(IXMLToSchema)
 

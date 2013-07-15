@@ -17,6 +17,7 @@ zope.deferredimport.defineFrom('plone.supermodel.directives',
 
 try:
     from plone.rfc822.interfaces import IPrimaryField
+    IPrimaryField  # PEP8
 except ImportError:
     pass
 else:
@@ -80,8 +81,9 @@ def finalizeSchemas(parent=Schema):
     """
     if not isinstance(parent, SchemaClass):
         raise TypeError('Only instances of plone.supermodel.model.SchemaClass can be finalized.')
+
     def walk(schema):
-        yield  schema
+        yield schema
         for child in schema.dependents.keys():
             for s in walk(child):
                 yield s

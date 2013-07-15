@@ -31,18 +31,18 @@
 
     <adapter factory=".converters.DefaultFromUnicode" />
     <adapter factory=".converters.DefaultToUnicode" />
-    
+
     <adapter factory=".converters.DateFromUnicode" />
     <adapter factory=".converters.DatetimeFromUnicode" />
-    
+
     <adapter factory=".converters.InterfaceFieldFromUnicode" />
     <adapter factory=".converters.InterfaceFieldToUnicode" />
-    
+
     <adapter factory=".converters.ObjectFromUnicode" />
-    
+
 
     <!-- Field handlers for all of zope.schema -->
-    
+
     <utility
         component=".fields.BytesHandler"
         name="zope.schema.Bytes"
@@ -143,10 +143,10 @@
         component=".fields.ChoiceHandler"
         name="zope.schema.Choice"
         />
-            
+
     <!-- Field name extractors -->
     <adapter factory=".serializer.DefaultFieldNameExtractor" />
-    
+
     <!-- Parsing policy -->
     <utility factory=".parser.DefaultSchemaPolicy" />
 

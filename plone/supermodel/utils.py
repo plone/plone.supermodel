@@ -267,10 +267,7 @@ def syncSchema(source, dest, overwrite=False, sync_bases=False):
             if hasattr(dest, '_v_attrs'):
                 dest._v_attrs[name] = clone
 
-
-
     # Copy tagged values
-
     dest_tags = set(dest.getTaggedValueTags())
     for tag in source.getTaggedValueTags():
         if overwrite or tag not in dest_tags:
