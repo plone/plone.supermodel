@@ -15,6 +15,7 @@ from plone.supermodel.utils import syncSchema
 
 # Directive
 
+
 class DirectiveClass(type):
     """A Directive is used to apply tagged values to a Schema
     """
@@ -50,6 +51,7 @@ class MetadataDictDirective(Directive):
 
     def store(self, tags, value):
         tags.setdefault(self.key, {}).update(value)
+
 
 # Plugin
 
@@ -96,6 +98,7 @@ class ListCheckerPlugin(CheckerPlugin):
             return
         for fieldName in self.value:
             yield fieldName
+
 
 class ListPositionCheckerPlugin(CheckerPlugin):
 
@@ -161,8 +164,8 @@ class SupermodelSchemaPlugin(object):
         model = loadFile(filename)
         if schema not in model.schemata:
             raise ValueError(
-                    u"Schema '%s' specified for interface %s does not exist in %s." % 
-                        (schema, interface.__identifier__, filename,)) 
+                    u"Schema '%s' specified for interface %s does not exist in %s." %
+                        (schema, interface.__identifier__, filename,))
 
         syncSchema(model.schemata[schema], interface, overwrite=False)
 
@@ -173,8 +176,8 @@ class fieldset(MetadataListDirective):
     key = FIELDSETS_KEY
 
     def factory(self, name, label=None, description=None, fields=None, **kw):
-        fieldset=Fieldset(name, label=label, description=description, fields=fields)
-        for (key,value) in kw.items():
+        fieldset = Fieldset(name, label=label, description=description, fields=fields)
+        for (key, value) in kw.items():
             setattr(fieldset, key, value)
         return [fieldset]
 
@@ -206,7 +209,6 @@ else:
                 raise TypeError('The primary directive expects at least one argument.')
             return args
 
-
     class PrimaryFieldsPlugin(ListCheckerPlugin):
 
         key = PRIMARY_FIELDS_KEY
@@ -215,4 +217,3 @@ else:
             schema = self.schema
             for fieldName in self.check():
                 alsoProvides(schema[fieldName], IPrimaryField)
-       

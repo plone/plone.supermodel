@@ -260,7 +260,7 @@ class ChoiceHandler(BaseHandler):
                 encoded = value.encode('unicode_escape')
                 if value != encoded:
                     unicode_found = True
-                term = SimpleTerm(token = encoded, value = value, title = value)
+                term = SimpleTerm(token=encoded, value=value, title=value)
                 terms.append(term)
             if unicode_found:
                 attributes['vocabulary'] = SimpleVocabulary(terms)

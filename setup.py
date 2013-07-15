@@ -44,8 +44,8 @@ setup(name='plone.supermodel',
           'zope.dottedname',
           'z3c.zcmlhook',
       ],
-      extras_require = {
-        'lxml': [], # BBB
+      extras_require={
+        'lxml': [],  # BBB
         'plone.rfc822': ['plone.rfc822'],
         'test': [
             'plone.rfc822',

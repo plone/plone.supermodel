@@ -46,6 +46,7 @@ class SupermodelParseError(Exception):
 
 # Helper adapters
 
+
 class DefaultSchemaPolicy(object):
     implements(ISchemaPolicy)
 
@@ -58,8 +59,8 @@ class DefaultSchemaPolicy(object):
     def name(self, schemaName, tree):
         return schemaName
 
-# Algorithm
 
+# Algorithm
 
 def parse(source, policy=u""):
     fname = None
@@ -122,7 +123,6 @@ def _parse(source, policy):
     for schema_element in root.findall(ns('schema')):
         parseinfo.stack.append(schema_element)
         schemaAttributes = {}
-        schema_metadata = {}
 
         schemaName = schema_element.get('name')
         if schemaName is None:
