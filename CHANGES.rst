@@ -4,8 +4,9 @@ Changelog
 1.2.3 (unreleased)
 ------------------
 
-- Add defaultFactory tag for Dexterity XML. Define an interface IDefaultFactory.
-  defaultFactories specified via XML must implement it or IContextAwareDefaultFactory.
+- Add defaultFactory tag for Dexterity XML. Define an interface
+  IDefaultFactory. defaultFactories specified via XML must implement it or
+  IContextAwareDefaultFactory.
 
 
 1.2.2 (2013-05-23)
