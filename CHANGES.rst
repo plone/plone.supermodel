@@ -1,7 +1,7 @@
 Changelog
 =========
 
-1.2.3 (unreleased)
+1.2.3 (2013-08-14)
 ------------------
 
 - Add defaultFactory tag for Dexterity XML. Define an interface
