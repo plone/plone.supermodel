@@ -217,10 +217,10 @@ class TestUtils(unittest.TestCase):
 
         utils.syncSchema(ISource, IDest)
 
-        self.failIf(IMarker.providedBy(IDest['one']))
-        self.failIf(IMarker.providedBy(IDest['two']))
-        self.failIf(IMarker.providedBy(IDest['three']))
-        self.failUnless(IMarker.providedBy(IDest['four']))
+        self.assertFalse(IMarker.providedBy(IDest['one']))
+        self.assertFalse(IMarker.providedBy(IDest['two']))
+        self.assertFalse(IMarker.providedBy(IDest['three']))
+        self.assertTrue(IMarker.providedBy(IDest['four']))
 
     def test_syncSchema_with_markers_overwrite(self):
 
@@ -241,9 +241,9 @@ class TestUtils(unittest.TestCase):
 
         utils.syncSchema(ISource, IDest, overwrite=True)
 
-        self.failUnless(IMarker.providedBy(IDest['one']))
-        self.failIf(IMarker.providedBy(IDest['two']))
-        self.failUnless(IMarker.providedBy(IDest['four']))
+        self.assertTrue(IMarker.providedBy(IDest['one']))
+        self.assertFalse(IMarker.providedBy(IDest['two']))
+        self.assertTrue(IMarker.providedBy(IDest['four']))
 
     def test_syncSchema_always_overwrites_fields_from_bases(self):
 

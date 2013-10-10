@@ -4,7 +4,8 @@ Changelog
 1.2.4 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Replace deprecated test assert statements.
+  [timo]
 
 
 1.2.3 (2013-08-14)
