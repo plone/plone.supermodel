@@ -93,6 +93,11 @@ def serialize(model):
         bases = [b.__identifier__ for b in schema.__bases__ if b is not Schema]
         if bases:
             schema_element.set('based-on', ' '.join(bases))
+        
+        for invariant in schema.queryTaggedValue('invariants', []):
+            invariant_element = etree.Element('invariant')
+            invariant_element.text = "%s.%s" % (invariant.__module__, invariant.__name__
+            schema_element.append(invariant_element)
 
         for fieldName in non_fieldset_fields:
             field = schema[fieldName]
