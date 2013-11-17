@@ -5,6 +5,7 @@ import unittest
 from lxml import etree
 
 from zope.interface import Interface, implements, alsoProvides, provider
+from zope.interface import Invalid
 import zope.component.testing
 
 from zope.schema import getFieldNamesInOrder
@@ -70,6 +71,11 @@ def dummy_defaultBadFactory():
 
 @provider(IInvariant)
 def dummy_invariant(data):
+    raise Invalid(u"Yikes! Invalid")
+    
+
+@provider(IInvariant)
+def dummy_invariant_prime(data):
     return None
     
 

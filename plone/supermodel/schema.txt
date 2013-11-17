@@ -448,7 +448,7 @@ fieldset.
 Invariant Support
 -----------------
 
-We may specify an invariant for the form via the "invariant" tag with
+We may specify one or more invariants for the form via the "invariant" tag with
 a dotted name for the invariant function.
 
     >>> schema = """\
@@ -456,6 +456,7 @@ a dotted name for the invariant function.
     ... <model xmlns="http://namespaces.plone.org/supermodel/schema">
     ...     <schema>
     ...         <invariant>plone.supermodel.tests.dummy_invariant</invariant>
+    ...         <invariant>plone.supermodel.tests.dummy_invariant_prime</invariant>
     ...         <field type="zope.schema.Text" name="description">
     ...             <title>Description</title>
     ...             <description>A short summary</description>
@@ -469,7 +470,15 @@ a dotted name for the invariant function.
 
     >>> model = loadString(schema)
     >>> model.schema.getTaggedValue('invariants')
-    [<function dummy_invariant at ...>]
+    [<function dummy_invariant at ...>, <function dummy_invariant_prime at ...>]
+
+When invariants are checked for our model.schema, we'll see our invariant
+in action.
+    
+    >>> model.schema.validateInvariants(object())
+    Traceback (most recent call last):
+    ...
+    Invalid: Yikes! Invalid
 
 The model's serialization should include the invariant.
 
@@ -477,6 +486,7 @@ The model's serialization should include the invariant.
     <model xmlns="http://namespaces.plone.org/supermodel/schema">
       <schema>
         <invariant>plone.supermodel.tests.dummy_invariant</invariant>
+        <invariant>plone.supermodel.tests.dummy_invariant_prime</invariant>
         <field name="description" type="zope.schema.Text">
           <description>A short summary</description>
           <title>Description</title>

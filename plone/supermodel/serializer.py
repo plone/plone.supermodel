@@ -96,7 +96,7 @@ def serialize(model):
         
         for invariant in schema.queryTaggedValue('invariants', []):
             invariant_element = etree.Element('invariant')
-            invariant_element.text = "%s.%s" % (invariant.__module__, invariant.__name__
+            invariant_element.text = "%s.%s" % (invariant.__module__, invariant.__name__)
             schema_element.append(invariant_element)
 
         for fieldName in non_fieldset_fields:
