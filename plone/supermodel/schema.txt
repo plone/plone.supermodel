@@ -445,6 +445,52 @@ fieldset.
       </schema>
     </model>
 
+Invariant Support
+-----------------
+
+    >>> schema = """\
+    ... <?xml version="1.0" encoding="UTF-8"?>
+    ... <model xmlns="http://namespaces.plone.org/supermodel/schema">
+    ...     <schema>
+    ...         <invariant>plone.supermodel.tests.dummy_invariant</invariant>
+    ...         <field type="zope.schema.Text" name="description">
+    ...             <title>Description</title>
+    ...             <description>A short summary</description>
+    ...         </field>
+    ...         <field type="zope.schema.Int" name="age">
+    ...             <title>Age</title>
+    ...         </field>
+    ...     </schema>
+    ... </model>
+    ... """
+
+    >>> model = loadString(schema)
+    >>> model.schema.getTaggedValue('invariants')
+    [<function dummy_invariant at ...>]
+
+    >>> schema = """\
+    ... <?xml version="1.0" encoding="UTF-8"?>
+    ... <model xmlns="http://namespaces.plone.org/supermodel/schema">
+    ...     <schema>
+    ...         <invariant>plone.supermodel.tests.dummy_unmarkedInvariant</invariant>
+    ...         <field type="zope.schema.Text" name="description">
+    ...             <title>Description</title>
+    ...             <description>A short summary</description>
+    ...         </field>
+    ...         <field type="zope.schema.Int" name="age">
+    ...             <title>Age</title>
+    ...         </field>
+    ...     </schema>
+    ... </model>
+    ... """
+
+    >>> model = loadString(schema)
+    Traceback (most recent call last):
+    ...
+    SupermodelParseError: Invariant functions must provide plone.supermodel.interfaces.IInvariant
+      File "<unknown>", line ...
+
+
 Internationalization
 --------------------
 

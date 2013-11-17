@@ -15,6 +15,7 @@ from zope import schema
 
 from plone.supermodel import utils
 from plone.supermodel.interfaces import IDefaultFactory
+from plone.supermodel.interfaces import IInvariant
 
 
 class IBase(Interface):
@@ -65,6 +66,16 @@ def dummy_defaultFactory():
 
 def dummy_defaultBadFactory():
     return u'b'
+
+
+@provider(IInvariant)
+def dummy_invariant(data):
+    return None
+    
+
+def dummy_unmarkedInvariant(data):
+    """ lacks IInvariant marker """
+    return None
 
 
 class TestUtils(unittest.TestCase):
