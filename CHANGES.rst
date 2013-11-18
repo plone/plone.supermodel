@@ -4,6 +4,10 @@ Changelog
 1.2.4 (unreleased)
 ------------------
 
+- Add invariant tag, a sub-element of schema, that accepts a dotted name as
+  a value. Invariants must provide plone.supermodel.interface.IInvariant.
+  [smcmahon]
+
 - Replace deprecated test assert statements.
   [timo]
 
@@ -14,6 +18,7 @@ Changelog
 - Add defaultFactory tag for Dexterity XML. Define an interface
   IDefaultFactory. defaultFactories specified via XML must implement it or
   IContextAwareDefaultFactory.
+  [smcmahon]
 
 
 1.2.2 (2013-05-23)
