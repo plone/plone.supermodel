@@ -274,16 +274,16 @@ class ChoiceHandler(BaseHandler):
     def _constructField(self, attributes):
         if 'values' in attributes:
             terms = []
-            unicode_found = False
             for value in attributes['values']:
-                encoded = value.encode('unicode_escape')
+                encoded = (value or '').encode('unicode_escape')
                 if value != encoded:
-                    unicode_found = True
-                term = SimpleTerm(token=encoded, value=value, title=value)
+                    value = value or u''
+                    term = SimpleTerm(token=encoded, value=value, title=value)
+                else:
+                    term = SimpleTerm(value=value, title=value)
                 terms.append(term)
-            if unicode_found:
-                attributes['vocabulary'] = SimpleVocabulary(terms)
-                del attributes['values']
+            attributes['vocabulary'] = SimpleVocabulary(terms)
+            del attributes['values']
         return super(ChoiceHandler, self)._constructField(attributes)
 
     def write(self, field, name, type, elementName='field'):

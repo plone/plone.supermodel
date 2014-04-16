@@ -4,7 +4,17 @@ Changelog
 1.2.5 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix parsing of empty Choice term to u'', not None, which addresses a
+  cause of https://github.com/plone/plone.app.dexterity/issues/49
+  [seanupton]
+
+- Explicitly construct SimpleTerm instances for each Choice field
+  element, instead of relying on zope.schema constructors to do so.
+  This ensures that all terms have non-None title attributes.
+  [seanupton]
+
+- Tests for ChoiceHandler serialization and parsing.
+  [seanupton]
 
 
 1.2.4 (2014-01-27)
