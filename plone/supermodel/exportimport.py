@@ -17,6 +17,15 @@ from plone.supermodel.interfaces import IFieldExportImportHandler
 from plone.supermodel.utils import noNS, valueToElement, elementToValue
 from plone.supermodel.debug import parseinfo
 
+try:
+    from collections import OrderedDict
+except:
+    from zope.schema import OrderedDict  # <py27
+
+
+class OrderedDictField(zope.schema.Dict):
+    _type = OrderedDict
+
 
 class BaseHandler(object):
     """Base class for import/export handlers.
@@ -184,7 +193,6 @@ class BaseHandler(object):
         """Read a single attribute from the given element. The attribute is of
         a type described by the given Field object.
         """
-
         return elementToValue(attributeField, element)
 
     def writeAttribute(self, attributeField, field, ignoreDefault=True):
@@ -271,16 +279,30 @@ class ChoiceHandler(BaseHandler):
         self.fieldAttributes['source'] = \
             zope.schema.Object(__name__='source', title=u"Source", schema=Interface)
 
+    def readAttribute(self, element, attributeField):
+        if element.tag == 'values':
+            if any([child.get('key') for child in element]):
+                attributeField = OrderedDictField(
+                    key_type=zope.schema.TextLine(),
+                    value_type=zope.schema.TextLine(),
+                    )
+        return elementToValue(attributeField, element)
+
     def _constructField(self, attributes):
         if 'values' in attributes:
+            if isinstance(attributes['values'], OrderedDict):
+                attributes['values'] = attributes['values'].items()
             terms = []
             for value in attributes['values']:
+                title = (value or u'')
+                if isinstance(value, tuple):
+                    value, title = value
                 encoded = (value or '').encode('unicode_escape')
                 if value != encoded:
                     value = value or u''
-                    term = SimpleTerm(token=encoded, value=value, title=value)
+                    term = SimpleTerm(token=encoded, value=value, title=title)
                 else:
-                    term = SimpleTerm(value=value, title=value)
+                    term = SimpleTerm(value=value, title=title)
                 terms.append(term)
             attributes['vocabulary'] = SimpleVocabulary(terms)
             del attributes['values']
@@ -306,9 +328,19 @@ class ChoiceHandler(BaseHandler):
                     or term.token != term.value.encode('unicode_escape')):
                     raise NotImplementedError(u"Cannot export a vocabulary that is not "
                                                "based on a simple list of values")
-                value.append(term.value)
+                if term.title and term.title != term.value:
+                    value.append((term.value, term.title))
+                else:
+                    value.append(term.value)
 
             attributeField = self.fieldAttributes['values']
+            if any(map(lambda v: isinstance(v, tuple), value)):
+                _pair = lambda v: v if len(v) == 2 else (v[0],) * 2
+                value = OrderedDict(map(_pair, value))
+                attributeField = OrderedDictField(
+                    key_type=zope.schema.TextLine(),
+                    value_type=zope.schema.TextLine(),
+                    )
             child = valueToElement(attributeField, value, name='values', force=True)
             element.append(child)
 

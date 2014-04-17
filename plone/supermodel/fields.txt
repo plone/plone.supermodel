@@ -1321,6 +1321,34 @@ tokens are the utf8-encoded values).
     >>> [t.value for t in reciprocal.vocabulary]
     [u'a', u'\xe7']
 
+
+Additionally, it is possible for Choice fields with a values vocabulary
+whose terms contain values distinct from term titles for each
+respective term.  This is accomplished by using the 'key' attribute
+of each contained 'element' of the values element (this is consistent
+with how Dict fields are output, only for Choices, order is guaranteed).
+
+    >>> from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
+    >>> vocab = SimpleVocabulary([
+    ...     SimpleTerm(value=u'a', title=u'A'),
+    ...     SimpleTerm(value=u'b', title=u'B'),
+    ...     ])
+    >>> field = schema.Choice(
+    ...     __name__="dummy",
+    ...     title=u"Test",
+    ...     vocabulary=vocab,
+    ...     )
+    >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
+    >>> element = handler.write(field, 'dummy', fieldType)
+    >>> print prettyXML(element)
+    <field name="dummy" type="zope.schema.Choice">
+      <title>Test</title>
+      <values>
+        <element key="a">A</element>
+        <element key="b">B</element>
+      </values>
+    </field>
+
 3. Sources and source binders
 
 We cannot export choice fields with a source or context source binder:

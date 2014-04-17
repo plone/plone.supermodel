@@ -397,7 +397,9 @@ class TestChoiceHandling(unittest.TestCase):
         self.handler = ChoiceHandler(schema.Choice)
 
     def _choice(self):
-        vocab = SimpleVocabulary([SimpleTerm(t, title=t) for t in (u'a', u'b', u'c')])
+        vocab = SimpleVocabulary(
+            [SimpleTerm(t, title=t) for t in (u'a', u'b', u'c')]
+            )
         expected = '<field name="myfield" type="zope.schema.Choice">'\
             '<values>'\
             '<element>a</element><element>b</element><element>c</element>'\
@@ -415,6 +417,21 @@ class TestChoiceHandling(unittest.TestCase):
             '</values>'\
             '</field>'
         return (schema.Choice(vocabulary=vocab), expected)
+
+    def _choice_with_term_titles(self):
+        # two terms with distinct titles, one with same as value:
+        vocab = SimpleVocabulary(
+            [SimpleTerm(t, title=t.upper()) for t in (u'a', u'b')] +
+            [SimpleTerm(u'c', title=u'c')],
+            )
+        expected = '<field name="myfield" type="zope.schema.Choice">'\
+            '<values>'\
+            '<element key="a">A</element>'\
+            '<element key="b">B</element>'\
+            '<element key="c">c</element>'\
+            '</values>'\
+            '</field>'
+        return (schema.Choice(vocabulary=vocab), expected)
  
     def test_choice_serialized(self):
         field, expected = self._choice()
@@ -424,10 +441,19 @@ class TestChoiceHandling(unittest.TestCase):
         field, expected = self._choice_with_empty()
         el = self.handler.write(field, 'myfield', 'zope.schema.Choice')
         self.assertEquals(etree.tostring(el), expected)
+        # now with terms that have titles:
+        field, expected = self._choice_with_term_titles()
+        el = self.handler.write(field, 'myfield', 'zope.schema.Choice')
+        self.assertEquals(etree.tostring(el), expected)
 
     def test_choice_parsing(self):
         _termvalues = lambda vocab: tuple((t.value, t.title) for t in vocab)
-        for field, expected in (self._choice(), self._choice_with_empty()):
+        cases = (
+            self._choice(),
+            self._choice_with_empty(),
+            self._choice_with_term_titles(),
+            )
+        for field, expected in cases:
             el = etree.fromstring(expected)
             imported_field = self.handler.read(el)
             self.assertEquals(

@@ -4,6 +4,11 @@ Changelog
 1.2.5 (unreleased)
 ------------------
 
+- Support Choice fields with terms containing distinct title from value
+  as option, while preserving backward-compatible round-trip for all
+  Choice fields where title is not distinct from value.
+  [seanupton]
+
 - Fix parsing of empty Choice term to u'', not None, which addresses a
   cause of https://github.com/plone/plone.app.dexterity/issues/49
   [seanupton]
