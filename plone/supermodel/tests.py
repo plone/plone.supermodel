@@ -5,6 +5,7 @@ import unittest
 from lxml import etree
 
 from zope.interface import Interface, implements, alsoProvides, provider
+from zope.interface import Invalid
 import zope.component.testing
 
 from zope.schema import getFieldNamesInOrder
@@ -15,6 +16,7 @@ from zope import schema
 
 from plone.supermodel import utils
 from plone.supermodel.interfaces import IDefaultFactory
+from plone.supermodel.interfaces import IInvariant
 
 
 class IBase(Interface):
@@ -65,6 +67,21 @@ def dummy_defaultFactory():
 
 def dummy_defaultBadFactory():
     return u'b'
+
+
+@provider(IInvariant)
+def dummy_invariant(data):
+    raise Invalid(u"Yikes! Invalid")
+    
+
+@provider(IInvariant)
+def dummy_invariant_prime(data):
+    return None
+    
+
+def dummy_unmarkedInvariant(data):
+    """ lacks IInvariant marker """
+    return None
 
 
 class TestUtils(unittest.TestCase):

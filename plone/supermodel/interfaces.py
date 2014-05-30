@@ -221,3 +221,12 @@ class IDefaultFactory(Interface):
 
     def __call__():
         """Returns a default value for the field."""
+
+
+class IInvariant(Interface):
+    """Marker interface for a callable used as a form invariant.
+    """
+    
+    def __call__(data):
+        """Returns None or raises zope.interface.Invalid
+        """

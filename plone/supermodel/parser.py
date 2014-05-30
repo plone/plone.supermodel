@@ -10,6 +10,7 @@ from zope.schema import getFields
 
 from zope.dottedname.resolve import resolve
 
+from plone.supermodel.interfaces import IInvariant
 from plone.supermodel.interfaces import ISchemaPolicy
 from plone.supermodel.interfaces import IFieldExportImportHandler
 
@@ -144,7 +145,8 @@ def _parse(source, policy):
             readField(fieldElement, schemaAttributes, fieldElements, baseFields)
             parseinfo.stack.pop()
 
-        # Read fieldsets and their fields
+        # Read invariants, fieldsets and their fields
+        invariants = []
         fieldsets = []
         fieldsets_by_name = {}
 
@@ -175,17 +177,29 @@ def _parse(source, policy):
                     if parsed_fieldName:
                         fieldset.fields.append(parsed_fieldName)
                     parseinfo.stack.pop()
+            elif subelement.tag == ns('invariant'):
+                dotted = subelement.text
+                invariant = resolve(dotted)
+                if not IInvariant.providedBy(invariant):
+                    raise ImportError(
+                        u"Invariant functions must provide plone.supermodel.interfaces.IInvariant"
+                    )
+                invariants.append(invariant)
             parseinfo.stack.pop()
 
         schema = SchemaClass(name=policy_util.name(schemaName, tree),
                                 bases=bases + policy_util.bases(schemaName, tree) + (Schema,),
                                 __module__=policy_util.module(schemaName, tree),
                                 attrs=schemaAttributes)
-
-        schema.setTaggedValue(FIELDSETS_KEY, fieldsets)
+        
+        # add invariants to schema as tagged values
+        if invariants:
+            schema_invariants = schema.queryTaggedValue('invariants', [])
+            schema.setTaggedValue('invariants', schema_invariants + invariants)            
 
         # Save fieldsets
-
+        schema.setTaggedValue(FIELDSETS_KEY, fieldsets)
+        
         # Let metadata handlers write metadata
         for handler_name, metadata_handler in field_metadata_handlers:
             for fieldName in schema:
