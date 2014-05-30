@@ -11,6 +11,12 @@ from zope.i18nmessageid import Message
 from plone.supermodel.interfaces import XML_NAMESPACE, I18N_NAMESPACE, IToUnicode
 from plone.supermodel.debug import parseinfo
 
+try:
+    from collections import OrderedDict
+except:
+    from zope.schema import OrderedDict  # <py27
+
+
 _marker = object()
 noNS_re = re.compile('^{\S+}')
 
@@ -87,7 +93,7 @@ def elementToValue(field, element, default=_marker):
 
     if IDict.providedBy(field):
         key_converter = IFromUnicode(field.key_type)
-        value = {}
+        value = OrderedDict()
         for child in element.iterchildren(tag=etree.Element):
             if noNS(child.tag.lower()) != 'element':
                 continue

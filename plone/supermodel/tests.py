@@ -11,12 +11,30 @@ import zope.component.testing
 from zope.schema import getFieldNamesInOrder
 from zope.schema.interfaces import IContextAwareDefaultFactory
 from zope.schema.interfaces import IContextSourceBinder
-from zope.schema.vocabulary import SimpleVocabulary
+from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
 from zope import schema
 
 from plone.supermodel import utils
+from plone.supermodel.exportimport import ChoiceHandler
 from plone.supermodel.interfaces import IDefaultFactory
 from plone.supermodel.interfaces import IInvariant
+
+
+def configure():
+    zope.component.testing.setUp()
+    configuration = """\
+    <configure
+         xmlns="http://namespaces.zope.org/zope"
+         i18n_domain="plone.supermodel.tests">
+
+        <include package="zope.component" file="meta.zcml" />
+
+        <include package="plone.supermodel" />
+
+    </configure>
+    """
+    from zope.configuration import xmlconfig
+    xmlconfig.xmlconfig(StringIO(configuration))
 
 
 class IBase(Interface):
@@ -321,21 +339,7 @@ class TestUtils(unittest.TestCase):
 class TestValueToElement(unittest.TestCase):
 
     def setUp(self):
-        zope.component.testing.setUp()
-        configuration = """\
-        <configure
-             xmlns="http://namespaces.zope.org/zope"
-             i18n_domain="plone.supermodel.tests">
-
-            <include package="zope.component" file="meta.zcml" />
-
-            <include package="plone.supermodel" />
-
-        </configure>
-        """
-        from zope.configuration import xmlconfig
-        xmlconfig.xmlconfig(StringIO(configuration))
-
+        configure()
 
     tearDown = zope.component.testing.tearDown
 
@@ -403,10 +407,83 @@ class TestValueToElement(unittest.TestCase):
             )
 
 
+class TestChoiceHandling(unittest.TestCase):
+   
+    def setUp(self):
+        configure()
+        self.handler = ChoiceHandler(schema.Choice)
+
+    def _choice(self):
+        vocab = SimpleVocabulary(
+            [SimpleTerm(t, title=t) for t in (u'a', u'b', u'c')]
+            )
+        expected = '<field name="myfield" type="zope.schema.Choice">'\
+            '<values>'\
+            '<element>a</element><element>b</element><element>c</element>'\
+            '</values>'\
+            '</field>'
+        return (schema.Choice(vocabulary=vocab), expected)
+
+    def _choice_with_empty(self):
+        # add an empty string term to vocabulary
+        vocab = SimpleVocabulary([SimpleTerm(t, title=t) for t in (u'a', u'')])
+        expected = '<field name="myfield" type="zope.schema.Choice">'\
+            '<values>'\
+            '<element>a</element>'\
+            '<element></element>'\
+            '</values>'\
+            '</field>'
+        return (schema.Choice(vocabulary=vocab), expected)
+
+    def _choice_with_term_titles(self):
+        # two terms with distinct titles, one with same as value:
+        vocab = SimpleVocabulary(
+            [SimpleTerm(t, title=t.upper()) for t in (u'a', u'b')] +
+            [SimpleTerm(u'c', title=u'c')],
+            )
+        expected = '<field name="myfield" type="zope.schema.Choice">'\
+            '<values>'\
+            '<element key="a">A</element>'\
+            '<element key="b">B</element>'\
+            '<element key="c">c</element>'\
+            '</values>'\
+            '</field>'
+        return (schema.Choice(vocabulary=vocab), expected)
+ 
+    def test_choice_serialized(self):
+        field, expected = self._choice()
+        el = self.handler.write(field, 'myfield', 'zope.schema.Choice')
+        self.assertEquals(etree.tostring(el), expected)
+        # now with an empty string term in vocab:
+        field, expected = self._choice_with_empty()
+        el = self.handler.write(field, 'myfield', 'zope.schema.Choice')
+        self.assertEquals(etree.tostring(el), expected)
+        # now with terms that have titles:
+        field, expected = self._choice_with_term_titles()
+        el = self.handler.write(field, 'myfield', 'zope.schema.Choice')
+        self.assertEquals(etree.tostring(el), expected)
+
+    def test_choice_parsing(self):
+        _termvalues = lambda vocab: tuple((t.value, t.title) for t in vocab)
+        cases = (
+            self._choice(),
+            self._choice_with_empty(),
+            self._choice_with_term_titles(),
+            )
+        for field, expected in cases:
+            el = etree.fromstring(expected)
+            imported_field = self.handler.read(el)
+            self.assertEquals(
+                _termvalues(imported_field.vocabulary),
+                _termvalues(field.vocabulary),
+                )
+
+
 def test_suite():
     return unittest.TestSuite((
         unittest.makeSuite(TestUtils),
         unittest.makeSuite(TestValueToElement),
+        unittest.makeSuite(TestChoiceHandling),
         doctest.DocFileSuite('schema.txt',
             setUp=zope.component.testing.setUp,
             tearDown=zope.component.testing.tearDown,

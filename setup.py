@@ -1,5 +1,12 @@
 import os
+import sys
 from setuptools import setup, find_packages
+
+
+# if <= Python 2.6 or less, specify minimum zope.schema compatible:
+ZOPESCHEMA = 'zope.schema'
+if sys.version_info < (2, 7):
+    ZOPESCHEMA += '>=4.1.0'
 
 
 def read(*rnames):
@@ -39,7 +46,7 @@ setup(name='plone.supermodel',
           'lxml',
           'zope.component',
           'zope.interface',
-          'zope.schema',
+          ZOPESCHEMA,
           'zope.deferredimport',
           'zope.dottedname',
           'z3c.zcmlhook',
