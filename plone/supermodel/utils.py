@@ -14,7 +14,7 @@ from plone.supermodel.debug import parseinfo
 try:
     from collections import OrderedDict
 except:
-    from zope.schema import OrderedDict  # <py27
+    from zope.schema.vocabulary import OrderedDict  # <py27
 
 
 _marker = object()
