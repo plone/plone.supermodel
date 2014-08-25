@@ -18,7 +18,7 @@ an order attribute, which defaults to 0.
     ...         self.schema = schema
     ...     def __call__(self):
     ...         print("%s: %r" % (self.__class__.__name__, self.schema))
-    ... 
+    ...
     >>> provideAdapter(TestPlugin, name=u"plone.supermodel.tests.TestPlugin")
 
 Schema plugins are executed at schema declaration.

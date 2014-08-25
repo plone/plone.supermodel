@@ -17,11 +17,11 @@ First, load this package's configuration:
     ... <configure
     ...      xmlns="http://namespaces.zope.org/zope"
     ...      i18n_domain="plone.supermodel.tests">
-    ...      
+    ...
     ...     <include package="zope.component" file="meta.zcml" />
-    ...     
+    ...
     ...     <include package="plone.supermodel" />
-    ...     
+    ...
     ... </configure>
     ... """
 
@@ -54,7 +54,7 @@ on how this is structured.
     ...             <max_length>10000</max_length>
     ...         </field>
     ...     </schema>
-    ...     
+    ...
     ...     <schema name="metadata">
     ...         <field type="zope.schema.Datetime" name="created">
     ...             <title>Created date</title>
@@ -66,7 +66,7 @@ on how this is structured.
     ...             <required>True</required>
     ...         </field>
     ...     </schema>
-    ...     
+    ...
     ... </model>
     ... """
 
@@ -84,8 +84,8 @@ We can now define a schema, using the directives defined in this package:
     >>> from plone.supermodel import model
     >>> class ITestContent(model.Schema):
     ...     model.load(schema_filename)
-    
-Note: If the schema filename is not an absolute path, it will be found 
+
+Note: If the schema filename is not an absolute path, it will be found
 relative to the module where the interface is defined.
 
 The interface should have the fields of the default (unnamed) schema:
@@ -94,7 +94,7 @@ The interface should have the fields of the default (unnamed) schema:
     >>> getFieldNamesInOrder(ITestContent)
     ['title', 'body']
 
-It also contains the filename that the schema was loaded from and the schema 
+It also contains the filename that the schema was loaded from and the schema
 name as a tagged values in the base interface.
 
     >>> from plone.supermodel.interfaces import FILENAME_KEY, SCHEMA_NAME_KEY
@@ -130,13 +130,13 @@ former will override the latter.
     >>> import zope.schema
     >>> class ITestContentWithNewFields(model.Schema):
     ...     model.load(schema_filename)
-    ...     
+    ...
     ...     title = zope.schema.TextLine(title=u"Title", default=u"Default title")
     ...     postscript = zope.schema.Text(title=u"Postscript")
 
     >>> getFieldNamesInOrder(ITestContentWithNewFields)
     ['body', 'title', 'postscript']
-    
+
     >>> ITestContentWithNewFields[u'title'].default
     u'Default title'
 
@@ -150,16 +150,16 @@ fieldsets. The same tagged value can be populated using a directive:
     ...
     ...     model.fieldset(u"default", label="Default", fields=['title', 'description'])
     ...     model.fieldset(u"metadata", label="Metadata", fields=['publication_date'], layout='concise')
-    ...     
+    ...
     ...     title = zope.schema.TextLine(title=u"Title")
     ...     description = zope.schema.TextLine(title=u"Description")
-    ...     
+    ...
     ...     publication_date = zope.schema.Date(title=u"Publication date")
-    
+
     >>> from plone.supermodel.interfaces import FIELDSETS_KEY
     >>> IGrouped.getTaggedValue(FIELDSETS_KEY)
     [<Fieldset 'default' of title, description>, <Fieldset 'metadata' of publication_date>]
-    
+
 Extra parameters, such as the layout parameter for the metadata fieldset, are
 accessible as attributes on the fieldset:
 
@@ -176,14 +176,14 @@ In combination with plone.rfc822, primary fields may be marked:
     >>> class IFields(model.Schema):
     ...     title = zope.schema.TextLine(title=u"Title")
     ...     description = zope.schema.TextLine(title=u"Description")
-    ...     
+    ...
     ...     model.primary('body')
     ...     body = zope.schema.Text(title=u"Body")
-    
+
     >>> from plone.rfc822.interfaces import IPrimaryField
     >>> IPrimaryField.providedBy(IFields['body'])
     True
-    
+
 Cleanup
 -------
 

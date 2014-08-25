@@ -90,12 +90,12 @@ def dummy_defaultBadFactory():
 @provider(IInvariant)
 def dummy_invariant(data):
     raise Invalid(u"Yikes! Invalid")
-    
+
 
 @provider(IInvariant)
 def dummy_invariant_prime(data):
     return None
-    
+
 
 def dummy_unmarkedInvariant(data):
     """ lacks IInvariant marker """
@@ -408,7 +408,7 @@ class TestValueToElement(unittest.TestCase):
 
 
 class TestChoiceHandling(unittest.TestCase):
-   
+
     def setUp(self):
         configure()
         self.handler = ChoiceHandler(schema.Choice)
@@ -449,7 +449,7 @@ class TestChoiceHandling(unittest.TestCase):
             '</values>'\
             '</field>'
         return (schema.Choice(vocabulary=vocab), expected)
- 
+
     def test_choice_serialized(self):
         field, expected = self._choice()
         el = self.handler.write(field, 'myfield', 'zope.schema.Choice')

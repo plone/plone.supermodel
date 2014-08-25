@@ -2,7 +2,7 @@
 plone.supermodel: content schemata loaded from XML
 ==================================================
 
-This package allows content schemata to be read and written as XML. It has a 
+This package allows content schemata to be read and written as XML. It has a
 standard importer and serialiser for interfaces that contain zope.schema
 fields. The format is general enough to be able to handle future fields
 easily, so long as they are properly specified through interfaces.
@@ -18,11 +18,11 @@ and can be loaded from the configure.zcml file of plone.supermodel.
     ... <configure
     ...      xmlns="http://namespaces.zope.org/zope"
     ...      i18n_domain="plone.supermodel.tests">
-    ...      
+    ...
     ...     <include package="zope.component" file="meta.zcml" />
-    ...     
+    ...
     ...     <include package="plone.supermodel" />
-    ...     
+    ...
     ... </configure>
     ... """
 
@@ -60,7 +60,7 @@ This will load one schema, with the default name u"":
 
     >>> model.schemata.keys()
     [u'']
-    
+
 We can inspect this schema and see that it contains zope.schema fields with
 attributes corresponding to the values set in XML.
 
@@ -69,12 +69,12 @@ attributes corresponding to the values set in XML.
     >>> from zope.schema import getFieldNamesInOrder
     >>> getFieldNamesInOrder(schema)
     ['title', 'description']
-    
+
     >>> schema['title'].title
     u'Title'
     >>> schema['title'].required
     True
-    
+
     >>> schema['description'].title
     u'Description'
     >>> schema['description'].description
@@ -124,7 +124,7 @@ In addition to parsing, we can serialize a model to an XML representation:
 Building interfaces from schemata
 ---------------------------------
 
-Above, we saw how to parse a schema from a file directly. Next, let's see how 
+Above, we saw how to parse a schema from a file directly. Next, let's see how
 this can be used more practically to define a custom interface. Here, we will
 use two schemata in one file.
 
@@ -142,7 +142,7 @@ use two schemata in one file.
     ...             <max_length>10000</max_length>
     ...         </field>
     ...     </schema>
-    ...     
+    ...
     ...     <schema name="metadata">
     ...         <field type="zope.schema.Datetime" name="created">
     ...             <title>Created date</title>
@@ -154,7 +154,7 @@ use two schemata in one file.
     ...             <required>True</required>
     ...         </field>
     ...     </schema>
-    ...     
+    ...
     ... </model>
     ... """
 
@@ -173,8 +173,8 @@ We can define interfaces from this using a helper function:
 
     >>> from plone.supermodel import xmlSchema
     >>> ITestContent = xmlSchema(schema_filename)
-    
-Note: If the schema filename is not an absolute path, it will be found 
+
+Note: If the schema filename is not an absolute path, it will be found
 relative to the module where the interface is defined.
 
 After being loaded, the interface should have the fields of the default
@@ -206,7 +206,7 @@ of just a single schema using serializeSchema():
         </field>
       </schema>
     </model>
-    
+
     >>> print serializeSchema(ITestMetadata, name=u"metadata") # doctest: +NORMALIZE_WHITESPACE
     <model xmlns="http://namespaces.plone.org/supermodel/schema">
       <schema name="metadata">
@@ -220,7 +220,7 @@ of just a single schema using serializeSchema():
         </field>
       </schema>
     </model>
-    
+
 Finally, let's clean up the temporary directory.
 
     >>> shutil.rmtree(tmpdir)
@@ -232,7 +232,7 @@ When building a schema interface from XML, it is possible to specify a base
 interface. This is analogous to "subclassing" an existing interface. The XML
 schema representation can override and/or extend fields from the base.
 
-For the purposes of this test, we have defined a dummy interface in 
+For the purposes of this test, we have defined a dummy interface in
 plone.supermodel.tests. We can't define it in the doctest, because the import
 resolver needs to have a proper module path. The interface looks like this
 though:
@@ -246,7 +246,7 @@ In real life, you'd more likely have a dotted name like
 my.package.interfaces.IBase, of course.
 
 Then, let's define a schema that is based on this interface.
-    
+
     >>> schema = """\
     ... <?xml version="1.0" encoding="UTF-8"?>
     ... <model xmlns="http://namespaces.plone.org/supermodel/schema">
@@ -274,12 +274,12 @@ generated interface contains the base schema.
     >>> model = loadString(schema)
     >>> model.schema.__bases__
     (<InterfaceClass plone.supermodel.tests.IBase>, <SchemaClass plone.supermodel.model.Schema>)
-    
+
 The fields of the base interface will also be replicated in the new schema.
 
     >>> getFieldNamesInOrder(model.schema)
     ['title', 'description', 'name', 'age']
-    
+
 Notice how the order of the 'description' field is dictated by where it
 appeared in the base interface, not where it appears in the XML schema.
 
@@ -287,7 +287,7 @@ We should also verify that the description field was indeed overridden:
 
     >>> model.schema['description'] # doctest: +ELLIPSIS
     <zope.schema._bootstrapfields.Text object at ...>
-    
+
 Finally, let's verify that bases are preserved upon serialisation:
 
     >>> print serializeSchema(model.schema) # doctest: +NORMALIZE_WHITESPACE
@@ -319,7 +319,7 @@ tag to wrap a sequence of fields.
     ... <?xml version="1.0" encoding="UTF-8"?>
     ... <model xmlns="http://namespaces.plone.org/supermodel/schema">
     ...     <schema>
-    ...     
+    ...
     ...         <field type="zope.schema.TextLine" name="title">
     ...             <title>Title</title>
     ...             <required>True</required>
@@ -329,17 +329,17 @@ tag to wrap a sequence of fields.
     ...             <required>True</required>
     ...             <max_length>10000</max_length>
     ...         </field>
-    ...         
+    ...
     ...         <fieldset name="dates" label="Dates" description="Standard dates">
     ...             <field type="zope.schema.Date" name="publication_date">
     ...                 <title>Publication date</title>
     ...             </field>
     ...         </fieldset>
-    ...         
+    ...
     ...         <field type="zope.schema.TextLine" name="author">
     ...             <title>Author</title>
     ...         </field>
-    ...         
+    ...
     ...         <fieldset name="dates" label="Ignored" description="Ignored">
     ...             <field type="zope.schema.Date" name="expiry_date">
     ...                 <title>Expiry date</title>
@@ -349,20 +349,20 @@ tag to wrap a sequence of fields.
     ...             </field>
     ...         </fieldset>
     ...     </schema>
-    ...     
+    ...
     ...     <schema name="metadata">
-    ...     
+    ...
     ...         <fieldset name="standard" label="Standard" />
     ...         <fieldset name="dates" label="Metadata dates" />
     ...         <fieldset name="author" label="Author info" />
-    ...         
+    ...
     ...         <fieldset name="dates">
     ...             <field type="zope.schema.Datetime" name="created">
     ...                 <title>Created date</title>
     ...                 <required>False</required>
     ...             </field>
     ...         </fieldset>
-    ...         
+    ...
     ...         <fieldset name="standard">
     ...             <field type="zope.schema.TextLine" name="creator">
     ...                 <title>Creator</title>
@@ -371,7 +371,7 @@ tag to wrap a sequence of fields.
     ...             </field>
     ...         </fieldset>
     ...     </schema>
-    ...     
+    ...
     ... </model>
     ... """
 
@@ -392,7 +392,7 @@ default schema above is unrelated to the one in the metadata schema.
 
     >>> getFieldNamesInOrder(model.schemata['metadata'])
     ['created', 'creator']
-    
+
     >>> from plone.supermodel.interfaces import FIELDSETS_KEY
     >>> model.schema.getTaggedValue(FIELDSETS_KEY)
     [<Fieldset 'dates' of publication_date, expiry_date, notification_date>]
@@ -474,7 +474,7 @@ a dotted name for the invariant function.
 
 When invariants are checked for our model.schema, we'll see our invariant
 in action.
-    
+
     >>> model.schema.validateInvariants(object())
     Traceback (most recent call last):
     ...
@@ -536,11 +536,11 @@ as a zope.i18nmessageid message id rather than a basic Unicode string::
     ...        xmlns:i18n="http://xml.zope.org/namespaces/i18n"
     ...        i18n:domain="plone.supermodel">
     ...     <schema>
-    ...     
+    ...
     ...         <field type="zope.schema.TextLine" name="title">
     ...             <title i18n:translate="supermodel_test_title">Title</title>
     ...         </field>
-    ...     
+    ...
     ...     </schema>
     ... </model>
     ... """
@@ -595,15 +595,15 @@ Metadata handlers should be able to reciprocally read and write metadata.
 
     >>> class FormLayoutMetadata(object):
     ...     implements(ISchemaMetadataHandler)
-    ...     
+    ...
     ...     namespace = "http://namespaces.acme.com/ui"
     ...     prefix = "ui"
-    ...     
+    ...
     ...     def read(self, schemaNode, schema):
     ...         layout = schemaNode.get(ns('layout', self.namespace))
     ...         if layout:
     ...             schema.setTaggedValue(u'acme.layout', layout)
-    ...             
+    ...
     ...     def write(self, schemaNode, schema):
     ...         layout = schema.queryTaggedValue(u'acme.layout', None)
     ...         if layout:
@@ -614,10 +614,10 @@ Metadata handlers should be able to reciprocally read and write metadata.
     >>> from plone.supermodel.interfaces import IFieldMetadataHandler
     >>> class FieldWidgetMetadata(object):
     ...     implements(IFieldMetadataHandler)
-    ...     
+    ...
     ...     namespace = "http://namespaces.acme.com/ui"
     ...     prefix = "ui"
-    ...         
+    ...
     ...     def read(self, fieldNode, schema, field):
     ...         name = field.__name__
     ...         widget = fieldNode.get(ns('widget', self.namespace))

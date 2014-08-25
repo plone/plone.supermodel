@@ -191,15 +191,15 @@ def _parse(source, policy):
                                 bases=bases + policy_util.bases(schemaName, tree) + (Schema,),
                                 __module__=policy_util.module(schemaName, tree),
                                 attrs=schemaAttributes)
-        
+
         # add invariants to schema as tagged values
         if invariants:
             schema_invariants = schema.queryTaggedValue('invariants', [])
-            schema.setTaggedValue('invariants', schema_invariants + invariants)            
+            schema.setTaggedValue('invariants', schema_invariants + invariants)
 
         # Save fieldsets
         schema.setTaggedValue(FIELDSETS_KEY, fieldsets)
-        
+
         # Let metadata handlers write metadata
         for handler_name, metadata_handler in field_metadata_handlers:
             for fieldName in schema:
