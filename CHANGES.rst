@@ -1,7 +1,7 @@
 Changelog
 =========
 
-1.2.5 (unreleased)
+1.2.5 (2014-09-07)
 ------------------
 
 - Support Choice fields with terms containing distinct title from value
