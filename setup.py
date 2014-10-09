@@ -49,6 +49,7 @@ setup(name='plone.supermodel',
           ZOPESCHEMA,
           'zope.deferredimport',
           'zope.dottedname',
+          'zope.i18nmessageid',
           'z3c.zcmlhook',
       ],
       extras_require={

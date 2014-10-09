@@ -19,6 +19,8 @@ from plone.supermodel.exportimport import ChoiceHandler
 from plone.supermodel.interfaces import IDefaultFactory
 from plone.supermodel.interfaces import IInvariant
 
+from zope.i18nmessageid import MessageFactory
+
 
 def configure():
     zope.component.testing.setUp()
@@ -350,6 +352,14 @@ class TestValueToElement(unittest.TestCase):
         self.assertEqual(sio.getvalue(), expected)
         unserialized = utils.elementToValue(field, element)
         self.assertEqual(value, unserialized)
+
+    def test_message(self):
+        _ = MessageFactory('my.domain')
+        field = schema.TextLine()
+        value = _('msgid', default=u'Default translation')
+        self._assertSerialized(
+            field, value,
+            '<value i18n:translate="msgid">Default translation</value>')
 
     def test_lists(self):
         field = schema.List(value_type=schema.Int())
