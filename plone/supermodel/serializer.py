@@ -9,13 +9,14 @@ from plone.supermodel.interfaces import IFieldExportImportHandler
 from plone.supermodel.interfaces import ISchemaMetadataHandler
 from plone.supermodel.interfaces import IFieldMetadataHandler
 
+from plone.supermodel.interfaces import I18N_NAMESPACE
 from plone.supermodel.interfaces import XML_NAMESPACE
 from plone.supermodel.interfaces import FIELDSETS_KEY
 from plone.supermodel.interfaces import IFieldNameExtractor
 
 from plone.supermodel.model import Schema
 
-from plone.supermodel.utils import sortedFields, prettyXML
+from plone.supermodel.utils import ns, sortedFields, prettyXML
 from lxml import etree
 
 
@@ -51,7 +52,7 @@ def serialize(model):
     schema_metadata_handlers = tuple(getUtilitiesFor(ISchemaMetadataHandler))
     field_metadata_handlers = tuple(getUtilitiesFor(IFieldMetadataHandler))
 
-    nsmap = {}
+    nsmap = {'i18n': I18N_NAMESPACE}
     for name, handler in schema_metadata_handlers + field_metadata_handlers:
         namespace, prefix = handler.namespace, handler.prefix
         if namespace is not None and prefix is not None:
@@ -122,6 +123,17 @@ def serialize(model):
             metadata_handler.write(schema_element, schema)
 
         xml.append(schema_element)
+
+    # handle i18n
+    i18n_domain = xml.get(ns('domain', prefix=I18N_NAMESPACE))
+    for node in xml.xpath('//*[@i18n:translate]', namespaces=nsmap):
+        domain = node.get(ns('domain', prefix=I18N_NAMESPACE), i18n_domain)
+        if i18n_domain is None:
+            i18n_domain = domain
+        if domain == i18n_domain:
+            node.attrib.pop(ns('domain', prefix=I18N_NAMESPACE))
+    if i18n_domain:
+        xml.set(ns('domain', prefix=I18N_NAMESPACE), i18n_domain)
 
     return prettyXML(xml)
 

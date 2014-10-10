@@ -175,6 +175,15 @@ def valueToElement(field, value, name=None, force=False):
             converter = IToUnicode(field)
             child.text = converter.toUnicode(value)
 
+            # handle i18n
+            if isinstance(value, Message):
+                child.set(ns('domain', I18N_NAMESPACE), value.domain)
+                if not value.default:
+                    child.set(ns('translate', I18N_NAMESPACE), '')
+                else:
+                    child.set(ns('translate', I18N_NAMESPACE), child.text)
+                    child.text = converter.toUnicode(value.default)
+
     return child
 
 
