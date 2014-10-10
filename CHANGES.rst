@@ -4,8 +4,8 @@ Changelog
 1.2.6 (unreleased)
 ------------------
 
-- Nothing changed yet.
-
+- Add i18n serialization from schema value to XML model
+  [datakurre]
 
 1.2.5 (2014-09-07)
 ------------------
