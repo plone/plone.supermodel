@@ -28,3 +28,7 @@ DottedNameHandler = plone.supermodel.exportimport.BaseHandler(zope.schema.Dotted
 InterfaceFieldHandler = plone.supermodel.exportimport.BaseHandler(zope.schema.InterfaceField)
 ObjectHandler = plone.supermodel.exportimport.ObjectHandler(zope.schema.Object)
 ChoiceHandler = plone.supermodel.exportimport.ChoiceHandler(zope.schema.Choice)
+
+# Field metadata handlers
+
+MessageIdHandler = plone.supermodel.exportimport.MessageIdHandler()

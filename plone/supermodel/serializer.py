@@ -10,12 +10,13 @@ from plone.supermodel.interfaces import ISchemaMetadataHandler
 from plone.supermodel.interfaces import IFieldMetadataHandler
 
 from plone.supermodel.interfaces import XML_NAMESPACE
+from plone.supermodel.interfaces import I18N_NAMESPACE
 from plone.supermodel.interfaces import FIELDSETS_KEY
 from plone.supermodel.interfaces import IFieldNameExtractor
 
 from plone.supermodel.model import Schema
 
-from plone.supermodel.utils import sortedFields, prettyXML
+from plone.supermodel.utils import ns, sortedFields, prettyXML
 from lxml import etree
 
 
@@ -120,6 +121,11 @@ def serialize(model):
 
         for handler_name, metadata_handler in schema_metadata_handlers:
             metadata_handler.write(schema_element, schema)
+
+        i18n_domain = schema_element.get(ns('domain', prefix=I18N_NAMESPACE))
+        if i18n_domain:
+            xml.set(ns('domain', prefix=I18N_NAMESPACE), i18n_domain)
+            schema_element.attrib.pop(ns('domain', prefix=I18N_NAMESPACE))
 
         xml.append(schema_element)
 

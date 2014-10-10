@@ -5,16 +5,19 @@ from zope.component import queryUtility
 
 import zope.schema
 
+from zope.i18nmessageid import Message
 from zope.schema.interfaces import IContextAwareDefaultFactory
 from zope.schema.interfaces import IField
 from zope.schema.interfaces import IVocabularyTokenized
 from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
 
+from plone.supermodel.interfaces import I18N_NAMESPACE
 from plone.supermodel.interfaces import IDefaultFactory
 from plone.supermodel.interfaces import IFieldNameExtractor
+from plone.supermodel.interfaces import IFieldMetadataHandler
 from plone.supermodel.interfaces import IFieldExportImportHandler
 
-from plone.supermodel.utils import noNS, valueToElement, elementToValue
+from plone.supermodel.utils import ns, noNS, valueToElement, elementToValue
 from plone.supermodel.debug import parseinfo
 
 try:
@@ -352,3 +355,49 @@ class ChoiceHandler(BaseHandler):
                                         "cannot be exported")
 
         return element
+
+
+class MessageIdHandler(object):
+
+    implements(IFieldMetadataHandler)
+
+    namespace = I18N_NAMESPACE
+    prefix = 'i18n'
+
+    def read(self, fieldNode, schema, field):
+        nsmap = {self.prefix: self.namespace}
+
+        root = fieldNode.getroottree().getroot()
+        root_domain = root.get(ns('domain', prefix=I18N_NAMESPACE), 'plone')
+
+        for node in fieldNode.xpath('*[@i18n:translate]', namespaces=nsmap):
+            name = node.xpath('local-name()')
+            text = unicode(node.text, 'utf-8', 'ignore')
+            domain = node.get(ns('domain', prefix=I18N_NAMESPACE), root_domain)
+            msgid = unicode(node.get(ns('translate', prefix=I18N_NAMESPACE)),
+                            'utf-8', 'ignore')
+            if msgid:
+                value = Message(msgid, domain=domain, default=text)
+            else:
+                value = Message(text, domain=domain)
+            setattr(field, name, value)
+
+    def write(self, fieldNode, schema, field):
+        root = fieldNode.getroottree().getroot()
+        root_domain = root.get(ns('domain', prefix=I18N_NAMESPACE))
+
+        for key, value in field.__dict__.items():
+            if not isinstance(value, Message):
+                continue
+            if not root_domain:
+                root.set(ns('domain', prefix=I18N_NAMESPACE), value.domain)
+                root_domain = value.domain
+            for node in fieldNode.xpath(key):
+                if value.default:
+                    node.set(ns('translate', I18N_NAMESPACE),
+                             value.encode('utf-8', 'ignore'))
+                    node.text = value.default.encode('utf-8', 'ignore')
+                else:
+                    node.set(ns('translate', I18N_NAMESPACE))
+                if value.domain != root_domain:
+                    node.set(ns('domain', I18N_NAMESPACE), value.domain)

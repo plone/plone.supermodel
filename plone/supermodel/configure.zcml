@@ -143,6 +143,10 @@
         component=".fields.ChoiceHandler"
         name="zope.schema.Choice"
         />
+    <utility
+        component=".fields.MessageIdHandler"
+        name="zope.i18nmessageid"
+        />
 
     <!-- Field name extractors -->
     <adapter factory=".serializer.DefaultFieldNameExtractor" />
