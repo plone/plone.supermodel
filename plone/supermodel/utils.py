@@ -132,11 +132,13 @@ def elementToValue(field, element, default=_marker):
         # handle i18n
         if isinstance(value, unicode) and parseinfo.i18n_domain is not None:
             translate_attr = ns('translate', I18N_NAMESPACE)
+            domain_attr = ns('domain', I18N_NAMESPACE)
             msgid = element.attrib.get(translate_attr)
+            domain = element.attrib.get(domain_attr, parseinfo.i18n_domain)
             if msgid:
-                value = Message(msgid, domain=parseinfo.i18n_domain, default=value)
+                value = Message(msgid, domain=domain, default=value)
             elif translate_attr in element.attrib:
-                value = Message(value, domain=parseinfo.i18n_domain)
+                value = Message(value, domain=domain)
 
     return value
 

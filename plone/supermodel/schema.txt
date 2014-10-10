@@ -541,6 +541,15 @@ as a zope.i18nmessageid message id rather than a basic Unicode string::
     ...             <title i18n:translate="supermodel_test_title">Title</title>
     ...         </field>
     ...
+    ...         <field type="zope.schema.TextLine" name="description">
+    ...             <title i18n:translate="">description</title>
+    ...         </field>
+    ...
+    ...         <field type="zope.schema.TextLine" name="feature">
+    ...             <title i18n:translate="domain_test"
+    ...                    i18n:domain="other">feature</title>
+    ...         </field>
+    ...
     ...     </schema>
     ... </model>
     ... """
@@ -557,6 +566,12 @@ as a zope.i18nmessageid message id rather than a basic Unicode string::
       <schema>
         <field name="title" type="zope.schema.TextLine">
           <title i18n:translate="supermodel_test_title">Title</title>
+        </field>
+        <field name="description" type="zope.schema.TextLine">
+          <title i18n:translate="">description</title>
+        </field>
+        <field name="feature" type="zope.schema.TextLine">
+          <title i18n:domain="other" i18n:translate="domain_test">feature</title>
         </field>
       </schema>
     </model>
