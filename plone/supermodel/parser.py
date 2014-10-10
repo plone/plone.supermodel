@@ -21,7 +21,6 @@ from plone.supermodel.utils import ns
 
 from plone.supermodel.model import Model, Fieldset, Schema, SchemaClass
 from plone.supermodel.interfaces import FIELDSETS_KEY
-from plone.supermodel.interfaces import I18N_NAMESPACE
 from plone.supermodel.debug import parseinfo
 
 
@@ -81,8 +80,6 @@ def parse(source, policy=u""):
 def _parse(source, policy):
     tree = etree.parse(source)
     root = tree.getroot()
-
-    parseinfo.i18n_domain = root.attrib.get(ns('domain', prefix=I18N_NAMESPACE))
 
     model = Model()
 

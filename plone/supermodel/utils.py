@@ -6,10 +6,10 @@ from lxml import etree
 
 from zope.interface import directlyProvidedBy, directlyProvides
 from zope.schema.interfaces import IField, IFromUnicode, IDict, ICollection
-from zope.i18nmessageid import Message
 
-from plone.supermodel.interfaces import XML_NAMESPACE, I18N_NAMESPACE, IToUnicode
+from plone.supermodel.interfaces import XML_NAMESPACE, IToUnicode
 from plone.supermodel.debug import parseinfo
+
 
 try:
     from collections import OrderedDict
@@ -129,15 +129,6 @@ def elementToValue(field, element, default=_marker):
             converter = IFromUnicode(field)
             value = converter.fromUnicode(unicode(text))
 
-        # handle i18n
-        if isinstance(value, unicode) and parseinfo.i18n_domain is not None:
-            translate_attr = ns('translate', I18N_NAMESPACE)
-            msgid = element.attrib.get(translate_attr)
-            if msgid:
-                value = Message(msgid, domain=parseinfo.i18n_domain, default=value)
-            elif translate_attr in element.attrib:
-                value = Message(value, domain=parseinfo.i18n_domain)
-
     return value
 
 
@@ -174,12 +165,6 @@ def valueToElement(field, value, name=None, force=False):
         else:
             converter = IToUnicode(field)
             child.text = converter.toUnicode(value)
-
-            # handle i18n
-            if isinstance(value, Message):
-                translate_attr = ns('translate', I18N_NAMESPACE)
-                child.attrib[translate_attr] = child.text
-                child.text = converter.toUnicode(value.default)
 
     return child
 
