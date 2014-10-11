@@ -107,7 +107,7 @@ In addition to parsing, we can serialize a model to an XML representation:
 
     >>> from plone.supermodel import serializeModel
     >>> print serializeModel(model) # doctest: +NORMALIZE_WHITESPACE
-    <model xmlns="http://namespaces.plone.org/supermodel/schema">
+    <model xmlns:i18n="http://xml.zope.org/namespaces/i18n" xmlns="http://namespaces.plone.org/supermodel/schema">
       <schema>
         <field name="title" type="zope.schema.TextLine">
           <title>Title</title>
@@ -195,7 +195,7 @@ of just a single schema using serializeSchema():
 
     >>> from plone.supermodel import serializeSchema
     >>> print serializeSchema(ITestContent) # doctest: +NORMALIZE_WHITESPACE
-    <model xmlns="http://namespaces.plone.org/supermodel/schema">
+    <model xmlns:i18n="http://xml.zope.org/namespaces/i18n" xmlns="http://namespaces.plone.org/supermodel/schema">
       <schema>
         <field name="title" type="zope.schema.TextLine">
           <title>Title</title>
@@ -208,7 +208,7 @@ of just a single schema using serializeSchema():
     </model>
 
     >>> print serializeSchema(ITestMetadata, name=u"metadata") # doctest: +NORMALIZE_WHITESPACE
-    <model xmlns="http://namespaces.plone.org/supermodel/schema">
+    <model xmlns:i18n="http://xml.zope.org/namespaces/i18n" xmlns="http://namespaces.plone.org/supermodel/schema">
       <schema name="metadata">
         <field name="created" type="zope.schema.Datetime">
           <required>False</required>
@@ -249,7 +249,7 @@ Then, let's define a schema that is based on this interface.
 
     >>> schema = """\
     ... <?xml version="1.0" encoding="UTF-8"?>
-    ... <model xmlns="http://namespaces.plone.org/supermodel/schema">
+    ... <model xmlns:i18n="http://xml.zope.org/namespaces/i18n" xmlns="http://namespaces.plone.org/supermodel/schema">
     ...     <schema based-on="plone.supermodel.tests.IBase">
     ...         <field type="zope.schema.Text" name="description">
     ...             <title>Description</title>
@@ -291,7 +291,7 @@ We should also verify that the description field was indeed overridden:
 Finally, let's verify that bases are preserved upon serialisation:
 
     >>> print serializeSchema(model.schema) # doctest: +NORMALIZE_WHITESPACE
-    <model xmlns="http://namespaces.plone.org/supermodel/schema">
+    <model xmlns:i18n="http://xml.zope.org/namespaces/i18n" xmlns="http://namespaces.plone.org/supermodel/schema">
       <schema based-on="plone.supermodel.tests.IBase">
         <field name="description" type="zope.schema.Text">
           <description>A short summary</description>
@@ -404,7 +404,7 @@ When we serialise a schema with fieldsets, fields will be grouped by
 fieldset.
 
     >>> print serializeModel(model) # doctest: +NORMALIZE_WHITESPACE
-    <model xmlns="http://namespaces.plone.org/supermodel/schema">
+    <model xmlns:i18n="http://xml.zope.org/namespaces/i18n" xmlns="http://namespaces.plone.org/supermodel/schema">
       <schema>
         <field name="title" type="zope.schema.TextLine">
           <title>Title</title>
@@ -483,7 +483,7 @@ in action.
 The model's serialization should include the invariant.
 
     >>> print serializeModel(model) # doctest: +NORMALIZE_WHITESPACE
-    <model xmlns="http://namespaces.plone.org/supermodel/schema">
+    <model xmlns:i18n="http://xml.zope.org/namespaces/i18n" xmlns="http://namespaces.plone.org/supermodel/schema">
       <schema>
         <invariant>plone.supermodel.tests.dummy_invariant</invariant>
         <invariant>plone.supermodel.tests.dummy_invariant_prime</invariant>
@@ -541,6 +541,15 @@ as a zope.i18nmessageid message id rather than a basic Unicode string::
     ...             <title i18n:translate="supermodel_test_title">Title</title>
     ...         </field>
     ...
+    ...         <field type="zope.schema.TextLine" name="description">
+    ...             <title i18n:translate="">description</title>
+    ...         </field>
+    ...
+    ...         <field type="zope.schema.TextLine" name="feature">
+    ...             <title i18n:translate="domain_test"
+    ...                    i18n:domain="other">feature</title>
+    ...         </field>
+    ...
     ...     </schema>
     ... </model>
     ... """
@@ -552,6 +561,20 @@ as a zope.i18nmessageid message id rather than a basic Unicode string::
     <type 'zope.i18nmessageid.message.Message'>
     >>> msgid.default
     u'Title'
+    >>> print serializeModel(model) # doctest: +NORMALIZE_WHITESPACE
+    <model xmlns:i18n="http://xml.zope.org/namespaces/i18n" xmlns="http://namespaces.plone.org/supermodel/schema" i18n:domain="plone.supermodel">
+      <schema>
+        <field name="title" type="zope.schema.TextLine">
+          <title i18n:translate="supermodel_test_title">Title</title>
+        </field>
+        <field name="description" type="zope.schema.TextLine">
+          <title i18n:translate="">description</title>
+        </field>
+        <field name="feature" type="zope.schema.TextLine">
+          <title i18n:domain="other" i18n:translate="domain_test">feature</title>
+        </field>
+      </schema>
+    </model>
 
 Creating custom metadata handlers
 ---------------------------------
@@ -649,7 +672,7 @@ Of course, we can also serialize the schema back to XML. Here, the 'prefix'
 set in the utility (if any) will be used by default.
 
     >>> print serializeModel(model) # doctest: +NORMALIZE_WHITESPACE
-    <model xmlns:ui="http://namespaces.acme.com/ui" xmlns="http://namespaces.plone.org/supermodel/schema">
+    <model xmlns:i18n="http://xml.zope.org/namespaces/i18n" xmlns:ui="http://namespaces.acme.com/ui" xmlns="http://namespaces.plone.org/supermodel/schema">
       <schema ui:layout="horizontal">
         <field name="title" type="zope.schema.TextLine" ui:widget="largetype">
           <title>Title</title>
