@@ -1,29 +1,26 @@
-import sys
-import linecache
-
+# -*- coding: utf-8 -*-
 from lxml import etree
-
-from zope.interface import implements
-from zope.component import getUtility, queryUtility, getUtilitiesFor
-
-from zope.schema import getFields
-
-from zope.dottedname.resolve import resolve
-
-from plone.supermodel.interfaces import IInvariant
-from plone.supermodel.interfaces import ISchemaPolicy
-from plone.supermodel.interfaces import IFieldExportImportHandler
-
-from plone.supermodel.interfaces import ISchemaMetadataHandler
-from plone.supermodel.interfaces import IFieldMetadataHandler
-
-from plone.supermodel.utils import ns
-
-from plone.supermodel.model import Model, Fieldset, Schema, SchemaClass
+from plone.supermodel.debug import parseinfo
 from plone.supermodel.interfaces import FIELDSETS_KEY
 from plone.supermodel.interfaces import I18N_NAMESPACE
-from plone.supermodel.debug import parseinfo
-
+from plone.supermodel.interfaces import IFieldExportImportHandler
+from plone.supermodel.interfaces import IFieldMetadataHandler
+from plone.supermodel.interfaces import IInvariant
+from plone.supermodel.interfaces import ISchemaMetadataHandler
+from plone.supermodel.interfaces import ISchemaPolicy
+from plone.supermodel.model import Fieldset
+from plone.supermodel.model import Model
+from plone.supermodel.model import Schema
+from plone.supermodel.model import SchemaClass
+from plone.supermodel.utils import ns
+from zope.component import getUtilitiesFor
+from zope.component import getUtility
+from zope.component import queryUtility
+from zope.dottedname.resolve import resolve
+from zope.interface import implementer
+from zope.schema import getFields
+import linecache
+import sys
 
 # Exception
 
@@ -47,9 +44,8 @@ class SupermodelParseError(Exception):
 
 # Helper adapters
 
-
+@implementer(ISchemaPolicy)
 class DefaultSchemaPolicy(object):
-    implements(ISchemaPolicy)
 
     def module(self, schemaName, tree):
         return 'plone.supermodel.generated'

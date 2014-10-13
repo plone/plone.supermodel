@@ -1,12 +1,12 @@
+# -*- coding: utf-8 -*-
 from StringIO import StringIO
-
-from zope.interface import moduleProvides
-
-from plone.supermodel.interfaces import FILENAME_KEY, IXMLToSchema
+from plone.supermodel import model
 from plone.supermodel import parser
 from plone.supermodel import serializer
 from plone.supermodel import utils
-from plone.supermodel import model
+from plone.supermodel.interfaces import FILENAME_KEY
+from plone.supermodel.interfaces import IXMLToSchema
+from zope.interface import moduleProvides
 
 # Cache models by absolute filename
 _model_cache = {}
@@ -42,4 +42,10 @@ def serializeModel(model):
 
 moduleProvides(IXMLToSchema)
 
-__all__ = ('xmlSchema', 'loadFile', 'loadString', 'serializeSchema', 'serializeModel')
+__all__ = (
+    'xmlSchema',
+    'loadFile',
+    'loadString',
+    'serializeSchema',
+    'serializeModel'
+)

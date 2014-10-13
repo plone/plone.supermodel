@@ -1,23 +1,24 @@
-import time
-import datetime
-
-from zope.interface import implements
-from zope.component import adapts
-
-from zope.schema.interfaces import IField, IFromUnicode
-from zope.schema.interfaces import IDate, IDatetime, IInterfaceField, IObject
-
-from zope.dottedname.resolve import resolve
-
+# -*- coding: utf-8 -*-
 from plone.supermodel.interfaces import IToUnicode
 from plone.supermodel.utils import fieldTypecast
+from zope.component import adapter
+from zope.dottedname.resolve import resolve
+from zope.interface import implementer
+from zope.schema.interfaces import IDate
+from zope.schema.interfaces import IDatetime
+from zope.schema.interfaces import IField
+from zope.schema.interfaces import IFromUnicode
+from zope.schema.interfaces import IInterfaceField
+from zope.schema.interfaces import IObject
+import datetime
+import time
+
 
 # Defaults
 
-
+@implementer(IFromUnicode)
+@adapter(IField)
 class DefaultFromUnicode(object):
-    implements(IFromUnicode)
-    adapts(IField)
 
     def __init__(self, context):
         self.context = context
@@ -26,9 +27,9 @@ class DefaultFromUnicode(object):
         return fieldTypecast(self.context, value)
 
 
+@implementer(IToUnicode)
+@adapter(IField)
 class DefaultToUnicode(object):
-    implements(IToUnicode)
-    adapts(IField)
 
     def __init__(self, context):
         self.context = context
@@ -39,10 +40,9 @@ class DefaultToUnicode(object):
 
 # Date/time fields
 
-
+@implementer(IFromUnicode)
+@adapter(IDate)
 class DateFromUnicode(object):
-    implements(IFromUnicode)
-    adapts(IDate)
 
     format = "%Y-%m-%d"
 
@@ -56,9 +56,9 @@ class DateFromUnicode(object):
         return d
 
 
+@implementer(IFromUnicode)
+@adapter(IDatetime)
 class DatetimeFromUnicode(object):
-    implements(IFromUnicode)
-    adapts(IDatetime)
 
     format = "%Y-%m-%d %H:%M:%S"
 
@@ -74,10 +74,9 @@ class DatetimeFromUnicode(object):
 
 # Interface fields
 
-
+@implementer(IFromUnicode)
+@adapter(IInterfaceField)
 class InterfaceFieldFromUnicode(object):
-    implements(IFromUnicode)
-    adapts(IInterfaceField)
 
     def __init__(self, context):
         self.context = context
@@ -88,9 +87,9 @@ class InterfaceFieldFromUnicode(object):
         return iface
 
 
+@implementer(IToUnicode)
+@adapter(IInterfaceField)
 class InterfaceFieldToUnicode(object):
-    implements(IToUnicode)
-    adapts(IInterfaceField)
 
     def __init__(self, context):
         self.context = context
@@ -104,9 +103,9 @@ class InterfaceFieldToUnicode(object):
 # particularly useful)
 
 
+@implementer(IFromUnicode)
+@adapter(IObject)
 class ObjectFromUnicode(object):
-    implements(IFromUnicode)
-    adapts(IObject)
 
     def __init__(self, context):
         self.context = context

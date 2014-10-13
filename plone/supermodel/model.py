@@ -1,14 +1,14 @@
-import logging
-import zope.deferredimport
-from zope.component import getAdapters
-from zope.interface import Interface
-from zope.interface import implements
-from zope.interface.interface import InterfaceClass
-
-from plone.supermodel.interfaces import IModel
+# -*- coding: utf-8 -*-
 from plone.supermodel.interfaces import IFieldset
+from plone.supermodel.interfaces import IModel
 from plone.supermodel.interfaces import ISchema
 from plone.supermodel.interfaces import ISchemaPlugin
+from zope.component import getAdapters
+from zope.interface import Interface
+from zope.interface import implementer
+from zope.interface.interface import InterfaceClass
+import logging
+import zope.deferredimport
 
 zope.deferredimport.defineFrom('plone.supermodel.directives',
     'load',
@@ -26,8 +26,8 @@ else:
 logger = logging.getLogger('plone.supermodel')
 
 
+@implementer(IFieldset)
 class Fieldset(object):
-    implements(IFieldset)
 
     def __init__(self, __name__, label=None, description=None, fields=None):
         self.__name__ = __name__
@@ -43,8 +43,8 @@ class Fieldset(object):
         return "<Fieldset '%s' of %s>" % (self.__name__, ', '.join(self.fields))
 
 
+@implementer(IModel)
 class Model(object):
-    implements(IModel)
 
     def __init__(self, schemata=None):
         if schemata is None:
@@ -58,8 +58,8 @@ class Model(object):
         return self.schemata.get(u"", None)
 
 
+@implementer(ISchema)
 class SchemaClass(InterfaceClass):
-    implements(ISchema)
 
     def __init__(self, name, bases=(), attrs=None, __doc__=None,
                  __module__=None):

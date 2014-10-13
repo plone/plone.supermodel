@@ -1,17 +1,19 @@
-import os.path
-import sys
-
-from zope.component import adapts
-from zope.interface import alsoProvides
-from zope.interface import implements
-from zope.interface.interface import TAGGED_DATA
-
+# -*- coding: utf-8 -*-
 from plone.supermodel import loadFile
+from plone.supermodel.interfaces import FIELDSETS_KEY
+from plone.supermodel.interfaces import FILENAME_KEY
 from plone.supermodel.interfaces import ISchema
 from plone.supermodel.interfaces import ISchemaPlugin
-from plone.supermodel.interfaces import FILENAME_KEY, SCHEMA_NAME_KEY, FIELDSETS_KEY, PRIMARY_FIELDS_KEY
+from plone.supermodel.interfaces import PRIMARY_FIELDS_KEY
+from plone.supermodel.interfaces import SCHEMA_NAME_KEY
 from plone.supermodel.model import Fieldset
 from plone.supermodel.utils import syncSchema
+from zope.component import adapter
+from zope.interface import alsoProvides
+from zope.interface import implementer
+from zope.interface.interface import TAGGED_DATA
+import os.path
+import sys
 
 # Directive
 
@@ -55,9 +57,9 @@ class MetadataDictDirective(Directive):
 
 # Plugin
 
+@adapter(ISchema)
+@implementer(ISchemaPlugin)
 class CheckerPlugin(object):
-    adapts(ISchema)
-    implements(ISchemaPlugin)
 
     key = None
 
@@ -125,9 +127,9 @@ class load(Directive):
         return dict(filename=filename, schema=schema)
 
 
+@adapter(ISchema)
+@implementer(ISchemaPlugin)
 class SupermodelSchemaPlugin(object):
-    adapts(ISchema)
-    implements(ISchemaPlugin)
 
     order = -1000
 
