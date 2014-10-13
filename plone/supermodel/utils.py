@@ -1,15 +1,19 @@
-import os.path
-import sys
-import re
-
+# -*- coding: utf-8 -*-
 from lxml import etree
-
-from zope.interface import directlyProvidedBy, directlyProvides
-from zope.schema.interfaces import IField, IFromUnicode, IDict, ICollection
-from zope.i18nmessageid import Message
-
-from plone.supermodel.interfaces import XML_NAMESPACE, I18N_NAMESPACE, IToUnicode
 from plone.supermodel.debug import parseinfo
+from plone.supermodel.interfaces import I18N_NAMESPACE
+from plone.supermodel.interfaces import IToUnicode
+from plone.supermodel.interfaces import XML_NAMESPACE
+from zope.i18nmessageid import Message
+from zope.interface import directlyProvidedBy
+from zope.interface import directlyProvides
+from zope.schema.interfaces import ICollection
+from zope.schema.interfaces import IDict
+from zope.schema.interfaces import IField
+from zope.schema.interfaces import IFromUnicode
+import os.path
+import re
+import sys
 
 try:
     from collections import OrderedDict

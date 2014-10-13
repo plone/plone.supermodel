@@ -1,21 +1,22 @@
+# -*- coding: utf-8 -*-
 from lxml import etree
-
-from zope.interface import Interface, implements, implementedBy
+from plone.supermodel.debug import parseinfo
+from plone.supermodel.interfaces import IDefaultFactory
+from plone.supermodel.interfaces import IFieldExportImportHandler
+from plone.supermodel.interfaces import IFieldNameExtractor
+from plone.supermodel.utils import noNS
+from plone.supermodel.utils import valueToElement
+from plone.supermodel.utils import elementToValue
 from zope.component import queryUtility
-
-import zope.schema
-
+from zope.interface import Interface
+from zope.interface import implementedBy
+from zope.interface import implementer
 from zope.schema.interfaces import IContextAwareDefaultFactory
 from zope.schema.interfaces import IField
 from zope.schema.interfaces import IVocabularyTokenized
-from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
-
-from plone.supermodel.interfaces import IDefaultFactory
-from plone.supermodel.interfaces import IFieldNameExtractor
-from plone.supermodel.interfaces import IFieldExportImportHandler
-
-from plone.supermodel.utils import noNS, valueToElement, elementToValue
-from plone.supermodel.debug import parseinfo
+from zope.schema.vocabulary import SimpleTerm
+from zope.schema.vocabulary import SimpleVocabulary
+import zope.schema
 
 try:
     from collections import OrderedDict
@@ -27,6 +28,7 @@ class OrderedDictField(zope.schema.Dict):
     _type = OrderedDict
 
 
+@implementer(IFieldExportImportHandler)
 class BaseHandler(object):
     """Base class for import/export handlers.
 
@@ -35,8 +37,6 @@ class BaseHandler(object):
 
     The write_field method is called to write one field to a particular element.
     """
-
-    implements(IFieldExportImportHandler)
 
     # Elements that we will not read/write. 'r' means skip when reading;
     # 'w' means skip when writing; 'rw' means skip always.
@@ -67,8 +67,11 @@ class BaseHandler(object):
         for schema in implementedBy(self.klass).flattened():
             self.fieldAttributes.update(zope.schema.getFields(schema))
 
-        self.fieldAttributes['defaultFactory'] = \
-            zope.schema.Object(__name__='defaultFactory', title=u"defaultFactory", schema=Interface)
+        self.fieldAttributes['defaultFactory'] = zope.schema.Object(
+            __name__='defaultFactory',
+            title=u"defaultFactory",
+            schema=Interface
+        )
 
     def _constructField(self, attributes):
         return self.klass(**attributes)
@@ -99,17 +102,26 @@ class BaseHandler(object):
                 elif attribute_name in self.fieldInstanceAttributes:
 
                     attributeField_type = attribute_element.get('type')
-                    handler = queryUtility(IFieldExportImportHandler, name=attributeField_type)
+                    handler = queryUtility(
+                        IFieldExportImportHandler,
+                        name=attributeField_type
+                    )
 
                     if handler is None:
-                        raise NotImplementedError(u"Type %s used for %s not supported" %
-                            (attributeField_type, attribute_name))
+                        raise NotImplementedError(
+                            u"Type %s used for %s not supported" %
+                            (attributeField_type, attribute_name)
+                        )
 
-                    attributes[attribute_name] = handler.read(attribute_element)
+                    attributes[attribute_name] = handler.read(
+                        attribute_element
+                    )
 
                 else:
-                    attributes[attribute_name] = \
-                        self.readAttribute(attribute_element, attributeField)
+                    attributes[attribute_name] = self.readAttribute(
+                        attribute_element,
+                        attributeField
+                    )
             parseinfo.stack.pop()
 
         name = element.get('name')
@@ -157,12 +169,16 @@ class BaseHandler(object):
             # restrict to those that provide IContextAwareDefaultFactory
             # or IDefaultFactory
             if not (
-                IContextAwareDefaultFactory.providedBy(field_instance.defaultFactory) or
+                IContextAwareDefaultFactory.providedBy(
+                    field_instance.defaultFactory
+                ) or
                 IDefaultFactory.providedBy(field_instance.defaultFactory)
-                ):
-                raise ImportError(u"defaultFactory must provide "
-                                           "zope.schema.interfaces.IContextAwareDefaultFactory "
-                                           "or plone.supermodel.IDefaultFactory")
+            ):
+                raise ImportError(
+                    u"defaultFactory must provide "
+                    u"zope.schema.interfaces.IContextAwareDefaultFactory "
+                    u"or plone.supermodel.IDefaultFactory"
+                )
 
         return field_instance
 
@@ -212,10 +228,17 @@ class BaseHandler(object):
         # The value points to another field. Recurse.
         if IField.providedBy(value):
             value_fieldType = IFieldNameExtractor(value)()
-            handler = queryUtility(IFieldExportImportHandler, name=value_fieldType)
+            handler = queryUtility(
+                IFieldExportImportHandler,
+                name=value_fieldType
+            )
             if handler is None:
                 return None
-            return handler.write(value, name=None, type=value_fieldType, elementName=elementName)
+            return handler.write(
+                value, name=None,
+                type=value_fieldType,
+                elementName=elementName
+            )
 
         # For 'default', 'missing_value' etc, we want to validate against
         # the imported field type itself, not the field type of the attribute
@@ -223,7 +246,12 @@ class BaseHandler(object):
                 elementName in self.nonValidatedfieldTypeAttributes:
             attributeField = field
 
-        return valueToElement(attributeField, value, name=elementName, force=force)
+        return valueToElement(
+            attributeField,
+            value,
+            name=elementName,
+            force=force
+        )
 
 
 class DictHandler(BaseHandler):
@@ -233,8 +261,14 @@ class DictHandler(BaseHandler):
 
     def __init__(self, klass):
         super(DictHandler, self).__init__(klass)
-        self.fieldAttributes['key_type'] = zope.schema.Field(__name__='key_type', title=u"Key type")
-        self.fieldAttributes['value_type'] = zope.schema.Field(__name__='value_type', title=u"Value type")
+        self.fieldAttributes['key_type'] = zope.schema.Field(
+            __name__='key_type',
+            title=u"Key type"
+        )
+        self.fieldAttributes['value_type'] = zope.schema.Field(
+            __name__='value_type',
+            title=u"Value type"
+        )
 
 
 class ObjectHandler(BaseHandler):
@@ -251,7 +285,9 @@ class ObjectHandler(BaseHandler):
         super(ObjectHandler, self).__init__(klass)
 
         # This is not correctly set in the interface
-        self.fieldAttributes['schema'] = zope.schema.InterfaceField(__name__='schema')
+        self.fieldAttributes['schema'] = zope.schema.InterfaceField(
+            __name__='schema'
+        )
 
 
 class ChoiceHandler(BaseHandler):
@@ -259,7 +295,13 @@ class ChoiceHandler(BaseHandler):
     """
 
     filteredAttributes = BaseHandler.filteredAttributes.copy()
-    filteredAttributes.update({'vocabulary': 'w', 'values': 'w', 'source': 'w', 'vocabularyName': 'rw'})
+    filteredAttributes.update(
+        {'vocabulary': 'w',
+         'values': 'w',
+         'source': 'w',
+         'vocabularyName': 'rw'
+         }
+    )
 
     def __init__(self, klass):
         super(ChoiceHandler, self).__init__(klass)
@@ -267,17 +309,27 @@ class ChoiceHandler(BaseHandler):
         # Special options for the constructor. These are not automatically written.
 
         self.fieldAttributes['vocabulary'] = \
-            zope.schema.TextLine(__name__='vocabulary', title=u"Named vocabulary")
+            zope.schema.TextLine(
+                __name__='vocabulary',
+                title=u"Named vocabulary"
+            )
 
         self.fieldAttributes['values'] = \
-            zope.schema.List(__name__='values', title=u"Values",
-                                value_type=zope.schema.Text(title=u"Value"))
+            zope.schema.List(
+                __name__='values',
+                title=u"Values",
+                value_type=zope.schema.Text(title=u"Value")
+            )
 
         # XXX: We can't be more specific about the schema, since the field
         # supports both ISource and IContextSourceBinder. However, the
         # initialiser will validate.
         self.fieldAttributes['source'] = \
-            zope.schema.Object(__name__='source', title=u"Source", schema=Interface)
+            zope.schema.Object(
+                __name__='source',
+                title=u"Source",
+                schema=Interface
+            )
 
     def readAttribute(self, element, attributeField):
         if element.tag == 'values':
@@ -300,7 +352,11 @@ class ChoiceHandler(BaseHandler):
                 encoded = (value or '').encode('unicode_escape')
                 if value != encoded:
                     value = value or u''
-                    term = SimpleTerm(token=encoded, value=value, title=title)
+                    term = SimpleTerm(
+                        token=encoded,
+                        value=value,
+                        title=title
+                    )
                 else:
                     term = SimpleTerm(value=value, title=title)
                 terms.append(term)
@@ -317,17 +373,25 @@ class ChoiceHandler(BaseHandler):
         # Named vocabulary
         if field.vocabularyName is not None and field.vocabulary is None:
             attributeField = self.fieldAttributes['vocabulary']
-            child = valueToElement(attributeField, field.vocabularyName, name='vocabulary', force=True)
+            child = valueToElement(
+                attributeField,
+                field.vocabularyName,
+                name='vocabulary',
+                force=True
+            )
             element.append(child)
 
         # Listed vocabulary - attempt to convert to a simple list of values
-        elif field.vocabularyName is None and IVocabularyTokenized.providedBy(field.vocabulary):
+        elif field.vocabularyName is None \
+             and IVocabularyTokenized.providedBy(field.vocabulary):
             value = []
             for term in field.vocabulary:
                 if (not isinstance(term.value, (str, unicode), )
                     or term.token != term.value.encode('unicode_escape')):
-                    raise NotImplementedError(u"Cannot export a vocabulary that is not "
-                                               "based on a simple list of values")
+                    raise NotImplementedError(
+                        u"Cannot export a vocabulary that is not "
+                        u"based on a simple list of values"
+                    )
                 if term.title and term.title != term.value:
                     value.append((term.value, term.title))
                 else:
@@ -341,14 +405,21 @@ class ChoiceHandler(BaseHandler):
                     key_type=zope.schema.TextLine(),
                     value_type=zope.schema.TextLine(),
                     )
-            child = valueToElement(attributeField, value, name='values', force=True)
+            child = valueToElement(
+                attributeField,
+                value,
+                name='values',
+                force=True
+            )
             element.append(child)
 
         # Anything else is not allowed - we can't export ISource/IVocabulary or
         #  IContextSourceBinder objects.
         else:
-            raise NotImplementedError(u"Choice fields with vocabularies not based on "
-                                        "a simple list of values or a named vocabulary "
-                                        "cannot be exported")
+            raise NotImplementedError(
+                u"Choice fields with vocabularies not based on "
+                u"a simple list of values or a named vocabulary "
+                u"cannot be exported"
+            )
 
         return element

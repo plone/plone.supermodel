@@ -4,6 +4,9 @@ Changelog
 1.2.6 (unreleased)
 ------------------
 
+- Code modernization: sorted imports, use decorators, utf8 headers.
+  [jensens]
+
 - Add i18n serialization from schema value to XML model
   [datakurre]
 

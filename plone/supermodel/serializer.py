@@ -1,30 +1,28 @@
-from zope.interface import implements
-from zope.component import adapts, getUtilitiesFor
-
+# -*- coding: utf-8 -*-
+from lxml import etree
+from plone.supermodel.interfaces import FIELDSETS_KEY
+from plone.supermodel.interfaces import I18N_NAMESPACE
+from plone.supermodel.interfaces import IFieldExportImportHandler
+from plone.supermodel.interfaces import IFieldMetadataHandler
+from plone.supermodel.interfaces import IFieldNameExtractor
+from plone.supermodel.interfaces import ISchemaMetadataHandler
+from plone.supermodel.interfaces import XML_NAMESPACE
+from plone.supermodel.model import Schema
+from plone.supermodel.utils import ns
+from plone.supermodel.utils import prettyXML
+from plone.supermodel.utils import sortedFields
+from zope.component import adapter
+from zope.component import getUtilitiesFor
+from zope.component import queryUtility
+from zope.interface import implementer
 from zope.schema.interfaces import IField
 
-from zope.component import queryUtility
 
-from plone.supermodel.interfaces import IFieldExportImportHandler
-from plone.supermodel.interfaces import ISchemaMetadataHandler
-from plone.supermodel.interfaces import IFieldMetadataHandler
-
-from plone.supermodel.interfaces import I18N_NAMESPACE
-from plone.supermodel.interfaces import XML_NAMESPACE
-from plone.supermodel.interfaces import FIELDSETS_KEY
-from plone.supermodel.interfaces import IFieldNameExtractor
-
-from plone.supermodel.model import Schema
-
-from plone.supermodel.utils import ns, sortedFields, prettyXML
-from lxml import etree
-
-
+@implementer(IFieldNameExtractor)
+@adapter(IField)
 class DefaultFieldNameExtractor(object):
     """Extract a name
     """
-    implements(IFieldNameExtractor)
-    adapts(IField)
 
     def __init__(self, context):
         self.context = context

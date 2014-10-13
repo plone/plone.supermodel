@@ -1,7 +1,7 @@
+# -*- coding: utf-8 -*-
 import zope.interface
-import zope.schema.interfaces
-
 import zope.schema
+import zope.schema.interfaces
 
 
 class IDottedName(zope.interface.Interface):
