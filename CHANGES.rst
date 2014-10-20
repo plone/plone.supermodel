@@ -1,7 +1,7 @@
 Changelog
 =========
 
-1.2.6 (unreleased)
+1.2.6 (2014-10-20)
 ------------------
 
 - Code modernization: sorted imports, use decorators, utf8 headers.
