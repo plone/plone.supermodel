@@ -162,7 +162,7 @@ class BaseHandler(object):
                 setattr(field_instance, attribute_name, value)
                 parseinfo.stack.pop()
 
-        field_instance._init_field = True
+        field_instance._init_field = False
 
         if field_instance.defaultFactory is not None:
             # we want to add some additional requirements for defaultFactory.
