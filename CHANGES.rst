@@ -10,7 +10,8 @@ New:
 
 Fixes:
 
-- *add item here*
+- Add temporary fix for a test failure within a Zope 4 environment.
+  [pbauer]
 
 
 1.2.6 (2014-10-20)
