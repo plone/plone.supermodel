@@ -14,7 +14,7 @@ if sys.version_info < (2, 7):
 def read(*rnames):
     return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
 
-version = '1.2.7'
+version = '1.2.8.dev0'
 
 long_description = (
     read('README.rst')
