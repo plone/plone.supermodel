@@ -4,10 +4,6 @@ Changelog
 1.2.7 (unreleased)
 ------------------
 
-New:
-
-- *add item here*
-
 Fixes:
 
 - Add temporary fix for a test failure within a Zope 4 environment.
