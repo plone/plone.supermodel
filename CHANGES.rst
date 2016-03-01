@@ -43,6 +43,9 @@ New:
 
 Fixes:
 
+- Remove temporary fix regarding test failures on Zope 4, as it's already fixed.
+  [thet]
+
 - Update setup.py url to point to github location.
   [esteele]
 

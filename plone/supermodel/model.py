@@ -107,23 +107,9 @@ def finalizeSchemas(parent=Schema):
 
     def walk(schema):
         yield schema
-        if getattr(schema, 'dependents', None) is None:
-            # This is just a temporary fix for a issue when running Plone-tests
-            # with zope4 (http://jenkins.plone.org/view/PLIPs/job/plip-zope4/).
-            # InterfaceClass
-            # plone.dexterity.schema.generated.plone_0_LockableType
-            # has zope.interface.adapter.VerifyingAdapterLookup as a
-            # dependent which again has no dependents.
-            # Maybe VerifyingAdapterLookup should not be here or it should have
-            # dependents (a weakref.WeakKeyDictionary())
-            # Maybe also related to the comment below which states that the
-            # first base class of a schema must be a SchemaClass.
-            logger.info(
-                'This should not happen: "%s" has no dependents!' % schema)
-        else:
-            for child in schema.dependents.keys():
-                for s in walk(child):
-                    yield s
+        for child in schema.dependents.keys():
+            for s in walk(child):
+                yield s
     schemas = set(walk(parent))
     for schema in schemas:
         if hasattr(schema, '_SchemaClass_finalize'):
