@@ -10,7 +10,8 @@ New:
 
 Fixes:
 
-- *add item here*
+- Update setup.py url to point to github location.
+  [esteele]
 
 
 1.2.7 (2016-02-12)

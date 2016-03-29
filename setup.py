@@ -43,7 +43,7 @@ setup(
     keywords='Plone XML schema',
     author='Martin Aspeli',
     author_email='optilude@gmail.com',
-    url='http://code.google.com/p/dexterity',
+    url='https://github.com/plone/plone.supermodel',
     license='BSD',
     packages=find_packages(exclude=['ez_setup']),
     namespace_packages=['plone'],
