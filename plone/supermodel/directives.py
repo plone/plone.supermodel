@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from plone.supermodel import loadFile
+from plone.supermodel.interfaces import DEFAULT_ORDER
 from plone.supermodel.interfaces import FIELDSETS_KEY
 from plone.supermodel.interfaces import FILENAME_KEY
 from plone.supermodel.interfaces import ISchema
@@ -12,11 +13,12 @@ from zope.component import adapter
 from zope.interface import alsoProvides
 from zope.interface import implementer
 from zope.interface.interface import TAGGED_DATA
+
 import os.path
 import sys
 
-# Directive
 
+# Directive
 
 class DirectiveClass(type):
     """A Directive is used to apply tagged values to a Schema
@@ -34,7 +36,11 @@ class DirectiveClass(type):
         value = instance.factory(*args, **kw)
         instance.store(tags, value)
 
-Directive = DirectiveClass('Directive', (), dict(__module__='plone.supermodel.directives',),)
+Directive = DirectiveClass(
+    'Directive',
+    (),
+    dict(__module__='plone.supermodel.directives',),
+)
 
 
 class MetadataListDirective(Directive):
@@ -75,9 +81,13 @@ class CheckerPlugin(object):
         for fieldName in self.fieldNames():
             if fieldName not in schema:
                 raise ValueError(
-                    u"The directive %s applied to interface %s "
-                    u"refers to unknown field name %s" % (self.key, schema.__identifier__, fieldName)
+                    u"The directive {0} applied to interface {1} "
+                    u"refers to unknown field name {2}".format(
+                        self.key,
+                        schema.__identifier__,
+                        fieldName
                     )
+                )
             yield fieldName
 
     def __call__(self):
@@ -166,8 +176,13 @@ class SupermodelSchemaPlugin(object):
         model = loadFile(filename)
         if schema not in model.schemata:
             raise ValueError(
-                    u"Schema '%s' specified for interface %s does not exist in %s." %
-                        (schema, interface.__identifier__, filename,))
+                u"Schema '{0}' specified for interface {1} does not exist "
+                "in {2}.".format(
+                    schema,
+                    interface.__identifier__,
+                    filename,
+                )
+            )
 
         syncSchema(model.schemata[schema], interface, overwrite=False)
 
@@ -177,8 +192,22 @@ class fieldset(MetadataListDirective):
     """
     key = FIELDSETS_KEY
 
-    def factory(self, name, label=None, description=None, fields=None, **kw):
-        fieldset = Fieldset(name, label=label, description=description, fields=fields)
+    def factory(
+        self,
+        name,
+        label=None,
+        description=None,
+        fields=None,
+        order=DEFAULT_ORDER,
+        **kw
+    ):
+        fieldset = Fieldset(
+            name,
+            label=label,
+            description=description,
+            fields=fields,
+            order=order,
+        )
         for (key, value) in kw.items():
             setattr(fieldset, key, value)
         return [fieldset]
@@ -208,7 +237,9 @@ else:
 
         def factory(self, *args):
             if not args:
-                raise TypeError('The primary directive expects at least one argument.')
+                raise TypeError(
+                    'The primary directive expects at least one argument.'
+                )
             return args
 
     class PrimaryFieldsPlugin(ListCheckerPlugin):

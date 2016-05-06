@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from lxml import etree
 from plone.supermodel.debug import parseinfo
+from plone.supermodel.interfaces import DEFAULT_ORDER
 from plone.supermodel.interfaces import FIELDSETS_KEY
 from plone.supermodel.interfaces import I18N_NAMESPACE
 from plone.supermodel.interfaces import IFieldExportImportHandler
@@ -19,10 +20,12 @@ from zope.component import queryUtility
 from zope.dottedname.resolve import resolve
 from zope.interface import implementer
 from zope.schema import getFields
+
 import linecache
 import sys
 
 # Exception
+
 
 class SupermodelParseError(Exception):
 
@@ -42,8 +45,8 @@ class SupermodelParseError(Exception):
             msg += '\n    %s' % line
         self.args = [msg]
 
-# Helper adapters
 
+# Helper adapters
 @implementer(ISchemaPolicy)
 class DefaultSchemaPolicy(object):
 
@@ -58,7 +61,6 @@ class DefaultSchemaPolicy(object):
 
 
 # Algorithm
-
 def parse(source, policy=u""):
     fname = None
     if isinstance(source, basestring):
@@ -69,16 +71,22 @@ def parse(source, policy=u""):
     except Exception, e:
         # Re-package the exception as a parse error that will get rendered with
         # the filename and line number of the element that caused the problem.
-        # Keep the original traceback so the developer can debug where the problem
-        # happened.
-        raise SupermodelParseError(e, fname, parseinfo.stack[-1]), None, sys.exc_info()[2]
+        # Keep the original traceback so the developer can debug where the
+        # problem happened.
+        raise SupermodelParseError(
+            e,
+            fname,
+            parseinfo.stack[-1]
+        ), None, sys.exc_info()[2]
 
 
 def _parse(source, policy):
     tree = etree.parse(source)
     root = tree.getroot()
 
-    parseinfo.i18n_domain = root.attrib.get(ns('domain', prefix=I18N_NAMESPACE))
+    parseinfo.i18n_domain = root.attrib.get(
+        ns('domain', prefix=I18N_NAMESPACE)
+    )
 
     model = Model()
 
@@ -95,13 +103,22 @@ def _parse(source, policy):
         fieldType = fieldElement.get('type')
 
         if fieldName is None or fieldType is None:
-            raise ValueError("The attributes 'name' and 'type' are required for each <field /> element")
+            raise ValueError(
+                'The attributes \'name\' and \'type\' are required for each '
+                '<field /> element'
+            )
 
         handler = handlers.get(fieldType, None)
         if handler is None:
-            handler = handlers[fieldType] = queryUtility(IFieldExportImportHandler, name=fieldType)
+            handler = handlers[fieldType] = queryUtility(
+                IFieldExportImportHandler,
+                name=fieldType
+            )
             if handler is None:
-                raise ValueError("Field type %s specified for field %s is not supported" % (fieldType, fieldName, ))
+                raise ValueError(
+                    'Field type {0} specified for field {1} is not '
+                    'supported'.format(fieldType, fieldName)
+                )
 
         field = handler.read(fieldElement)
 
@@ -138,7 +155,12 @@ def _parse(source, policy):
         # Read global fields
         for fieldElement in schema_element.findall(ns('field')):
             parseinfo.stack.append(fieldElement)
-            readField(fieldElement, schemaAttributes, fieldElements, baseFields)
+            readField(
+                fieldElement,
+                schemaAttributes,
+                fieldElements,
+                baseFields
+            )
             parseinfo.stack.pop()
 
         # Read invariants, fieldsets and their fields
@@ -150,26 +172,48 @@ def _parse(source, policy):
             parseinfo.stack.append(subelement)
 
             if subelement.tag == ns('field'):
-                readField(subelement, schemaAttributes, fieldElements, baseFields)
+                readField(
+                    subelement,
+                    schemaAttributes,
+                    fieldElements,
+                    baseFields
+                )
             elif subelement.tag == ns('fieldset'):
 
                 fieldset_name = subelement.get('name')
                 if fieldset_name is None:
-                    raise ValueError(u"Fieldset in schema %s has no name" % (schemaName))
+                    raise ValueError(
+                        u'Fieldset in schema {0} has no name'.format(
+                            schemaName
+                        )
+                    )
 
                 fieldset = fieldsets_by_name.get(fieldset_name, None)
                 if fieldset is None:
                     fieldset_label = subelement.get('label')
                     fieldset_description = subelement.get('description')
-
-                    fieldset = fieldsets_by_name[fieldset_name] = Fieldset(fieldset_name,
-                                    label=fieldset_label, description=fieldset_description)
+                    fieldset_order = subelement.get('order')
+                    if fieldset_order is None:
+                        fieldset_order = DEFAULT_ORDER
+                    elif isinstance(fieldset_order, basestring):
+                        fieldset_order = int(fieldset_order)
+                    fieldset = fieldsets_by_name[fieldset_name] = Fieldset(
+                        fieldset_name,
+                        label=fieldset_label,
+                        description=fieldset_description,
+                        order=fieldset_order,
+                    )
                     fieldsets_by_name[fieldset_name] = fieldset
                     fieldsets.append(fieldset)
 
                 for fieldElement in subelement.findall(ns('field')):
                     parseinfo.stack.append(fieldElement)
-                    parsed_fieldName = readField(fieldElement, schemaAttributes, fieldElements, baseFields)
+                    parsed_fieldName = readField(
+                        fieldElement,
+                        schemaAttributes,
+                        fieldElements,
+                        baseFields
+                    )
                     if parsed_fieldName:
                         fieldset.fields.append(parsed_fieldName)
                     parseinfo.stack.pop()
@@ -178,15 +222,18 @@ def _parse(source, policy):
                 invariant = resolve(dotted)
                 if not IInvariant.providedBy(invariant):
                     raise ImportError(
-                        u"Invariant functions must provide plone.supermodel.interfaces.IInvariant"
+                        u'Invariant functions must provide '
+                        u'plone.supermodel.interfaces.IInvariant'
                     )
                 invariants.append(invariant)
             parseinfo.stack.pop()
 
-        schema = SchemaClass(name=policy_util.name(schemaName, tree),
-                                bases=bases + policy_util.bases(schemaName, tree) + (Schema,),
-                                __module__=policy_util.module(schemaName, tree),
-                                attrs=schemaAttributes)
+        schema = SchemaClass(
+            name=policy_util.name(schemaName, tree),
+            bases=bases + policy_util.bases(schemaName, tree) + (Schema,),
+            __module__=policy_util.module(schemaName, tree),
+            attrs=schemaAttributes
+        )
 
         # add invariants to schema as tagged values
         if invariants:
@@ -200,7 +247,11 @@ def _parse(source, policy):
         for handler_name, metadata_handler in field_metadata_handlers:
             for fieldName in schema:
                 if fieldName in fieldElements:
-                    metadata_handler.read(fieldElements[fieldName], schema, schema[fieldName])
+                    metadata_handler.read(
+                        fieldElements[fieldName],
+                        schema,
+                        schema[fieldName]
+                    )
 
         for handler_name, metadata_handler in schema_metadata_handlers:
             metadata_handler.read(schema_element, schema)

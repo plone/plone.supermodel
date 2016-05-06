@@ -108,12 +108,12 @@ class TestUtils(unittest.TestCase):
     def test_syncSchema(self):
 
         class ISource(Interface):
-            one = schema.TextLine(title=u"A") # order: 0
-            two = schema.Int(title=u"B")      # order: 1
+            one = schema.TextLine(title=u"A")  # order: 0
+            two = schema.Int(title=u"B")       # order: 1
 
         class IDest(Interface):
-            one = schema.TextLine(title=u"C") # order: 0
-            three = schema.Int(title=u"D")    # order: 1
+            one = schema.TextLine(title=u"C")  # order: 0
+            three = schema.Int(title=u"D")     # order: 1
 
         ISource.setTaggedValue("tag1", "tag one")
         ISource.setTaggedValue("tag2", "tag two")
@@ -465,19 +465,20 @@ class TestChoiceHandling(unittest.TestCase):
         self.assertEquals(etree.tostring(el), expected)
 
     def test_choice_parsing(self):
-        _termvalues = lambda vocab: tuple((t.value, t.title) for t in vocab)
+        def _termvalues(vocab):
+            return tuple((t.value, t.title) for t in vocab)
         cases = (
             self._choice(),
             self._choice_with_empty(),
             self._choice_with_term_titles(),
-            )
+        )
         for field, expected in cases:
             el = etree.fromstring(expected)
             imported_field = self.handler.read(el)
             self.assertEquals(
                 _termvalues(imported_field.vocabulary),
                 _termvalues(field.vocabulary),
-                )
+            )
 
 
 def test_suite():
@@ -485,21 +486,25 @@ def test_suite():
         unittest.makeSuite(TestUtils),
         unittest.makeSuite(TestValueToElement),
         unittest.makeSuite(TestChoiceHandling),
-        doctest.DocFileSuite('schema.txt',
+        doctest.DocFileSuite(
+            'schema.rst',
             setUp=zope.component.testing.setUp,
             tearDown=zope.component.testing.tearDown,
             optionflags=doctest.ELLIPSIS),
-        doctest.DocFileSuite('fields.txt',
+        doctest.DocFileSuite(
+            'fields.rst',
             setUp=zope.component.testing.setUp,
             tearDown=zope.component.testing.tearDown,
             optionflags=doctest.ELLIPSIS),
-        doctest.DocFileSuite('schemaclass.txt',
+        doctest.DocFileSuite(
+            'schemaclass.rst',
             setUp=zope.component.testing.setUp,
             tearDown=zope.component.testing.tearDown),
-        doctest.DocFileSuite('directives.txt',
+        doctest.DocFileSuite(
+            'directives.rst',
             setUp=zope.component.testing.setUp,
             tearDown=zope.component.testing.tearDown),
-        ))
+    ))
 
 
 if __name__ == '__main__':

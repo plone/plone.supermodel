@@ -1,12 +1,13 @@
 Changelog
 =========
 
-1.2.8 (unreleased)
+1.3.0 (unreleased)
 ------------------
 
 New:
 
-- *add item here*
+- Support to define the order of fieldsets.
+  [jensens]
 
 Fixes:
 

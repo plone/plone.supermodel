@@ -158,7 +158,7 @@ fieldsets. The same tagged value can be populated using a directive:
 
     >>> from plone.supermodel.interfaces import FIELDSETS_KEY
     >>> IGrouped.getTaggedValue(FIELDSETS_KEY)
-    [<Fieldset 'default' of title, description>, <Fieldset 'metadata' of publication_date>]
+    [<Fieldset 'default' order 9999 of title, description>, <Fieldset 'metadata' order 9999 of publication_date>]
 
 Extra parameters, such as the layout parameter for the metadata fieldset, are
 accessible as attributes on the fieldset:

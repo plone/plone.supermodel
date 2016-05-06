@@ -330,7 +330,7 @@ tag to wrap a sequence of fields.
     ...             <max_length>10000</max_length>
     ...         </field>
     ...
-    ...         <fieldset name="dates" label="Dates" description="Standard dates">
+    ...         <fieldset name="dates" label="Dates" description="Standard dates" order="1">
     ...             <field type="zope.schema.Date" name="publication_date">
     ...                 <title>Publication date</title>
     ...             </field>
@@ -395,10 +395,10 @@ default schema above is unrelated to the one in the metadata schema.
 
     >>> from plone.supermodel.interfaces import FIELDSETS_KEY
     >>> model.schema.getTaggedValue(FIELDSETS_KEY)
-    [<Fieldset 'dates' of publication_date, expiry_date, notification_date>]
+    [<Fieldset 'dates' order 1 of publication_date, expiry_date, notification_date>]
 
     >>> model.schemata[u"metadata"].getTaggedValue(FIELDSETS_KEY)
-    [<Fieldset 'standard' of creator>, <Fieldset 'dates' of created>, <Fieldset 'author' of >]
+    [<Fieldset 'standard' order 9999 of creator>, <Fieldset 'dates' order 9999 of created>, <Fieldset 'author' order 9999 of >]
 
 When we serialise a schema with fieldsets, fields will be grouped by
 fieldset.
