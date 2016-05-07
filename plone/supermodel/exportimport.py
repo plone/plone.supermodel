@@ -35,7 +35,8 @@ class BaseHandler(object):
     The read_field method is called to read one field of the known subtype
     from an XML element.
 
-    The write_field method is called to write one field to a particular element.
+    The write_field method is called to write one field to a particular
+    element.
     """
 
     # Elements that we will not read/write. 'r' means skip when reading;
@@ -306,38 +307,38 @@ class ChoiceHandler(BaseHandler):
     def __init__(self, klass):
         super(ChoiceHandler, self).__init__(klass)
 
-        # Special options for the constructor. These are not automatically written.
+        # Special options for the constructor. These are not automatically
+        # written.
 
-        self.fieldAttributes['vocabulary'] = \
-            zope.schema.TextLine(
-                __name__='vocabulary',
-                title=u"Named vocabulary"
-            )
+        self.fieldAttributes['vocabulary'] = zope.schema.TextLine(
+            __name__='vocabulary',
+            title=u"Named vocabulary"
+        )
 
-        self.fieldAttributes['values'] = \
-            zope.schema.List(
-                __name__='values',
-                title=u"Values",
-                value_type=zope.schema.Text(title=u"Value")
-            )
+        self.fieldAttributes['values'] = zope.schema.List(
+            __name__='values',
+            title=u"Values",
+            value_type=zope.schema.Text(title=u"Value")
+        )
 
         # XXX: We can't be more specific about the schema, since the field
         # supports both ISource and IContextSourceBinder. However, the
         # initialiser will validate.
-        self.fieldAttributes['source'] = \
-            zope.schema.Object(
-                __name__='source',
-                title=u"Source",
-                schema=Interface
-            )
+        self.fieldAttributes['source'] = zope.schema.Object(
+            __name__='source',
+            title=u"Source",
+            schema=Interface
+        )
 
     def readAttribute(self, element, attributeField):
-        if element.tag == 'values':
-            if any([child.get('key') for child in element]):
-                attributeField = OrderedDictField(
-                    key_type=zope.schema.TextLine(),
-                    value_type=zope.schema.TextLine(),
-                    )
+        if (
+            element.tag == 'values' and
+            any([child.get('key') for child in element])
+        ):
+            attributeField = OrderedDictField(
+                key_type=zope.schema.TextLine(),
+                value_type=zope.schema.TextLine(),
+            )
         return elementToValue(attributeField, element)
 
     def _constructField(self, attributes):
@@ -366,7 +367,12 @@ class ChoiceHandler(BaseHandler):
 
     def write(self, field, name, type, elementName='field'):
 
-        element = super(ChoiceHandler, self).write(field, name, type, elementName)
+        element = super(ChoiceHandler, self).write(
+            field,
+            name,
+            type,
+            elementName
+        )
 
         # write vocabulary or values list
 
@@ -382,12 +388,16 @@ class ChoiceHandler(BaseHandler):
             element.append(child)
 
         # Listed vocabulary - attempt to convert to a simple list of values
-        elif field.vocabularyName is None \
-             and IVocabularyTokenized.providedBy(field.vocabulary):
+        elif (
+            field.vocabularyName is None and
+            IVocabularyTokenized.providedBy(field.vocabulary)
+        ):
             value = []
             for term in field.vocabulary:
-                if (not isinstance(term.value, (str, unicode), )
-                    or term.token != term.value.encode('unicode_escape')):
+                if (
+                    not isinstance(term.value, (str, unicode), ) or
+                    term.token != term.value.encode('unicode_escape')
+                ):
                     raise NotImplementedError(
                         u"Cannot export a vocabulary that is not "
                         u"based on a simple list of values"
@@ -399,12 +409,13 @@ class ChoiceHandler(BaseHandler):
 
             attributeField = self.fieldAttributes['values']
             if any(map(lambda v: isinstance(v, tuple), value)):
-                _pair = lambda v: v if len(v) == 2 else (v[0],) * 2
+                def _pair(v):
+                    return v if len(v) == 2 else (v[0],) * 2
                 value = OrderedDict(map(_pair, value))
                 attributeField = OrderedDictField(
                     key_type=zope.schema.TextLine(),
                     value_type=zope.schema.TextLine(),
-                    )
+                )
             child = valueToElement(
                 attributeField,
                 value,
