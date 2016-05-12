@@ -91,6 +91,8 @@ Bytes
     2
     >>> reciprocal.max_length
     10
+    >>> reciprocal._init_field
+    False
 
 BytesLine
 ---------
@@ -135,6 +137,8 @@ BytesLine
     2
     >>> reciprocal.max_length
     10
+    >>> reciprocal._init_field
+    False
 
 ASCII
 -----
@@ -179,6 +183,8 @@ ASCII
     2
     >>> reciprocal.max_length
     10
+    >>> reciprocal._init_field
+    False
 
 ASCIILine
 ---------
@@ -223,6 +229,8 @@ ASCIILine
     2
     >>> reciprocal.max_length
     10
+    >>> reciprocal._init_field
+    False
 
 Text
 ----
@@ -267,6 +275,8 @@ Text
     2
     >>> reciprocal.max_length
     10
+    >>> reciprocal._init_field
+    False
 
 TextLine
 --------
@@ -311,6 +321,8 @@ TextLine
     2
     >>> reciprocal.max_length
     10
+    >>> reciprocal._init_field
+    False
 
 SourceText
 ----------
@@ -355,6 +367,8 @@ SourceText
     2
     >>> reciprocal.max_length
     10
+    >>> reciprocal._init_field
+    False
 
 URI
 ---
@@ -399,6 +413,8 @@ URI
     2
     >>> reciprocal.max_length
     100
+    >>> reciprocal._init_field
+    False
 
 Id
 --
@@ -443,6 +459,8 @@ Id
     2
     >>> reciprocal.max_length
     10
+    >>> reciprocal._init_field
+    False
 
 DottedName
 -----------
@@ -493,6 +511,8 @@ DottedName
     2
     >>> reciprocal.max_dots
     4
+    >>> reciprocal._init_field
+    False
 
 Password
 --------
@@ -537,6 +557,8 @@ Password
     2
     >>> reciprocal.max_length
     10
+    >>> reciprocal._init_field
+    False
 
 Bool
 ----
@@ -574,6 +596,8 @@ Bool
     False
     >>> reciprocal.missing_value
     True
+    >>> reciprocal._init_field
+    False
 
 Int
 ---
@@ -618,6 +642,8 @@ Int
     1
     >>> reciprocal.max
     99
+    >>> reciprocal._init_field
+    False
 
 Float
 -----
@@ -662,6 +688,8 @@ Float
     1.123
     >>> reciprocal.max
     99.5
+    >>> reciprocal._init_field
+    False
 
 Decimal
 -------
@@ -707,6 +735,8 @@ Decimal
     True
     >>> reciprocal.max == decimal.Decimal('99.5')
     True
+    >>> reciprocal._init_field
+    False
 
 Date
 ----
@@ -751,6 +781,8 @@ Date
     datetime.date(2000, 10, 12)
     >>> reciprocal.max
     datetime.date(2099, 12, 31)
+    >>> reciprocal._init_field
+    False
 
 Datetime
 ---------
@@ -795,6 +827,8 @@ Datetime
     datetime.datetime(2000, 10, 12, 0, 0, 2, 3)
     >>> reciprocal.max
     datetime.datetime(2099, 12, 31, 1, 2, 2, 3)
+    >>> reciprocal._init_field
+    False
 
 InterfaceField
 ---------------
@@ -833,6 +867,8 @@ InterfaceField
     <InterfaceClass plone.supermodel.tests.IDummy>
     >>> reciprocal.missing_value
     <InterfaceClass plone.supermodel.tests.IDummy>
+    >>> reciprocal._init_field
+    False
 
 Tuple
 -----
@@ -888,6 +924,8 @@ Tuple
     <class 'zope.schema._bootstrapfields.Int'>
     >>> reciprocal.value_type.title
     u'Val'
+    >>> reciprocal._init_field
+    False
 
 List
 ----
@@ -943,6 +981,8 @@ List
     <class 'zope.schema._bootstrapfields.Int'>
     >>> reciprocal.value_type.title
     u'Val'
+    >>> reciprocal._init_field
+    False
 
 Set
 ---
@@ -998,6 +1038,8 @@ Set
     <class 'zope.schema._bootstrapfields.Int'>
     >>> reciprocal.value_type.title
     u'Val'
+    >>> reciprocal._init_field
+    False
 
 FrozenSet
 ---------
@@ -1053,6 +1095,8 @@ FrozenSet
     <class 'zope.schema._bootstrapfields.Int'>
     >>> reciprocal.value_type.title
     u'Val'
+    >>> reciprocal._init_field
+    False
 
 Dict
 ----
@@ -1116,6 +1160,8 @@ Dict
     <class 'zope.schema._bootstrapfields.Int'>
     >>> reciprocal.value_type.title
     u'Val'
+    >>> reciprocal._init_field
+    False
 
 Object
 ------
@@ -1174,6 +1220,8 @@ object field that references a particular dotted name.
     True
     >>> reciprocal.missing_value is None
     True
+    >>> reciprocal._init_field
+    False
 
 Choice
 ------
@@ -1228,6 +1276,8 @@ These can be both exported and imported.
     True
     >>> reciprocal.vocabularyName
     u'dummy.vocab'
+    >>> reciprocal._init_field
+    False
 
 2. Values vocabularies
 
@@ -1448,6 +1498,8 @@ be specified via an importable dotted name.
     True
     >>> reciprocal.vocabularyName is None
     True
+    >>> reciprocal._init_field
+    False
 
 defaultFactory usage
 --------------------
@@ -1483,6 +1535,8 @@ Sanity checks::
     >>> reciprocal = handler.read(element)
     >>> reciprocal.__class__
     <class 'zope.schema._bootstrapfields.TextLine'>
+    >>> reciprocal._init_field
+    False
 
 And, look for the specified defaultFactory::
     >>> reciprocal.defaultFactory == plone.supermodel.tests.dummy_defaultFactory
@@ -1506,6 +1560,8 @@ Let's try it with a callable that provides IContextAwareDefaultFactory::
     >>> reciprocal = handler.read(element)
     >>> reciprocal.defaultFactory == plone.supermodel.tests.dummy_defaultCAFactory
     True
+    >>> reciprocal._init_field
+    False
 
 And, check to make sure that we can't use a callable that doesn't have one
 of our marker interfaces::
