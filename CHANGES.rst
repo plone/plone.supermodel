@@ -14,6 +14,9 @@ Fixes:
 - Update setup.py url to point to github location.
   [esteele]
 
+- Unset _init_field flag on init completion.
+  [metatoaster]
+
 
 1.2.7 (2016-02-12)
 ------------------
