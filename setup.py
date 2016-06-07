@@ -2,13 +2,6 @@
 from setuptools import find_packages
 from setuptools import setup
 import os
-import sys
-
-
-# if <= Python 2.6 or less, specify minimum zope.schema compatible:
-ZOPESCHEMA = 'zope.schema'
-if sys.version_info < (2, 7):
-    ZOPESCHEMA += '>=4.1.0'
 
 
 def read(*rnames):
@@ -17,10 +10,8 @@ def read(*rnames):
 version = '1.3.0.dev0'
 
 long_description = (
-    read('README.rst')
-    + '\n' +
-    read('CHANGES.rst')
-    + '\n'
+    read('README.rst') + '\n' +
+    read('CHANGES.rst') + '\n'
     )
 
 setup(
@@ -32,10 +23,8 @@ setup(
     # https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
         "Framework :: Plone",
-        "Framework :: Plone :: 4.3",
         "Framework :: Plone :: 5.0",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 2.6",
         "Programming Language :: Python :: 2.7",
         "Topic :: Software Development :: Libraries :: Python Modules",
         "License :: OSI Approved :: BSD License",
@@ -55,7 +44,7 @@ setup(
         'zope.component',
         'zope.i18nmessageid',
         'zope.interface',
-        ZOPESCHEMA,
+        'zope.schema>=4.1.0',
         'zope.deferredimport',
         'zope.dottedname',
         'z3c.zcmlhook',

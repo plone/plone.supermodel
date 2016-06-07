@@ -6,6 +6,10 @@ Changelog
 
 New:
 
+- Python 2.6 and Plone 4.3 no longer officially supported.  It might
+  still work, but no special effort is made to keep this compatible.
+  [maurits]
+
 - Support to define the order of fieldsets.
   [jensens]
 
