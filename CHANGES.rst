@@ -14,6 +14,9 @@ New features:
 
 Bug fixes:
 
+- Fixed unicode-handling of integer values for IChoice. #16
+  [iham]
+
 - *add item here*
 
 
