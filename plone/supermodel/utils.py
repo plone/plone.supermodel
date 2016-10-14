@@ -8,6 +8,7 @@ from zope.i18nmessageid import Message
 from zope.interface import directlyProvidedBy
 from zope.interface import directlyProvides
 from zope.schema.interfaces import ICollection
+from zope.schema.interfaces import IChoice
 from zope.schema.interfaces import IDict
 from zope.schema.interfaces import IField
 from zope.schema.interfaces import IFromUnicode
@@ -130,8 +131,11 @@ def elementToValue(field, element, default=_marker):
         if text is None:
             value = field.missing_value
         else:
-            converter = IFromUnicode(field)
-            value = converter.fromUnicode(unicode(text))
+            if IChoice.providedBy(field) and text.isdigit():
+                value = int(text)
+            else:
+                converter = IFromUnicode(field)
+                value = converter.fromUnicode(unicode(text))
 
         # handle i18n
         if isinstance(value, unicode) and parseinfo.i18n_domain is not None:
