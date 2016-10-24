@@ -4,14 +4,19 @@ from plone.supermodel.debug import parseinfo
 from plone.supermodel.interfaces import I18N_NAMESPACE
 from plone.supermodel.interfaces import IToUnicode
 from plone.supermodel.interfaces import XML_NAMESPACE
+
+from zope.component import getUtility
+
 from zope.i18nmessageid import Message
 from zope.interface import directlyProvidedBy
 from zope.interface import directlyProvides
-from zope.schema.interfaces import ICollection
 from zope.schema.interfaces import IChoice
+from zope.schema.interfaces import ICollection
 from zope.schema.interfaces import IDict
 from zope.schema.interfaces import IField
 from zope.schema.interfaces import IFromUnicode
+from zope.schema.interfaces import IVocabularyFactory
+
 import os.path
 import re
 import sys
@@ -125,17 +130,30 @@ def elementToValue(field, element, default=_marker):
             parseinfo.stack.pop()
         value = fieldTypecast(field, value)
 
+    elif IChoice.providedBy(field):
+        vocabulary = None
+        try:
+            vcf = getUtility(IVocabularyFactory, field.vocabularyName)
+            vocabulary = vcf(None)
+        except:
+            pass
+
+        if vocabulary and hasattr(vocabulary, 'by_value'):
+            try:
+                field._type = type(vocabulary.by_value.keys()[0])
+            except:
+                pass
+
+        value = fieldTypecast(field, element.text)
+
     # Unicode
     else:
         text = element.text
         if text is None:
             value = field.missing_value
         else:
-            if IChoice.providedBy(field) and text.isdigit():
-                value = int(text)
-            else:
-                converter = IFromUnicode(field)
-                value = converter.fromUnicode(unicode(text))
+            converter = IFromUnicode(field)
+            value = converter.fromUnicode(unicode(text))
 
         # handle i18n
         if isinstance(value, unicode) and parseinfo.i18n_domain is not None:
