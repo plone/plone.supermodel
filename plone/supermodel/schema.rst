@@ -558,7 +558,7 @@ as a zope.i18nmessageid message id rather than a basic Unicode string::
     >>> msgid
     u'supermodel_test_title'
     >>> type(msgid)
-    <type 'zope.i18nmessageid.message.Message'>
+    <... 'zope.i18nmessageid.message.Message'>
     >>> msgid.default
     u'Title'
     >>> print serializeModel(model) # doctest: +NORMALIZE_WHITESPACE
