@@ -4,14 +4,6 @@ Changelog
 1.3.1 (unreleased)
 ------------------
 
-Breaking changes:
-
-- *add item here*
-
-New features:
-
-- *add item here*
-
 Bug fixes:
 
 - Test-Fix: Support latest zope.i18nmessageid.
