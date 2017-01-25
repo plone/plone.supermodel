@@ -14,7 +14,10 @@ New features:
 
 Bug fixes:
 
-- *add item here*
+- Fix issue where supermodel XML choice field parser failed to parse vocabulary
+  values with separate keys and display titles, because the parser expected
+  values tag to not have any namespace.
+  [datakurre]
 
 
 1.3.1 (2016-12-30)

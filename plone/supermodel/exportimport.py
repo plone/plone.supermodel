@@ -332,7 +332,7 @@ class ChoiceHandler(BaseHandler):
 
     def readAttribute(self, element, attributeField):
         if (
-            element.tag == 'values' and
+            etree.QName(element).localname == 'values' and
             any([child.get('key') for child in element])
         ):
             attributeField = OrderedDictField(
