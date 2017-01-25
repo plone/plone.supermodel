@@ -451,6 +451,22 @@ class TestChoiceHandling(unittest.TestCase):
             '</field>'
         return (schema.Choice(vocabulary=vocab), expected)
 
+    def _choice_with_term_titles_and_ns(self):
+        # two terms with distinct titles, one with same as value:
+        vocab = SimpleVocabulary(
+            [SimpleTerm(t, title=t.upper()) for t in (u'a', u'b')] +
+            [SimpleTerm(u'c', title=u'c')],
+            )
+        expected = '<field name="myfield" type="zope.schema.Choice"'\
+            '      xmlns="http://namespaces.plone.org/supermodel/schema">'\
+            '<values>'\
+            '<element key="a">A</element>'\
+            '<element key="b">B</element>'\
+            '<element key="c">c</element>'\
+            '</values>'\
+            '</field>'
+        return (schema.Choice(vocabulary=vocab), expected)
+
     def test_choice_serialized(self):
         field, expected = self._choice()
         el = self.handler.write(field, 'myfield', 'zope.schema.Choice')
@@ -471,6 +487,7 @@ class TestChoiceHandling(unittest.TestCase):
             self._choice(),
             self._choice_with_empty(),
             self._choice_with_term_titles(),
+            self._choice_with_term_titles_and_ns(),
         )
         for field, expected in cases:
             el = etree.fromstring(expected)
