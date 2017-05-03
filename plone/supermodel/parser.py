@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from lxml import etree
+from plone.supermodel import PY3
 from plone.supermodel.debug import parseinfo
 from plone.supermodel.interfaces import DEFAULT_ORDER
 from plone.supermodel.interfaces import FIELDSETS_KEY
@@ -24,6 +25,12 @@ from zope.schema import getFields
 import linecache
 import six
 import sys
+import traceback
+
+if PY3:
+    string_types = str,
+else:
+    string_types = basestring,
 
 
 # Exception
@@ -31,20 +38,21 @@ import sys
 
 class SupermodelParseError(Exception):
 
-    def __init__(self, orig_exc, fname, element):
+    def __init__(self, orig_exc, fname, element, tb):
         msg = str(orig_exc)
-
         lineno = None
         if hasattr(orig_exc, 'lineno'):
             lineno = orig_exc.lineno
         elif element is not None:
             lineno = getattr(element, 'sourceline', 'unknown')
-
         if fname or lineno != 'unknown':
             msg += '\n  File "%s", line %s' % (fname or '<unknown>', lineno)
         if fname and lineno:
             line = linecache.getline(fname, lineno).strip()
             msg += '\n    %s' % line
+        msg += '\n'
+        msg += ''.join(traceback.format_tb(tb))
+        msg += '\n'
         self.args = [msg]
 
 
@@ -65,7 +73,7 @@ class DefaultSchemaPolicy(object):
 # Algorithm
 def parse(source, policy=u""):
     fname = None
-    if isinstance(source, six.string_types):
+    if isinstance(source, string_types):
         fname = source
 
     try:
@@ -75,11 +83,7 @@ def parse(source, policy=u""):
         # the filename and line number of the element that caused the problem.
         # Keep the original traceback so the developer can debug where the
         # problem happened.
-        six.reraise(SupermodelParseError(
-            e,
-            fname,
-            parseinfo.stack[-1]
-        ), None, sys.exc_info()[2])
+        raise SupermodelParseError(e, fname, parseinfo.stack[-1], sys.exc_info()[2])
 
 
 def _parse(source, policy):
@@ -197,7 +201,7 @@ def _parse(source, policy):
                     fieldset_order = subelement.get('order')
                     if fieldset_order is None:
                         fieldset_order = DEFAULT_ORDER
-                    elif isinstance(fieldset_order, six.string_types):
+                    elif isinstance(fieldset_order, string_types):
                         fieldset_order = int(fieldset_order)
                     fieldset = fieldsets_by_name[fieldset_name] = Fieldset(
                         fieldset_name,

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from lxml import etree
+from plone.supermodel import PY3
 from plone.supermodel.debug import parseinfo
 from plone.supermodel.interfaces import I18N_NAMESPACE
 from plone.supermodel.interfaces import IToUnicode
@@ -100,6 +101,10 @@ def elementToValue(field, element, default=_marker):
     If not, the field will be adapted to this interface to obtain a converter.
     """
     value = default
+    if PY3:
+        text_type = str
+    else:
+        text_type = unicode
 
     if IDict.providedBy(field):
         key_converter = IFromUnicode(field.key_type)
@@ -113,7 +118,7 @@ def elementToValue(field, element, default=_marker):
             if key_text is None:
                 k = None
             else:
-                k = key_converter.fromUnicode(six.text_type(key_text))
+                k = key_converter.fromUnicode(text_type(key_text))
 
             value[k] = elementToValue(field.value_type, child)
             parseinfo.stack.pop()
@@ -153,10 +158,10 @@ def elementToValue(field, element, default=_marker):
             value = field.missing_value
         else:
             converter = IFromUnicode(field)
-            value = converter.fromUnicode(six.text_type(text))
+            value = converter.fromUnicode(text_type(text))
 
         # handle i18n
-        if isinstance(value, six.text_type) and parseinfo.i18n_domain is not None:
+        if isinstance(value, text_type) and parseinfo.i18n_domain is not None:
             translate_attr = ns('translate', I18N_NAMESPACE)
             domain_attr = ns('domain', I18N_NAMESPACE)
             msgid = element.attrib.get(translate_attr)

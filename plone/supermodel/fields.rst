@@ -30,7 +30,12 @@ First, let's wire up the package.
     ... </configure>
     ... """
 
-    >>> from StringIO import StringIO
+    >>> from plone.supermodel import PY3
+    >>> if PY3:
+    ...     from io import StringIO
+    ... else:
+    ...     from StringIO import StringIO
+    >>> from plone.supermodel import b
     >>> from zope.configuration import xmlconfig
     >>> xmlconfig.xmlconfig(StringIO(configuration))
 
@@ -53,12 +58,12 @@ Bytes
 
     >>> field = schema.Bytes(__name__="dummy", title=u"Test",
     ...     description=u"Test desc", required=False, readonly=True,
-    ...     default='abc', missing_value='m',
+    ...     default=b('abc'), missing_value='m',
     ...     min_length=2, max_length=10)
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element).decode('latin-1'))
     <field name="dummy" type="zope.schema.Bytes">
       <default>abc</default>
       <description>Test desc</description>
@@ -99,12 +104,12 @@ BytesLine
 
     >>> field = schema.BytesLine(__name__="dummy", title=u"Test",
     ...     description=u"Test desc", required=False, readonly=True,
-    ...     default='abc', missing_value='m',
+    ...     default=b('abc'), missing_value='m',
     ...     min_length=2, max_length=10)
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element).decode('latin-1'))
     <field name="dummy" type="zope.schema.BytesLine">
       <default>abc</default>
       <description>Test desc</description>
@@ -150,7 +155,7 @@ ASCII
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element).decode('latin-1'))
     <field name="dummy" type="zope.schema.ASCII">
       <default>abc</default>
       <description>Test desc</description>
@@ -196,7 +201,7 @@ ASCIILine
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element).decode('latin-1'))
     <field name="dummy" type="zope.schema.ASCIILine">
       <default>abc</default>
       <description>Test desc</description>
@@ -242,7 +247,7 @@ Text
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element).decode('latin-1'))
     <field name="dummy" type="zope.schema.Text">
       <default>abc</default>
       <description>Test desc</description>
@@ -288,7 +293,7 @@ TextLine
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element).decode('latin-1'))
     <field name="dummy" type="zope.schema.TextLine">
       <default>abc</default>
       <description>Test desc</description>
@@ -334,7 +339,7 @@ SourceText
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element).decode('latin-1'))
     <field name="dummy" type="zope.schema.SourceText">
       <default>abc</default>
       <description>Test desc</description>
@@ -380,7 +385,7 @@ URI
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element).decode('latin-1'))
     <field name="dummy" type="zope.schema.URI">
       <default>http://plone.org</default>
       <description>Test desc</description>
@@ -426,7 +431,7 @@ Id
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element).decode('latin-1'))
     <field name="dummy" type="zope.schema.Id">
       <default>a.b.c</default>
       <description>Test desc</description>
@@ -472,7 +477,7 @@ DottedName
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element).decode('latin-1'))
     <field name="dummy" type="zope.schema.DottedName">
       <default>a.b.c</default>
       <description>Test desc</description>
@@ -524,7 +529,7 @@ Password
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element).decode('latin-1'))
     <field name="dummy" type="zope.schema.Password">
       <default>abc</default>
       <description>Test desc</description>
@@ -569,7 +574,7 @@ Bool
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element).decode('latin-1'))
     <field name="dummy" type="zope.schema.Bool">
       <default>False</default>
       <description>Test desc</description>
@@ -609,7 +614,7 @@ Int
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element).decode('latin-1'))
     <field name="dummy" type="zope.schema.Int">
       <default>12</default>
       <description>Test desc</description>
@@ -655,7 +660,7 @@ Float
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element).decode('latin-1'))
     <field name="dummy" type="zope.schema.Float">
       <default>12.1</default>
       <description>Test desc</description>
@@ -702,7 +707,7 @@ Decimal
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element).decode('latin-1'))
     <field name="dummy" type="zope.schema.Decimal">
       <default>12.1</default>
       <description>Test desc</description>
@@ -748,7 +753,7 @@ Date
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element).decode('latin-1'))
     <field name="dummy" type="zope.schema.Date">
       <default>2001-01-02</default>
       <description>Test desc</description>
@@ -794,7 +799,7 @@ Datetime
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element).decode('latin-1'))
     <field name="dummy" type="zope.schema.Datetime">
       <default>2001-01-02 01:02:03</default>
       <description>Test desc</description>
@@ -840,7 +845,7 @@ InterfaceField
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element).decode('latin-1'))
     <field name="dummy" type="zope.schema.InterfaceField">
       <default>plone.supermodel.tests.IDummy</default>
       <description>Test desc</description>
@@ -881,7 +886,7 @@ Tuple
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element).decode('latin-1'))
     <field name="dummy" type="zope.schema.Tuple">
       <default>
         <element>1</element>
@@ -938,7 +943,7 @@ List
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element).decode('latin-1'))
     <field name="dummy" type="zope.schema.List">
       <default>
         <element>1</element>
@@ -995,7 +1000,7 @@ Set
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element).decode('latin-1'))
     <field name="dummy" type="zope.schema.Set">
       <default>
         <element>1</element>
@@ -1052,7 +1057,7 @@ FrozenSet
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element).decode('latin-1'))
     <field name="dummy" type="zope.schema.FrozenSet">
       <default>
         <element>1</element>
@@ -1110,7 +1115,7 @@ Dict
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element).decode('latin-1'))
     <field name="dummy" type="zope.schema.Dict">
       <default>
         <element key="a">1</element>
@@ -1179,7 +1184,7 @@ fields will be omitted, as there is no way to write these reliably.
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType) #doctest: +ELLIPSIS
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element).decode('latin-1'))
     <field name="dummy" type="zope.schema.Object">
       <description>Test desc</description>
       <readonly>True</readonly>
@@ -1244,7 +1249,7 @@ These can be both exported and imported.
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element).decode('latin-1'))
     <field name="dummy" type="zope.schema.Choice">
       <default>a</default>
       <description>Test desc</description>
@@ -1291,7 +1296,7 @@ a unicode string when importing.
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element).decode('latin-1'))
     <field name="dummy" type="zope.schema.Choice">
       <default>a</default>
       <description>Test desc</description>
@@ -1353,7 +1358,7 @@ tokens are the utf8-encoded values).
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element).decode('latin-1'))
     <field name="dummy" type="zope.schema.Choice">
       <default>a</default>
       <description>Test desc</description>
@@ -1390,7 +1395,7 @@ with how Dict fields are output, only for Choices, order is guaranteed).
     ...     )
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element).decode('latin-1'))
     <field name="dummy" type="zope.schema.Choice">
       <title>Test</title>
       <values>

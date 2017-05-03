@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from plone.supermodel import PY3
 from plone.supermodel.interfaces import IToUnicode
 from plone.supermodel.utils import fieldTypecast
 from zope.component import adapter
@@ -37,7 +38,9 @@ class DefaultToUnicode(object):
         self.context = context
 
     def toUnicode(self, value):
-        return six.text_type(value)
+        if PY3:
+            return str(value)
+        return unicode(value)
 
 
 # Date/time fields
@@ -97,7 +100,9 @@ class InterfaceFieldToUnicode(object):
         self.context = context
 
     def toUnicode(self, value):
-        return six.text_type(value.__identifier__)
+        if PY3:
+            return value.__identifier__
+        return unicode(value.__identifier__)
 
 
 # Object fields - we can read, but not write, as there is no way to know
