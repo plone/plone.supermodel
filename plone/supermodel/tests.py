@@ -522,7 +522,9 @@ class Py23DocChecker(doctest.OutputChecker):
                 'zope.interface.exceptions.Invalid',
                 'Invalid', got)
             got = re.sub(
-                "ModuleNotFoundError: No module named 'plone.supermodel.tests.nonExistentFactory'; 'plone.supermodel.tests' is not a package",
+                "(Import|ModuleNotFound)Error: No module named "
+                "'plone.supermodel.tests.nonExistentFactory'; "
+                "'plone.supermodel.tests' is not a package",
                 'ImportError: No module named nonExistentFactory', got)
         return doctest.OutputChecker.check_output(self, want, got, optionflags)
 
