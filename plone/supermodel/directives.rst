@@ -25,7 +25,11 @@ First, load this package's configuration:
     ... </configure>
     ... """
 
-    >>> from StringIO import StringIO
+    >>> from plone.supermodel import PY3
+    >>> if PY3:
+    ...     from io import StringIO
+    ... else:
+    ...     from StringIO import StringIO
     >>> from zope.configuration import xmlconfig
     >>> xmlconfig.xmlconfig(StringIO(configuration))
 
@@ -76,7 +80,7 @@ temporary directory created above.
 
     >>> schema_filename = os.path.join(tmpdir, "schema.xml")
     >>> schema_file = open(schema_filename, "w")
-    >>> schema_file.write(schema)
+    >>> foo = schema_file.write(schema)
     >>> schema_file.close()
 
 We can now define a schema, using the directives defined in this package:
