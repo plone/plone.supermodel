@@ -88,9 +88,9 @@ Bytes
     False
     >>> reciprocal.readonly
     True
-    >>> reciprocal.default
+    >>> reciprocal.default.decode('latin-1')
     'abc'
-    >>> reciprocal.missing_value
+    >>> reciprocal.missing_value.decode('latin-1')
     'm'
     >>> reciprocal.min_length
     2
@@ -134,9 +134,9 @@ BytesLine
     False
     >>> reciprocal.readonly
     True
-    >>> reciprocal.default
+    >>> reciprocal.default.decode('latin-1')
     'abc'
-    >>> reciprocal.missing_value
+    >>> reciprocal.missing_value.decode('latin-1')
     'm'
     >>> reciprocal.min_length
     2
@@ -1031,10 +1031,14 @@ Set
     False
     >>> reciprocal.readonly
     True
-    >>> reciprocal.default
-    set([1, 2])
-    >>> reciprocal.missing_value
-    set([])
+    >>> isinstance(reciprocal.default, set)
+    True
+    >>> [i for i in reciprocal.default]
+    [1, 2]
+    >>> isinstance(reciprocal.missing_value, set)
+    True
+    >>> len(reciprocal.missing_value)
+    0
     >>> reciprocal.min_length
     2
     >>> reciprocal.max_length
@@ -1088,10 +1092,14 @@ FrozenSet
     False
     >>> reciprocal.readonly
     True
-    >>> reciprocal.default
-    frozenset([1, 2])
-    >>> reciprocal.missing_value
-    frozenset([])
+    >>> isinstance(reciprocal.default, frozenset)
+    True
+    >>> [i for i in reciprocal.default]
+    [1, 2]
+    >>> isinstance(reciprocal.missing_value, frozenset)
+    True
+    >>> len(reciprocal.missing_value)
+    0
     >>> reciprocal.min_length
     2
     >>> reciprocal.max_length
@@ -1338,7 +1346,7 @@ sure it hasn't regressed.
 
     >>> from plone.supermodel.interfaces import XML_NAMESPACE
     >>> element.set('xmlns', XML_NAMESPACE)
-    >>> element = etree.parse(StringIO(prettyXML(element))).getroot()
+    >>> element = etree.parse(StringIO(prettyXML(element).decode('latin-1'))).getroot()
     >>> reciprocal = handler.read(element)
     >>> [t.value for t in reciprocal.vocabulary]
     [u'a', u'b', u'c']

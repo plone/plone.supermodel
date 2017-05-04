@@ -5,6 +5,7 @@ from plone.supermodel.utils import fieldTypecast
 from zope.component import adapter
 from zope.dottedname.resolve import resolve
 from zope.interface import implementer
+from zope.schema.interfaces import IBytes
 from zope.schema.interfaces import IDate
 from zope.schema.interfaces import IDatetime
 from zope.schema.interfaces import IField
@@ -121,3 +122,19 @@ class ObjectFromUnicode(object):
         obj = resolve(value)
         self.context.validate(obj)
         return obj
+
+
+@implementer(IToUnicode)
+@adapter(IBytes)
+class BytesToUnicode(object):
+
+    def __init__(self, context):
+        self.context = context
+
+    def toUnicode(self, value):
+        if PY3:
+            if isinstance(value, str):
+                return value
+            else:
+                return value.decode('latin-1')
+        return unicode(value)
