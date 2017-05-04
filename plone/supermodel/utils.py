@@ -194,7 +194,7 @@ def valueToElement(field, value, name=None, force=False):
 
         if IDict.providedBy(field):
             key_converter = IToUnicode(field.key_type)
-            for k, v in value.items():
+            for k, v in sorted(value.items()):
                 list_element = valueToElement(field.value_type, v, 'element', force)
                 list_element.attrib['key'] = key_converter.toUnicode(k)
                 child.append(list_element)

@@ -89,9 +89,9 @@ Bytes
     >>> reciprocal.readonly
     True
     >>> reciprocal.default.decode('latin-1')
-    'abc'
+    u'abc'
     >>> reciprocal.missing_value.decode('latin-1')
-    'm'
+    u'm'
     >>> reciprocal.min_length
     2
     >>> reciprocal.max_length
@@ -135,9 +135,9 @@ BytesLine
     >>> reciprocal.readonly
     True
     >>> reciprocal.default.decode('latin-1')
-    'abc'
+    u'abc'
     >>> reciprocal.missing_value.decode('latin-1')
-    'm'
+    u'm'
     >>> reciprocal.min_length
     2
     >>> reciprocal.max_length
@@ -1157,8 +1157,12 @@ Dict
     False
     >>> reciprocal.readonly
     True
-    >>> reciprocal.default
-    {'a': 1, 'b': 2}
+    >>> reciprocal.default['a']
+    1
+    >>> reciprocal.default['b']
+    2
+    >>> sorted(reciprocal.default.keys())
+    ['a', 'b']
     >>> reciprocal.missing_value
     {}
     >>> reciprocal.min_length

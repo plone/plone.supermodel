@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 try:
-    from io import StringIO, BytesIO
-except ImportError:
     from cStringIO import StringIO
+except ImportError:
+    from io import StringIO, BytesIO
 from lxml import etree
 from plone.supermodel import b, PY3
 from plone.supermodel import utils

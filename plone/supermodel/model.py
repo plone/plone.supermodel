@@ -111,7 +111,7 @@ def finalizeSchemas(parent=Schema):
             for s in walk(child):
                 yield s
     schemas = set(walk(parent))
-    for schema in schemas:
+    for schema in sorted(schemas):
         if hasattr(schema, '_SchemaClass_finalize'):
             schema._SchemaClass_finalize()
         elif isinstance(schema, InterfaceClass):

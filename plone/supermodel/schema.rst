@@ -64,7 +64,7 @@ We can parse this model using the loadString() function:
 This will load one schema, with the default name u"":
 
     >>> list(model.schemata.keys())
-    ['']
+    [u'']
 
 We can inspect this schema and see that it contains zope.schema fields with
 attributes corresponding to the values set in XML.
