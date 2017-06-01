@@ -1269,9 +1269,9 @@ These can be both exported and imported.
     >>> reciprocal.readonly
     True
     >>> reciprocal.default # note - value is always unicode
-    u'a'
+    'a'
     >>> reciprocal.missing_value # note - value is always unicode
-    u''
+    ''
     >>> reciprocal.vocabulary is None
     True
     >>> reciprocal.vocabularyName
@@ -1320,9 +1320,9 @@ a unicode string when importing.
     >>> reciprocal.readonly
     True
     >>> reciprocal.default
-    u'a'
+    'a'
     >>> reciprocal.missing_value
-    u''
+    ''
     >>> [t.value for t in reciprocal.vocabulary]
     [u'a', u'b', u'c']
     >>> reciprocal.vocabularyName is None
@@ -1462,7 +1462,7 @@ be specified via an importable dotted name.
     >>> reciprocal.readonly
     True
     >>> reciprocal.default
-    u'a'
+    'a'
     >>> reciprocal.vocabulary is plone.supermodel.tests.dummy_binder
     True
     >>> reciprocal.vocabularyName is None
@@ -1493,7 +1493,7 @@ be specified via an importable dotted name.
     >>> reciprocal.readonly
     True
     >>> reciprocal.default
-    u'a'
+    'a'
     >>> reciprocal.vocabulary is plone.supermodel.tests.dummy_vocabulary_instance
     True
     >>> reciprocal.vocabularyName is None

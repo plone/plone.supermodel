@@ -14,6 +14,9 @@ New features:
 
 Bug fixes:
 
+- Fixed typecasting of IChoice based on its vocabulary. #16
+  [iham]
+
 - *add item here*
 
 
