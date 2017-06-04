@@ -4,20 +4,10 @@ Changelog
 1.3.3 (unreleased)
 ------------------
 
-Breaking changes:
-
-- *add item here*
-
-New features:
-
-- *add item here*
-
 Bug fixes:
 
 - Fixed typecasting of IChoice based on its vocabulary. #16
   [iham]
-
-- *add item here*
 
 
 1.3.2 (2017-02-05)
