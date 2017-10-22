@@ -4,9 +4,7 @@ from plone.supermodel.debug import parseinfo
 from plone.supermodel.interfaces import I18N_NAMESPACE
 from plone.supermodel.interfaces import IToUnicode
 from plone.supermodel.interfaces import XML_NAMESPACE
-
 from zope.component import getUtility
-
 from zope.i18nmessageid import Message
 from zope.interface import directlyProvidedBy
 from zope.interface import directlyProvides
@@ -19,7 +17,9 @@ from zope.schema.interfaces import IVocabularyFactory
 
 import os.path
 import re
+import six
 import sys
+
 
 try:
     from collections import OrderedDict
@@ -113,7 +113,7 @@ def elementToValue(field, element, default=_marker):
             if key_text is None:
                 k = None
             else:
-                k = key_converter.fromUnicode(unicode(key_text))
+                k = key_converter.fromUnicode(six.text_type(key_text))
 
             value[k] = elementToValue(field.value_type, child)
             parseinfo.stack.pop()
@@ -153,10 +153,10 @@ def elementToValue(field, element, default=_marker):
             value = field.missing_value
         else:
             converter = IFromUnicode(field)
-            value = converter.fromUnicode(unicode(text))
+            value = converter.fromUnicode(six.text_type(text))
 
         # handle i18n
-        if isinstance(value, unicode) and parseinfo.i18n_domain is not None:
+        if isinstance(value, six.text_type) and parseinfo.i18n_domain is not None:
             translate_attr = ns('translate', I18N_NAMESPACE)
             domain_attr = ns('domain', I18N_NAMESPACE)
             msgid = element.attrib.get(translate_attr)

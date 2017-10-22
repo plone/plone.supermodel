@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from setuptools import find_packages
 from setuptools import setup
+
 import os
 
 
@@ -41,6 +42,7 @@ setup(
     zip_safe=False,
     install_requires=[
         'setuptools',
+        'six',
         'lxml',
         'zope.component',
         'zope.i18nmessageid',
