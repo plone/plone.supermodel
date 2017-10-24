@@ -4,19 +4,22 @@ from plone.supermodel.debug import parseinfo
 from plone.supermodel.interfaces import IDefaultFactory
 from plone.supermodel.interfaces import IFieldExportImportHandler
 from plone.supermodel.interfaces import IFieldNameExtractor
+from plone.supermodel.utils import elementToValue
 from plone.supermodel.utils import noNS
 from plone.supermodel.utils import valueToElement
-from plone.supermodel.utils import elementToValue
 from zope.component import queryUtility
-from zope.interface import Interface
 from zope.interface import implementedBy
 from zope.interface import implementer
+from zope.interface import Interface
 from zope.schema.interfaces import IContextAwareDefaultFactory
 from zope.schema.interfaces import IField
 from zope.schema.interfaces import IVocabularyTokenized
 from zope.schema.vocabulary import SimpleTerm
 from zope.schema.vocabulary import SimpleVocabulary
+
+import six
 import zope.schema
+
 
 try:
     from collections import OrderedDict
@@ -395,7 +398,7 @@ class ChoiceHandler(BaseHandler):
             value = []
             for term in field.vocabulary:
                 if (
-                    not isinstance(term.value, (str, unicode), ) or
+                    not isinstance(term.value, six.string_types, ) or
                     term.token != term.value.encode('unicode_escape')
                 ):
                     raise NotImplementedError(

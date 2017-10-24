@@ -22,7 +22,9 @@ from zope.interface import implementer
 from zope.schema import getFields
 
 import linecache
+import six
 import sys
+
 
 # Exception
 
@@ -63,21 +65,21 @@ class DefaultSchemaPolicy(object):
 # Algorithm
 def parse(source, policy=u""):
     fname = None
-    if isinstance(source, basestring):
+    if isinstance(source, six.string_types):
         fname = source
 
     try:
         return _parse(source, policy)
-    except Exception, e:
+    except Exception as e:
         # Re-package the exception as a parse error that will get rendered with
         # the filename and line number of the element that caused the problem.
         # Keep the original traceback so the developer can debug where the
         # problem happened.
-        raise SupermodelParseError(
+        six.reraise(SupermodelParseError(
             e,
             fname,
             parseinfo.stack[-1]
-        ), None, sys.exc_info()[2]
+        ), None, sys.exc_info()[2])
 
 
 def _parse(source, policy):
@@ -195,7 +197,7 @@ def _parse(source, policy):
                     fieldset_order = subelement.get('order')
                     if fieldset_order is None:
                         fieldset_order = DEFAULT_ORDER
-                    elif isinstance(fieldset_order, basestring):
+                    elif isinstance(fieldset_order, six.string_types):
                         fieldset_order = int(fieldset_order)
                     fieldset = fieldsets_by_name[fieldset_name] = Fieldset(
                         fieldset_name,

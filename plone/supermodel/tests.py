@@ -1,21 +1,22 @@
 # -*- coding: utf-8 -*-
-from cStringIO import StringIO
 from lxml import etree
 from plone.supermodel import utils
 from plone.supermodel.exportimport import ChoiceHandler
 from plone.supermodel.interfaces import IDefaultFactory
 from plone.supermodel.interfaces import IInvariant
+from six.moves import cStringIO as StringIO
 from zope import schema
-from zope.interface import Interface
-from zope.interface import Invalid
 from zope.interface import alsoProvides
 from zope.interface import implementer
+from zope.interface import Interface
+from zope.interface import Invalid
 from zope.interface import provider
 from zope.schema import getFieldNamesInOrder
 from zope.schema.interfaces import IContextAwareDefaultFactory
 from zope.schema.interfaces import IContextSourceBinder
 from zope.schema.vocabulary import SimpleTerm
 from zope.schema.vocabulary import SimpleVocabulary
+
 import doctest
 import unittest
 import zope.component.testing
