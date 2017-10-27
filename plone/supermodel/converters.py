@@ -10,7 +10,9 @@ from zope.schema.interfaces import IField
 from zope.schema.interfaces import IFromUnicode
 from zope.schema.interfaces import IInterfaceField
 from zope.schema.interfaces import IObject
+
 import datetime
+import six
 import time
 
 
@@ -35,7 +37,7 @@ class DefaultToUnicode(object):
         self.context = context
 
     def toUnicode(self, value):
-        return unicode(value)
+        return six.text_type(value)
 
 
 # Date/time fields
@@ -95,7 +97,7 @@ class InterfaceFieldToUnicode(object):
         self.context = context
 
     def toUnicode(self, value):
-        return unicode(value.__identifier__)
+        return six.text_type(value.__identifier__)
 
 
 # Object fields - we can read, but not write, as there is no way to know

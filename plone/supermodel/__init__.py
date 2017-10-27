@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
-from StringIO import StringIO
 from plone.supermodel import model
 from plone.supermodel import parser
 from plone.supermodel import serializer
 from plone.supermodel import utils
 from plone.supermodel.interfaces import FILENAME_KEY
 from plone.supermodel.interfaces import IXMLToSchema
+from six import StringIO
 from zope.interface import moduleProvides
+
 
 # Cache models by absolute filename
 _model_cache = {}
