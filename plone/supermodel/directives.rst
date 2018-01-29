@@ -13,7 +13,7 @@ Setup
 
 First, load this package's configuration:
 
-    >>> configuration = """\
+    >>> configuration = u"""\
     ... <configure
     ...      xmlns="http://namespaces.zope.org/zope"
     ...      i18n_domain="plone.supermodel.tests">
@@ -25,11 +25,7 @@ First, load this package's configuration:
     ... </configure>
     ... """
 
-    >>> from plone.supermodel import PY3
-    >>> if PY3:
-    ...     from io import StringIO
-    ... else:
-    ...     from StringIO import StringIO
+    >>> from six import StringIO
     >>> from zope.configuration import xmlconfig
     >>> xmlconfig.xmlconfig(StringIO(configuration))
 
@@ -112,7 +108,7 @@ We can also use a different, named schema:
     >>> class ITestMetadata(model.Schema):
     ...     """Test metadata schema, built from XML
     ...     """
-    ...     model.load(schema_filename, schema=u"metadata")
+    ...     model.load(schema_filename, schema=u'metadata')
 
     >>> getFieldNamesInOrder(ITestMetadata)
     ['created', 'creator']

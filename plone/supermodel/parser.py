@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from lxml import etree
-from plone.supermodel import PY3
 from plone.supermodel.debug import parseinfo
 from plone.supermodel.interfaces import DEFAULT_ORDER
 from plone.supermodel.interfaces import FIELDSETS_KEY
@@ -27,15 +26,9 @@ import six
 import sys
 import traceback
 
-if PY3:
-    string_types = str,
-else:
-    string_types = basestring,
 
 
 # Exception
-
-
 class SupermodelParseError(Exception):
 
     def __init__(self, orig_exc, fname, element, tb):
@@ -73,7 +66,7 @@ class DefaultSchemaPolicy(object):
 # Algorithm
 def parse(source, policy=u""):
     fname = None
-    if isinstance(source, string_types):
+    if isinstance(source, six.string_types):
         fname = source
 
     try:
@@ -83,7 +76,8 @@ def parse(source, policy=u""):
         # the filename and line number of the element that caused the problem.
         # Keep the original traceback so the developer can debug where the
         # problem happened.
-        raise SupermodelParseError(e, fname, parseinfo.stack[-1], sys.exc_info()[2])
+        raise SupermodelParseError(
+            e, fname, parseinfo.stack[-1], sys.exc_info()[2])
 
 
 def _parse(source, policy):
@@ -114,7 +108,7 @@ def _parse(source, policy):
                 '<field /> element'
             )
 
-        handler = handlers.get(fieldType, None)
+        handler = handlers.get(fieldType)
         if handler is None:
             handler = handlers[fieldType] = queryUtility(
                 IFieldExportImportHandler,
@@ -130,7 +124,7 @@ def _parse(source, policy):
 
         # Preserve order from base interfaces if this field is an override
         # of a field with the same name in a base interface
-        base_field = baseFields.get(fieldName, None)
+        base_field = baseFields.get(fieldName)
         if base_field is not None:
             field.order = base_field.order
 
@@ -184,6 +178,7 @@ def _parse(source, policy):
                     fieldElements,
                     baseFields
                 )
+
             elif subelement.tag == ns('fieldset'):
 
                 fieldset_name = subelement.get('name')
@@ -194,14 +189,14 @@ def _parse(source, policy):
                         )
                     )
 
-                fieldset = fieldsets_by_name.get(fieldset_name, None)
+                fieldset = fieldsets_by_name.get(fieldset_name)
                 if fieldset is None:
                     fieldset_label = subelement.get('label')
                     fieldset_description = subelement.get('description')
                     fieldset_order = subelement.get('order')
                     if fieldset_order is None:
                         fieldset_order = DEFAULT_ORDER
-                    elif isinstance(fieldset_order, string_types):
+                    elif isinstance(fieldset_order, six.string_types):
                         fieldset_order = int(fieldset_order)
                     fieldset = fieldsets_by_name[fieldset_name] = Fieldset(
                         fieldset_name,
@@ -223,6 +218,7 @@ def _parse(source, policy):
                     if parsed_fieldName:
                         fieldset.fields.append(parsed_fieldName)
                     parseinfo.stack.pop()
+
             elif subelement.tag == ns('invariant'):
                 dotted = subelement.text
                 invariant = resolve(dotted)

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from lxml import etree
-from plone.supermodel import b, PY3
 from plone.supermodel.debug import parseinfo
 from plone.supermodel.interfaces import IDefaultFactory
 from plone.supermodel.interfaces import IFieldExportImportHandler
@@ -24,13 +23,8 @@ import zope.schema
 
 try:
     from collections import OrderedDict
-except:
+except ImportError:
     from zope.schema.vocabulary import OrderedDict  # <py27
-
-if PY3:
-    stringish_types = (bytes, str)
-else:
-    stringish_types = (str, unicode)
 
 
 class OrderedDictField(zope.schema.Dict):
@@ -403,9 +397,11 @@ class ChoiceHandler(BaseHandler):
         ):
             value = []
             for term in field.vocabulary:
+                term_token = six.binary_type(term.token) if six.PY2 \
+                    else six.binary_type(term.token, encoding='unicode_escape')
                 if (
-                    not isinstance(term.value, stringish_types) or
-                    b(term.token) != term.value.encode('unicode_escape')
+                    not isinstance(term.value, six.string_types) or
+                    term_token != term.value.encode('unicode_escape')
                 ):
                     raise NotImplementedError(
                         u"Cannot export a vocabulary that is not "

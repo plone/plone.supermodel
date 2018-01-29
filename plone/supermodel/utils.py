@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from lxml import etree
-from plone.supermodel import PY3
 from plone.supermodel.debug import parseinfo
 from plone.supermodel.interfaces import I18N_NAMESPACE
 from plone.supermodel.interfaces import IToUnicode
@@ -14,7 +13,6 @@ from zope.schema.interfaces import ICollection
 from zope.schema.interfaces import IDict
 from zope.schema.interfaces import IField
 from zope.schema.interfaces import IFromUnicode
-from zope.schema.interfaces import IVocabularyFactory
 
 import os.path
 import re
@@ -24,7 +22,7 @@ import sys
 
 try:
     from collections import OrderedDict
-except:
+except ImportError:
     from zope.schema.vocabulary import OrderedDict  # <py27
 
 
@@ -36,7 +34,7 @@ def ns(name, prefix=XML_NAMESPACE):
     """Return the element or attribute name with the given prefix
     """
 
-    return u"{%s}%s" % (prefix, name)
+    return u'{%s}%s' % (prefix, name)
 
 
 def noNS(name):
@@ -47,15 +45,16 @@ def noNS(name):
 
 def indent(node, level=0):
 
-    node_indent = level * "  "
-    child_indent = (level + 1) * "  "
+    INDENT_SIZE = 2
+    node_indent = level * (' ' * INDENT_SIZE)
+    child_indent = (level + 1) * (' ' * INDENT_SIZE)
 
     # node has childen
     if len(node):
 
         # add indent before first child node
         if not node.text or not node.text.strip():
-            node.text = "\n" + child_indent
+            node.text = '\n' + child_indent
 
         # let each child indent itself
         last_idx = len(node) - 1
@@ -65,11 +64,11 @@ def indent(node, level=0):
             # add a tail for the next child node...
             if idx != last_idx:
                 if not child.tail or not child.tail.strip():
-                    child.tail = "\n" + child_indent
+                    child.tail = '\n' + child_indent
             # ... or for the closing element of this node
             else:
                 if not child.tail or not child.tail.strip():
-                    child.tail = "\n" + node_indent
+                    child.tail = '\n' + node_indent
 
 
 def prettyXML(tree):
@@ -101,11 +100,6 @@ def elementToValue(field, element, default=_marker):
     If not, the field will be adapted to this interface to obtain a converter.
     """
     value = default
-    if PY3:
-        text_type = str
-    else:
-        text_type = unicode
-
     if IDict.providedBy(field):
         key_converter = IFromUnicode(field.key_type)
         value = OrderedDict()
@@ -114,11 +108,11 @@ def elementToValue(field, element, default=_marker):
                 continue
             parseinfo.stack.append(child)
 
-            key_text = child.attrib.get('key', None)
+            key_text = child.attrib.get('key')
             if key_text is None:
                 k = None
             else:
-                k = key_converter.fromUnicode(text_type(key_text))
+                k = key_converter.fromUnicode(six.text_type(key_text))
 
             value[k] = elementToValue(field.value_type, child)
             parseinfo.stack.pop()
@@ -158,10 +152,11 @@ def elementToValue(field, element, default=_marker):
             value = field.missing_value
         else:
             converter = IFromUnicode(field)
-            value = converter.fromUnicode(text_type(text))
+            value = converter.fromUnicode(six.text_type(text))
 
         # handle i18n
-        if isinstance(value, text_type) and parseinfo.i18n_domain is not None:
+        if isinstance(value, six.string_types) and \
+                parseinfo.i18n_domain is not None:
             translate_attr = ns('translate', I18N_NAMESPACE)
             domain_attr = ns('domain', I18N_NAMESPACE)
             msgid = element.attrib.get(translate_attr)
@@ -195,13 +190,15 @@ def valueToElement(field, value, name=None, force=False):
         if IDict.providedBy(field):
             key_converter = IToUnicode(field.key_type)
             for k, v in sorted(value.items()):
-                list_element = valueToElement(field.value_type, v, 'element', force)
+                list_element = valueToElement(
+                    field.value_type, v, 'element', force)
                 list_element.attrib['key'] = key_converter.toUnicode(k)
                 child.append(list_element)
 
         elif ICollection.providedBy(field):
             for v in value:
-                list_element = valueToElement(field.value_type, v, 'element', force)
+                list_element = valueToElement(
+                    field.value_type, v, 'element', force)
                 child.append(list_element)
 
         else:

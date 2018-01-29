@@ -1,15 +1,11 @@
 # -*- coding: utf-8 -*-
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from io import StringIO, BytesIO
 from lxml import etree
-from plone.supermodel import b, PY3
 from plone.supermodel import utils
 from plone.supermodel.exportimport import ChoiceHandler
 from plone.supermodel.interfaces import IDefaultFactory
 from plone.supermodel.interfaces import IInvariant
-from six.moves import cStringIO as StringIO
+from six import BytesIO
+from six import StringIO
 from zope import schema
 from zope.interface import alsoProvides
 from zope.interface import implementer
@@ -25,13 +21,14 @@ from zope.schema.vocabulary import SimpleVocabulary
 import doctest
 import unittest
 import re
+import six
 import sys
 import zope.component.testing
 
 
 def configure():
     zope.component.testing.setUp()
-    configuration = """\
+    configuration = u"""\
     <configure
          xmlns="http://namespaces.zope.org/zope"
          i18n_domain="plone.supermodel.tests">
@@ -353,71 +350,68 @@ class TestValueToElement(unittest.TestCase):
     tearDown = zope.component.testing.tearDown
 
     def _assertSerialized(self, field, value, expected):
-        element = utils.valueToElement(field, value, b('value'))
-        if PY3:
-            sio = BytesIO()
-        else:
-            sio = StringIO()
+        element = utils.valueToElement(field, value, b'value')
+        sio = StringIO() if six.PY2 else BytesIO()
         etree.ElementTree(element).write(sio)
         self.assertEqual(sio.getvalue(), expected)
         unserialized = utils.elementToValue(field, element)
-        self.assertEqual(value, b(unserialized))
+        self.assertEqual(value, unserialized)
 
     def test_lists(self):
         field = schema.List(value_type=schema.Int())
         value = []
-        self._assertSerialized(field, value, b('<value/>'))
+        self._assertSerialized(field, value, b'<value/>')
         value = [1, 2]
         self._assertSerialized(
             field, value,
-            b('<value>'
-              '<element>1</element>'
-              '<element>2</element>'
-              '</value>')
-            )
+            b'<value>'
+            b'<element>1</element>'
+            b'<element>2</element>'
+            b'</value>'
+        )
 
     def test_nested_lists(self):
         field = schema.List(value_type=schema.List(value_type=schema.Int()))
         value = []
-        self._assertSerialized(field, value, b('<value/>'))
+        self._assertSerialized(field, value, b'<value/>')
         value = [[1], [1, 2], []]
         self._assertSerialized(field, value,
-            b('<value>'
-              '<element><element>1</element></element>'
-              '<element><element>1</element><element>2</element></element>'
-              '<element/>'
-              '</value>')
-            )
+            b'<value>'
+            b'<element><element>1</element></element>'
+            b'<element><element>1</element><element>2</element></element>'
+            b'<element/>'
+            b'</value>'
+        )
 
     def test_dicts(self):
         field = schema.Dict(key_type=schema.Int(), value_type=schema.TextLine())
         value = {}
-        self._assertSerialized(field, value, b('<value/>'))
+        self._assertSerialized(field, value, b'<value/>')
         value = {1: 'one', 2: 'two'}
         self._assertSerialized(field, value,
-            b('<value>'
-              '<element key="1">one</element>'
-              '<element key="2">two</element>'
-              '</value>')
-            )
+            b'<value>'
+            b'<element key="1">one</element>'
+            b'<element key="2">two</element>'
+            b'</value>'
+        )
 
     def test_nested_dicts(self):
         field = schema.Dict(key_type=schema.Int(),
             value_type=schema.Dict(
                 key_type=schema.Int(),
                 value_type=schema.TextLine(),
-                ),
-            )
+            ),
+        )
         value = {}
-        self._assertSerialized(field, value, b('<value/>'))
+        self._assertSerialized(field, value, b'<value/>')
         value = {1: {2: 'two'}, 3: {4: 'four', 5: 'five'}, 6: {}}
         self._assertSerialized(field, value,
-            b('<value>'
-              '<element key="1"><element key="2">two</element></element>'
-              '<element key="3"><element key="4">four</element><element key="5">five</element></element>'
-              '<element key="6"/>'
-              '</value>')
-            )
+            b'<value>'
+            b'<element key="1"><element key="2">two</element></element>'
+            b'<element key="3"><element key="4">four</element><element key="5">five</element></element>'
+            b'<element key="6"/>'
+            b'</value>'
+        )
 
 
 class TestChoiceHandling(unittest.TestCase):
@@ -480,17 +474,19 @@ class TestChoiceHandling(unittest.TestCase):
         return (schema.Choice(vocabulary=vocab), expected)
 
     def test_choice_serialized(self):
-        field, expected = self._choice()
-        el = self.handler.write(field, 'myfield', 'zope.schema.Choice')
-        self.assertEquals(etree.tostring(el), b(expected))
-        # now with an empty string term in vocab:
-        field, expected = self._choice_with_empty()
-        el = self.handler.write(field, 'myfield', 'zope.schema.Choice')
-        self.assertEquals(etree.tostring(el), b(expected))
-        # now with terms that have titles:
-        field, expected = self._choice_with_term_titles()
-        el = self.handler.write(field, 'myfield', 'zope.schema.Choice')
-        self.assertEquals(etree.tostring(el), b(expected))
+        """ Tests a regular choice, one with empty string term in vocab,
+        and another with terms that have titles
+        """
+        choice = self._choice()
+        choice_with_empty = self._choice_with_empty()
+        choice_with_term_titles = self._choice_with_term_titles()
+        for case in (choice, choice_with_empty, choice_with_term_titles):
+            field, expected = case
+            expected = six.binary_type(expected) if six.PY2 \
+                else six.binary_type(expected, encoding='latin-1')
+            el = self.handler.write(field, 'myfield', 'zope.schema.Choice')
+            self.assertEquals(etree.tostring(el), expected)
+
 
     def test_choice_parsing(self):
         def _termvalues(vocab):
@@ -512,7 +508,7 @@ class TestChoiceHandling(unittest.TestCase):
 
 class Py23DocChecker(doctest.OutputChecker):
     def check_output(self, want, got, optionflags):
-        if sys.version_info[0] > 2:
+        if not six.PY2:
             want = re.sub("u'(.*?)'", "'\\1'", want)
             want = re.sub('u"(.*?)"', '"\\1"', want)
             got = re.sub(
@@ -529,32 +525,40 @@ class Py23DocChecker(doctest.OutputChecker):
         return doctest.OutputChecker.check_output(self, want, got, optionflags)
 
 
+optionflags = doctest.ELLIPSIS | \
+    doctest.REPORT_UDIFF | \
+    doctest.NORMALIZE_WHITESPACE | \
+    doctest.REPORT_ONLY_FIRST_FAILURE
+
+
 def test_suite():
     return unittest.TestSuite((
         unittest.makeSuite(TestUtils),
         unittest.makeSuite(TestValueToElement),
         unittest.makeSuite(TestChoiceHandling),
         doctest.DocFileSuite(
-            'schema.rst',
-            setUp=zope.component.testing.setUp,
-            tearDown=zope.component.testing.tearDown,
-            optionflags=doctest.ELLIPSIS,
-            checker=Py23DocChecker()),
-        doctest.DocFileSuite(
             'fields.rst',
             setUp=zope.component.testing.setUp,
             tearDown=zope.component.testing.tearDown,
-            optionflags=doctest.ELLIPSIS,
-            checker=Py23DocChecker()),
-        doctest.DocFileSuite(
-            'schemaclass.rst',
-            setUp=zope.component.testing.setUp,
-            tearDown=zope.component.testing.tearDown,
+            optionflags=optionflags,
             checker=Py23DocChecker()),
         doctest.DocFileSuite(
             'directives.rst',
             setUp=zope.component.testing.setUp,
             tearDown=zope.component.testing.tearDown,
+            optionflags=optionflags,
+            checker=Py23DocChecker()),
+        doctest.DocFileSuite(
+            'schema.rst',
+            setUp=zope.component.testing.setUp,
+            tearDown=zope.component.testing.tearDown,
+            optionflags=optionflags,
+            checker=Py23DocChecker()),
+        doctest.DocFileSuite(
+            'schemaclass.rst',
+            setUp=zope.component.testing.setUp,
+            tearDown=zope.component.testing.tearDown,
+            optionflags=optionflags,
             checker=Py23DocChecker()),
     ))
 

@@ -1,32 +1,19 @@
 # -*- coding: utf-8 -*-
-import sys
-PY3 = sys.version_info[0] == 3
-
 from plone.supermodel import model
 from plone.supermodel import parser
 from plone.supermodel import serializer
 from plone.supermodel import utils
 from plone.supermodel.interfaces import FILENAME_KEY
 from plone.supermodel.interfaces import IXMLToSchema
+from six import BytesIO
 from six import StringIO
 from zope.interface import moduleProvides
 
-if PY3:
-    from io import BytesIO
-else:
-    from StringIO import StringIO
+import six
+
 
 # Cache models by absolute filename
 _model_cache = {}
-
-
-def b(s):
-    if PY3:
-        if not isinstance(s, str):
-            return s
-        return bytes(s, encoding='latin-1')
-    else:
-        return s
 
 
 def xmlSchema(filename, schema=u"", policy=u"", _frame=2):
@@ -46,10 +33,9 @@ def loadFile(filename, reload=False, policy=u"", _frame=2):
 
 
 def loadString(model, policy=u""):
-    if PY3:
-        source = BytesIO(b(model))
-    else:
-        source = StringIO(model)
+    source = StringIO(model) if six.PY2 \
+        else BytesIO(six.binary_type(model, encoding='latin-1'))
+    # source = StringIO(model) if six.PY2 else BytesIO(model)
     return parser.parse(source, policy=policy)
 
 

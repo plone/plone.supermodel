@@ -14,7 +14,7 @@ Before we can begin, we must register the field handlers that know how to
 import and export fields from/to XML. These are registered as named utilities,
 and can be loaded from the configure.zcml file of plone.supermodel.
 
-    >>> configuration = """\
+    >>> configuration = u"""\
     ... <configure
     ...      xmlns="http://namespaces.zope.org/zope"
     ...      i18n_domain="plone.supermodel.tests">
@@ -26,12 +26,7 @@ and can be loaded from the configure.zcml file of plone.supermodel.
     ... </configure>
     ... """
 
-    >>> from plone.supermodel import PY3
-    >>> if PY3:
-    ...     from io import StringIO
-    ... else:
-    ...     from StringIO import StringIO
-
+    >>> from six import StringIO
     >>> from zope.configuration import xmlconfig
     >>> xmlconfig.xmlconfig(StringIO(configuration))
 
@@ -69,7 +64,7 @@ This will load one schema, with the default name u"":
 We can inspect this schema and see that it contains zope.schema fields with
 attributes corresponding to the values set in XML.
 
-    >>> schema = model.schema # shortcut to model.schemata[u""]
+    >>> schema = model.schema  # shortcut to model.schemata[u""]
 
     >>> from zope.schema import getFieldNamesInOrder
     >>> getFieldNamesInOrder(schema)
@@ -169,10 +164,9 @@ directory.
 
     >>> import tempfile, os.path, shutil
     >>> tmpdir = tempfile.mkdtemp()
-    >>> schema_filename = os.path.join(tmpdir, "schema.xml")
-    >>> schema_file = open(schema_filename, "w")
-    >>> foo = schema_file.write(schema)
-    >>> schema_file.close()
+    >>> schema_filename = os.path.join(tmpdir, 'schema.xml')
+    >>> with open(schema_filename, 'w') as fd:
+    ...     fd.write(schema)
 
 We can define interfaces from this using a helper function:
 
@@ -190,7 +184,7 @@ After being loaded, the interface should have the fields of the default
 
 We can also use a different, named schema:
 
-    >>> ITestMetadata = xmlSchema(schema_filename, schema=u"metadata")
+    >>> ITestMetadata = xmlSchema(schema_filename, schema=u'metadata')
     >>> getFieldNamesInOrder(ITestMetadata)
     ['created', 'creator']
 
@@ -212,7 +206,7 @@ of just a single schema using serializeSchema():
       </schema>
     </model>
 
-    >>> print(serializeSchema(ITestMetadata, name=u"metadata").decode('latin-1')) # doctest: +NORMALIZE_WHITESPACE
+    >>> print(serializeSchema(ITestMetadata, name=u'metadata').decode('latin-1')) # doctest: +NORMALIZE_WHITESPACE
     <model xmlns:i18n="http://xml.zope.org/namespaces/i18n" xmlns="http://namespaces.plone.org/supermodel/schema">
       <schema name="metadata">
         <field name="created" type="zope.schema.Datetime">
@@ -243,9 +237,9 @@ resolver needs to have a proper module path. The interface looks like this
 though:
 
     class IBase(Interface):
-        title = zope.schema.TextLine(title=u"Title")
-        description = zope.schema.TextLine(title=u"Description")
-        name = zope.schema.TextLine(title=u"Name")
+        title = zope.schema.TextLine(title=u'Title')
+        description = zope.schema.TextLine(title=u'Description')
+        name = zope.schema.TextLine(title=u'Name')
 
 In real life, you'd more likely have a dotted name like
 my.package.interfaces.IBase, of course.
@@ -270,7 +264,7 @@ Then, let's define a schema that is based on this interface.
 Here, notice the use of the 'based-on' attribute, which specifies a dotted
 name to the base interface. It is possible to specify multiple interfaces
 as a space-separated list. However, if you find that you need this, you
-may want to ask yourself why. :) Inside the schema proper, we override the
+may want to ask yourself why. :) Inside the proper schema, we override the
 'description' field and add a new field, 'age'.
 
 When we load this model, we should find that the __bases__ list of the
@@ -402,11 +396,10 @@ default schema above is unrelated to the one in the metadata schema.
     >>> model.schema.getTaggedValue(FIELDSETS_KEY)
     [<Fieldset 'dates' order 1 of publication_date, expiry_date, notification_date>]
 
-    >>> model.schemata[u"metadata"].getTaggedValue(FIELDSETS_KEY)
+    >>> model.schemata[u'metadata'].getTaggedValue(FIELDSETS_KEY)
     [<Fieldset 'standard' order 9999 of creator>, <Fieldset 'dates' order 9999 of created>, <Fieldset 'author' order 9999 of >]
 
-When we serialise a schema with fieldsets, fields will be grouped by
-fieldset.
+When we serialise a schema with fieldsets, fields will be grouped by fieldset.
 
     >>> print(serializeModel(model).decode('latin-1')) # doctest: +NORMALIZE_WHITESPACE
     <model xmlns:i18n="http://xml.zope.org/namespaces/i18n" xmlns="http://namespaces.plone.org/supermodel/schema">
@@ -477,8 +470,8 @@ a dotted name for the invariant function.
     >>> model.schema.getTaggedValue('invariants')
     [<function dummy_invariant at ...>, <function dummy_invariant_prime at ...>]
 
-When invariants are checked for our model.schema, we'll see our invariant
-in action.
+When invariants are checked for our model.schema, we'll see our invariant in
+action.
 
     >>> model.schema.validateInvariants(object())
     Traceback (most recent call last):
@@ -531,9 +524,9 @@ or we won't accept them.
 Internationalization
 --------------------
 
-Translation domains and message ids can be specified for text
-that is interpreted as unicode. This will result in deserialization
-as a zope.i18nmessageid message id rather than a basic Unicode string::
+Translation domains and message ids can be specified for text that is
+interpreted as unicode. This will result in deserialization as a
+zope.i18nmessageid message id rather than a basic Unicode string::
 
     >>> schema = """\
     ... <?xml version="1.0" encoding="UTF-8"?>
@@ -624,8 +617,8 @@ Metadata handlers should be able to reciprocally read and write metadata.
     >>> @implementer(ISchemaMetadataHandler)
     ... class FormLayoutMetadata(object):
     ...
-    ...     namespace = "http://namespaces.acme.com/ui"
-    ...     prefix = "ui"
+    ...     namespace = 'http://namespaces.acme.com/ui'
+    ...     prefix = 'ui'
     ...
     ...     def read(self, schemaNode, schema):
     ...         layout = schemaNode.get(ns('layout', self.namespace))
@@ -643,8 +636,8 @@ Metadata handlers should be able to reciprocally read and write metadata.
     >>> @implementer(IFieldMetadataHandler)
     ... class FieldWidgetMetadata(object):
     ...
-    ...     namespace = "http://namespaces.acme.com/ui"
-    ...     prefix = "ui"
+    ...     namespace = 'http://namespaces.acme.com/ui'
+    ...     prefix = 'ui'
     ...
     ...     def read(self, fieldNode, schema, field):
     ...         name = field.__name__

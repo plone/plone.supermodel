@@ -3,7 +3,7 @@ plone.supermodel: SchemaClass
 =============================
 
     >>> from plone.supermodel.model import Schema, SchemaClass
-    >>> from plone.supermodel import interfaces, PY3
+    >>> from plone.supermodel import interfaces
     >>> from zope.interface import Interface, implementer
     >>> from zope.component import adapts, provideAdapter
 
@@ -37,23 +37,24 @@ Except, there is a known issue. Until
 https://bugs.launchpad.net/zope.interface/+bug/791218 is resolved, this
 inheritance only works if the *first* base class is an instance of SchemaClass.
 So below I've commented out the output that we hope for once that issue is
-resolved. 
+resolved.
 Somehow the issue got solved when using python 3, so we need to check python
 version to get expected results here.
 
+    >>> import six
     >>> class ISomeInterface(Interface):
     ...     pass
 
     >>> adapter_calls = []
     >>> class IB(ISomeInterface, IA):
     ...     pass
-    >>> adapter_calls == ([('TestPlugin', 'IB')] if PY3 else [])
+    >>> adapter_calls == ([] if six.PY2 else [('TestPlugin', 'IB')])
     True
 
     >>> adapter_calls = []
     >>> class IC(IB):
     ...     pass
-    >>> adapter_calls == ([('TestPlugin', 'IC')] if PY3 else [])
+    >>> adapter_calls == ([] if six.PY2 else [('TestPlugin', 'IC')])
     True
 
 To support the registration of schema plugins in ZCML, plugins are
@@ -71,12 +72,11 @@ directly.
     >>> adapter_calls == (
     ...     [('TestPlugin2', 'IA'),
     ...         ('TestPlugin', 'IA'),
+    ...        ] if six.PY2 else [
+    ...         ('TestPlugin', 'IA'),
     ...         ('TestPlugin2', 'IB'),
     ...         ('TestPlugin', 'IB'),
     ...         ('TestPlugin2', 'IC'),
-    ...         ('TestPlugin', 'IC'),
-    ...        ] if PY3 else [
-    ...         ('TestPlugin2', 'IA'),
-    ...        ('TestPlugin', 'IA')])
+    ...        ('TestPlugin', 'IC')])
     True
     >>> adapter_calls = []

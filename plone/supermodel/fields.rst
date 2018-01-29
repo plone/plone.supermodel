@@ -18,7 +18,7 @@ limitations:
 
 First, let's wire up the package.
 
-    >>> configuration = """\
+    >>> configuration = u"""\
     ... <configure
     ...      xmlns="http://namespaces.zope.org/zope"
     ...      i18n_domain="plone.behavior.tests">
@@ -30,35 +30,30 @@ First, let's wire up the package.
     ... </configure>
     ... """
 
-    >>> from plone.supermodel import PY3
-    >>> if PY3:
-    ...     from io import StringIO
-    ... else:
-    ...     from StringIO import StringIO
-    >>> from plone.supermodel import b
+    >>> from six import StringIO
     >>> from zope.configuration import xmlconfig
     >>> xmlconfig.xmlconfig(StringIO(configuration))
 
 Then, let's test each field in turn.
 
-    >>> from zope.component import getUtility
-    >>> from zope import schema
-
+    >>> from lxml import etree
     >>> from plone.supermodel.interfaces import IFieldExportImportHandler
     >>> from plone.supermodel.interfaces import IFieldNameExtractor
     >>> from plone.supermodel.utils import prettyXML
+    >>> from zope import schema
+    >>> from zope.component import getUtility
 
     >>> import datetime
     >>> import plone.supermodel.tests
+    >>> import six
 
-    >>> from lxml import etree
 
 Bytes
 -----
 
-    >>> field = schema.Bytes(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
-    ...     default=b('abc'), missing_value='m',
+    >>> field = schema.Bytes(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
+    ...     default=b'abc', missing_value='m',
     ...     min_length=2, max_length=10)
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
@@ -102,9 +97,9 @@ Bytes
 BytesLine
 ---------
 
-    >>> field = schema.BytesLine(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
-    ...     default=b('abc'), missing_value='m',
+    >>> field = schema.BytesLine(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
+    ...     default=b'abc', missing_value='m',
     ...     min_length=2, max_length=10)
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
@@ -148,8 +143,8 @@ BytesLine
 ASCII
 -----
 
-    >>> field = schema.ASCII(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.ASCII(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default='abc', missing_value='m',
     ...     min_length=2, max_length=10)
     >>> fieldType = IFieldNameExtractor(field)()
@@ -194,8 +189,8 @@ ASCII
 ASCIILine
 ---------
 
-    >>> field = schema.ASCIILine(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.ASCIILine(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default='abc', missing_value='m',
     ...     min_length=2, max_length=10)
     >>> fieldType = IFieldNameExtractor(field)()
@@ -240,8 +235,8 @@ ASCIILine
 Text
 ----
 
-    >>> field = schema.Text(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.Text(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default=u'abc', missing_value=u'm',
     ...     min_length=2, max_length=10)
     >>> fieldType = IFieldNameExtractor(field)()
@@ -286,8 +281,8 @@ Text
 TextLine
 --------
 
-    >>> field = schema.TextLine(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.TextLine(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default=u'abc', missing_value=u'm',
     ...     min_length=2, max_length=10)
     >>> fieldType = IFieldNameExtractor(field)()
@@ -332,8 +327,8 @@ TextLine
 SourceText
 ----------
 
-    >>> field = schema.SourceText(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.SourceText(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default=u'abc', missing_value=u'm',
     ...     min_length=2, max_length=10)
     >>> fieldType = IFieldNameExtractor(field)()
@@ -378,8 +373,8 @@ SourceText
 URI
 ---
 
-    >>> field = schema.URI(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.URI(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default='http://plone.org', missing_value='m',
     ...     min_length=2, max_length=100)
     >>> fieldType = IFieldNameExtractor(field)()
@@ -424,8 +419,8 @@ URI
 Id
 --
 
-    >>> field = schema.Id(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.Id(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default='a.b.c', missing_value='m',
     ...     min_length=2, max_length=10)
     >>> fieldType = IFieldNameExtractor(field)()
@@ -470,8 +465,8 @@ Id
 DottedName
 -----------
 
-    >>> field = schema.DottedName(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.DottedName(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default='a.b.c', missing_value='m',
     ...     min_length=2, max_length=10, min_dots=2, max_dots=4)
     >>> fieldType = IFieldNameExtractor(field)()
@@ -522,8 +517,8 @@ DottedName
 Password
 --------
 
-    >>> field = schema.Password(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.Password(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default=u'abc', missing_value=u'm',
     ...     min_length=2, max_length=10)
     >>> fieldType = IFieldNameExtractor(field)()
@@ -568,8 +563,8 @@ Password
 Bool
 ----
 
-    >>> field = schema.Bool(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.Bool(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default=False, missing_value=True)
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
@@ -607,8 +602,8 @@ Bool
 Int
 ---
 
-    >>> field = schema.Int(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.Int(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default=12, missing_value=-1,
     ...     min=1, max=99)
     >>> fieldType = IFieldNameExtractor(field)()
@@ -653,8 +648,8 @@ Int
 Float
 -----
 
-    >>> field = schema.Float(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.Float(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default=12.1, missing_value=-1.0,
     ...     min=1.123, max=99.5)
     >>> fieldType = IFieldNameExtractor(field)()
@@ -700,8 +695,8 @@ Decimal
 -------
 
     >>> import decimal
-    >>> field = schema.Decimal(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.Decimal(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default=decimal.Decimal("12.1"), missing_value=decimal.Decimal("-1.0"),
     ...     min=decimal.Decimal("1.123"), max=decimal.Decimal("99.5"))
     >>> fieldType = IFieldNameExtractor(field)()
@@ -746,8 +741,8 @@ Decimal
 Date
 ----
 
-    >>> field = schema.Date(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.Date(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default=datetime.date(2001,1,2), missing_value=datetime.date(2000,1,1),
     ...     min=datetime.date(2000,10,12), max=datetime.date(2099,12,31))
     >>> fieldType = IFieldNameExtractor(field)()
@@ -792,8 +787,8 @@ Date
 Datetime
 ---------
 
-    >>> field = schema.Datetime(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.Datetime(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default=datetime.datetime(2001,1,2,1,2,3), missing_value=datetime.datetime(2000,1,1,2,3,4),
     ...     min=datetime.datetime(2000,10,12,0,0,2), max=datetime.datetime(2099,12,31,1,2,2))
     >>> fieldType = IFieldNameExtractor(field)()
@@ -838,8 +833,8 @@ Datetime
 InterfaceField
 ---------------
 
-    >>> field = schema.InterfaceField(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.InterfaceField(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default=plone.supermodel.tests.IDummy,
     ...     missing_value=plone.supermodel.tests.IDummy)
     >>> fieldType = IFieldNameExtractor(field)()
@@ -878,8 +873,8 @@ InterfaceField
 Tuple
 -----
 
-    >>> field = schema.Tuple(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.Tuple(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default=(1,2), missing_value=(),
     ...     min_length=2, max_length=10,
     ...     value_type=schema.Int(title=u"Val"))
@@ -935,8 +930,8 @@ Tuple
 List
 ----
 
-    >>> field = schema.List(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.List(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default=[1,2], missing_value=[],
     ...     min_length=2, max_length=10,
     ...     value_type=schema.Int(title=u"Val"))
@@ -992,8 +987,8 @@ List
 Set
 ---
 
-    >>> field = schema.Set(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.Set(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default=set((1,2)), missing_value=set(),
     ...     min_length=2, max_length=10,
     ...     value_type=schema.Int(title=u"Val"))
@@ -1033,7 +1028,7 @@ Set
     True
     >>> isinstance(reciprocal.default, set)
     True
-    >>> [i for i in reciprocal.default]
+    >>> list(reciprocal.default)
     [1, 2]
     >>> isinstance(reciprocal.missing_value, set)
     True
@@ -1053,8 +1048,8 @@ Set
 FrozenSet
 ---------
 
-    >>> field = schema.FrozenSet(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.FrozenSet(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default=frozenset((1,2)), missing_value=frozenset(),
     ...     min_length=2, max_length=10,
     ...     value_type=schema.Int(title=u"Val"))
@@ -1094,7 +1089,7 @@ FrozenSet
     True
     >>> isinstance(reciprocal.default, frozenset)
     True
-    >>> [i for i in reciprocal.default]
+    >>> list(reciprocal.default)
     [1, 2]
     >>> isinstance(reciprocal.missing_value, frozenset)
     True
@@ -1114,12 +1109,12 @@ FrozenSet
 Dict
 ----
 
-    >>> field = schema.Dict(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.Dict(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default={'a':1, 'b':2}, missing_value={},
     ...     min_length=2, max_length=10,
-    ...     key_type=schema.ASCIILine(title=u"Key"),
-    ...     value_type=schema.Int(title=u"Val"))
+    ...     key_type=schema.ASCIILine(title=u'Key'),
+    ...     value_type=schema.Int(title=u'Val'))
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
@@ -1189,8 +1184,8 @@ fields will be omitted, as there is no way to write these reliably.
     >>> dummy1 = plone.supermodel.tests.Dummy()
     >>> dummy2 = plone.supermodel.tests.Dummy()
 
-    >>> field = schema.Object(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.Object(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default=dummy1, missing_value=dummy2,
     ...     schema=plone.supermodel.tests.IDummy)
     >>> fieldType = IFieldNameExtractor(field)()
@@ -1254,8 +1249,8 @@ dotted name.
 
 These can be both exported and imported.
 
-    >>> field = schema.Choice(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.Choice(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default='a', missing_value='', vocabulary=u'dummy.vocab')
 
     >>> fieldType = IFieldNameExtractor(field)()
@@ -1301,8 +1296,8 @@ These can be both exported and imported.
 These can be both imported and exported, but note that the value is always
 a unicode string when importing.
 
-    >>> field = schema.Choice(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.Choice(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default='a', missing_value='', values=['a', 'b', 'c'])
 
     >>> fieldType = IFieldNameExtractor(field)()
@@ -1363,8 +1358,8 @@ tokens are the utf8-encoded values).
     ...     SimpleTerm(token='a', value=u'a', title=u'a'),
     ...     SimpleTerm(token=r'\xe7', value=u'\xe7', title=u'\xe7'), # c with cedilla
     ...     ])
-    >>> field = schema.Choice(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.Choice(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default='a', missing_value='', vocabulary=vocab)
 
     >>> fieldType = IFieldNameExtractor(field)()
@@ -1401,8 +1396,8 @@ with how Dict fields are output, only for Choices, order is guaranteed).
     ...     SimpleTerm(value=u'b', title=u'B'),
     ...     ])
     >>> field = schema.Choice(
-    ...     __name__="dummy",
-    ...     title=u"Test",
+    ...     __name__='dummy',
+    ...     title=u'Test',
     ...     vocabulary=vocab,
     ...     )
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
@@ -1420,8 +1415,8 @@ with how Dict fields are output, only for Choices, order is guaranteed).
 
 We cannot export choice fields with a source or context source binder:
 
-    >>> field = schema.Choice(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.Choice(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     vocabulary=plone.supermodel.tests.dummy_vocabulary_instance)
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
@@ -1430,8 +1425,8 @@ We cannot export choice fields with a source or context source binder:
     ...
     NotImplementedError: Cannot export a vocabulary that is not based on a simple list of values
 
-    >>> field = schema.Choice(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.Choice(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     source=plone.supermodel.tests.dummy_vocabulary_instance)
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
@@ -1440,8 +1435,8 @@ We cannot export choice fields with a source or context source binder:
     ...
     NotImplementedError: Cannot export a vocabulary that is not based on a simple list of values
 
-    >>> field = schema.Choice(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.Choice(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     source=plone.supermodel.tests.dummy_binder)
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
