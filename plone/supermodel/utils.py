@@ -73,7 +73,10 @@ def indent(node, level=0):
 
 def prettyXML(tree):
     indent(tree)
-    return etree.tostring(tree)
+    xml = etree.tostring(tree)
+    if six.PY2:
+        return xml
+    return xml.decode()
 
 
 def fieldTypecast(field, value):
@@ -152,7 +155,11 @@ def elementToValue(field, element, default=_marker):
             value = field.missing_value
         else:
             converter = IFromUnicode(field)
-            value = converter.fromUnicode(six.text_type(text))
+            if isinstance(text, six.binary_type):
+                text = text.decode()
+            else:
+                text = six.text_type(text)
+            value = converter.fromUnicode(text)
 
         # handle i18n
         if isinstance(value, six.string_types) and \

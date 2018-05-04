@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
+from io import BytesIO
 from plone.supermodel import model
 from plone.supermodel import parser
 from plone.supermodel import serializer
 from plone.supermodel import utils
 from plone.supermodel.interfaces import FILENAME_KEY
 from plone.supermodel.interfaces import IXMLToSchema
-from six import BytesIO
-from six import StringIO
 from zope.interface import moduleProvides
 
 import six
@@ -33,10 +32,9 @@ def loadFile(filename, reload=False, policy=u"", _frame=2):
 
 
 def loadString(model, policy=u""):
-    source = StringIO(model) if six.PY2 \
-        else BytesIO(six.binary_type(model, encoding='latin-1'))
-    # source = StringIO(model) if six.PY2 else BytesIO(model)
-    return parser.parse(source, policy=policy)
+    if not isinstance(model, six.binary_type):
+        model = model.encode()
+    return parser.parse(BytesIO(model), policy=policy)
 
 
 def serializeSchema(schema, name=u""):

@@ -19,10 +19,9 @@ from zope.schema.vocabulary import SimpleTerm
 from zope.schema.vocabulary import SimpleVocabulary
 
 import doctest
-import unittest
 import re
 import six
-import sys
+import unittest
 import zope.component.testing
 
 
@@ -487,7 +486,6 @@ class TestChoiceHandling(unittest.TestCase):
             el = self.handler.write(field, 'myfield', 'zope.schema.Choice')
             self.assertEquals(etree.tostring(el), expected)
 
-
     def test_choice_parsing(self):
         def _termvalues(vocab):
             return tuple((t.value, t.title) for t in vocab)
@@ -500,7 +498,7 @@ class TestChoiceHandling(unittest.TestCase):
         for field, expected in cases:
             el = etree.fromstring(expected)
             imported_field = self.handler.read(el)
-            self.assertEquals(
+            self.assertEqual(
                 _termvalues(imported_field.vocabulary),
                 _termvalues(field.vocabulary),
             )
@@ -508,7 +506,9 @@ class TestChoiceHandling(unittest.TestCase):
 
 class Py23DocChecker(doctest.OutputChecker):
     def check_output(self, want, got, optionflags):
-        if not six.PY2:
+        if six.PY2:
+            want = re.sub("b'(.*?)'", "'\\1'", want)
+        else:
             want = re.sub("u'(.*?)'", "'\\1'", want)
             want = re.sub('u"(.*?)"', '"\\1"', want)
             got = re.sub(

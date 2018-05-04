@@ -38,7 +38,8 @@ class DefaultToUnicode(object):
         self.context = context
 
     def toUnicode(self, value):
-
+        if isinstance(value, six.binary_type):
+            return value.decode()
         return six.text_type(value)
 
 
@@ -128,4 +129,6 @@ class BytesToUnicode(object):
         self.context = context
 
     def toUnicode(self, value):
+        if isinstance(value, six.binary_type):
+            return value.decode()
         return six.text_type(value)

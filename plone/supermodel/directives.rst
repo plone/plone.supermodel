@@ -13,7 +13,7 @@ Setup
 
 First, load this package's configuration:
 
-    >>> configuration = u"""\
+    >>> configuration = b"""\
     ... <configure
     ...      xmlns="http://namespaces.zope.org/zope"
     ...      i18n_domain="plone.supermodel.tests">
@@ -25,9 +25,9 @@ First, load this package's configuration:
     ... </configure>
     ... """
 
-    >>> from six import StringIO
+    >>> from io import BytesIO
     >>> from zope.configuration import xmlconfig
-    >>> xmlconfig.xmlconfig(StringIO(configuration))
+    >>> xmlconfig.xmlconfig(BytesIO(configuration))
 
 We will also need a temporary directory for storing test schema files.
 
@@ -76,7 +76,7 @@ temporary directory created above.
 
     >>> schema_filename = os.path.join(tmpdir, "schema.xml")
     >>> schema_file = open(schema_filename, "w")
-    >>> foo = schema_file.write(schema)
+    >>> _ = schema_file.write(schema)  # On Python 3 this returns the length
     >>> schema_file.close()
 
 We can now define a schema, using the directives defined in this package:

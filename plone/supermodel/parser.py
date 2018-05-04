@@ -27,7 +27,6 @@ import sys
 import traceback
 
 
-
 # Exception
 class SupermodelParseError(Exception):
 

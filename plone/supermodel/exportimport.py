@@ -397,11 +397,9 @@ class ChoiceHandler(BaseHandler):
         ):
             value = []
             for term in field.vocabulary:
-                term_token = six.binary_type(term.token) if six.PY2 \
-                    else six.binary_type(term.token, encoding='unicode_escape')
                 if (
                     not isinstance(term.value, six.string_types) or
-                    term_token != term.value.encode('unicode_escape')
+                    six.b(term.token) != term.value.encode('unicode_escape')
                 ):
                     raise NotImplementedError(
                         u"Cannot export a vocabulary that is not "

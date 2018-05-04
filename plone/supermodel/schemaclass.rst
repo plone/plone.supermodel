@@ -5,15 +5,16 @@ plone.supermodel: SchemaClass
     >>> from plone.supermodel.model import Schema, SchemaClass
     >>> from plone.supermodel import interfaces
     >>> from zope.interface import Interface, implementer
-    >>> from zope.component import adapts, provideAdapter
+    >>> from zope.component import adapter, provideAdapter
 
 Schema plugins are registered as named adapters. They may optionally contain
 an order attribute, which defaults to 0.
 
     >>> adapter_calls = []
     >>> @implementer(interfaces.ISchemaPlugin)
+    ... @adapter(interfaces.ISchema)
     ... class TestPlugin(object):
-    ...     adapts(interfaces.ISchema)
+    ...
     ...     order = 1
     ...     def __init__(self, schema):
     ...         self.schema = schema
@@ -25,7 +26,7 @@ an order attribute, which defaults to 0.
 
 Schema plugins are executed at schema declaration.
 
-    >>> class IA(Schema):
+    >>> class IA(Schema):  # doctest: +ELLIPSIS
     ...     pass
     >>> adapter_calls == [('TestPlugin', 'IA')]
     True
@@ -68,15 +69,20 @@ directly.
 
     >>> provideAdapter(TestPlugin2, name=u"plone.supermodel.tests.TestPlugin2")
     >>> from plone.supermodel.model import finalizeSchemas
+
     >>> finalizeSchemas(IA)
     >>> adapter_calls == (
-    ...     [('TestPlugin2', 'IA'),
+    ...     [
+    ...         ('TestPlugin2', 'IA'),
     ...         ('TestPlugin', 'IA'),
-    ...        ] if six.PY2 else [
+    ...     ] if six.PY2 else [
+    ...         ('TestPlugin2', 'IA'),
     ...         ('TestPlugin', 'IA'),
     ...         ('TestPlugin2', 'IB'),
     ...         ('TestPlugin', 'IB'),
     ...         ('TestPlugin2', 'IC'),
-    ...        ('TestPlugin', 'IC')])
+    ...         ('TestPlugin', 'IC'),
+    ...     ]
+    ... )
     True
     >>> adapter_calls = []
