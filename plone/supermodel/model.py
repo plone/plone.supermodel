@@ -106,10 +106,12 @@ def finalizeSchemas(parent=Schema):
         )
 
     def walk(schema):
-        yield schema
-        for child in schema.dependents.keys():
-            for s in walk(child):
-                yield s
+        if isinstance(schema, SchemaClass):
+            yield schema
+            for child in schema.dependents.keys():
+                for s in walk(child):
+                    yield s
+
     schemas = set(walk(parent))
     for schema in schemas:
         if hasattr(schema, '_SchemaClass_finalize'):
