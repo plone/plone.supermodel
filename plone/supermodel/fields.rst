@@ -1213,8 +1213,8 @@ object field that references a particular dotted name.
     ... """)
 
     >>> reciprocal = handler.read(element)
-    >>> reciprocal.__class__
-    <class 'zope.schema._field.Object'>
+    >>> isinstance(reciprocal, schema._field.Object)
+    True
     >>> reciprocal.__name__
     'dummy'
     >>> reciprocal.title
