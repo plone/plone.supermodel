@@ -23,7 +23,7 @@ import zope.schema
 
 try:
     from collections import OrderedDict
-except:
+except ImportError:
     from zope.schema.vocabulary import OrderedDict  # <py27
 
 
@@ -398,8 +398,8 @@ class ChoiceHandler(BaseHandler):
             value = []
             for term in field.vocabulary:
                 if (
-                    not isinstance(term.value, six.string_types, ) or
-                    term.token != term.value.encode('unicode_escape')
+                    not isinstance(term.value, six.string_types) or
+                    six.b(term.token) != term.value.encode('unicode_escape')
                 ):
                     raise NotImplementedError(
                         u"Cannot export a vocabulary that is not "
