@@ -11,7 +11,7 @@ Breaking changes:
 New features:
 
 - Python 3 compatibility.
-  [pbauer, dhavlik, ale-rt]
+  [pbauer, davilima6, dhavlik, ale-rt]
 
 Bug fixes:
 
