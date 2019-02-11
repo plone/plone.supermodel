@@ -18,7 +18,7 @@ limitations:
 
 First, let's wire up the package.
 
-    >>> configuration = """\
+    >>> configuration = b"""\
     ... <configure
     ...      xmlns="http://namespaces.zope.org/zope"
     ...      i18n_domain="plone.behavior.tests">
@@ -30,35 +30,36 @@ First, let's wire up the package.
     ... </configure>
     ... """
 
-    >>> from StringIO import StringIO
+    >>> from io import BytesIO
     >>> from zope.configuration import xmlconfig
-    >>> xmlconfig.xmlconfig(StringIO(configuration))
+    >>> xmlconfig.xmlconfig(BytesIO(configuration))
 
 Then, let's test each field in turn.
 
-    >>> from zope.component import getUtility
-    >>> from zope import schema
-
+    >>> from lxml import etree
     >>> from plone.supermodel.interfaces import IFieldExportImportHandler
     >>> from plone.supermodel.interfaces import IFieldNameExtractor
     >>> from plone.supermodel.utils import prettyXML
+    >>> from zope import schema
+    >>> from zope.component import getUtility
 
     >>> import datetime
     >>> import plone.supermodel.tests
+    >>> import six
 
-    >>> from lxml import etree
 
 Bytes
 -----
 
     >>> field = schema.Bytes(__name__="dummy", title=u"Test",
     ...     description=u"Test desc", required=False, readonly=True,
-    ...     default='abc', missing_value='m',
+    ...     default=b'abc', missing_value=b'm',
     ...     min_length=2, max_length=10)
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> from __future__ import print_function
+    >>> print(prettyXML(element))
     <field name="dummy" type="zope.schema.Bytes">
       <default>abc</default>
       <description>Test desc</description>
@@ -83,10 +84,10 @@ Bytes
     False
     >>> reciprocal.readonly
     True
-    >>> reciprocal.default
-    'abc'
-    >>> reciprocal.missing_value
-    'm'
+    >>> reciprocal.default.decode('latin-1')
+    u'abc'
+    >>> reciprocal.missing_value.decode('latin-1')
+    u'm'
     >>> reciprocal.min_length
     2
     >>> reciprocal.max_length
@@ -99,12 +100,12 @@ BytesLine
 
     >>> field = schema.BytesLine(__name__="dummy", title=u"Test",
     ...     description=u"Test desc", required=False, readonly=True,
-    ...     default='abc', missing_value='m',
+    ...     default=b'abc', missing_value=b'm',
     ...     min_length=2, max_length=10)
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element))
     <field name="dummy" type="zope.schema.BytesLine">
       <default>abc</default>
       <description>Test desc</description>
@@ -129,10 +130,10 @@ BytesLine
     False
     >>> reciprocal.readonly
     True
-    >>> reciprocal.default
-    'abc'
-    >>> reciprocal.missing_value
-    'm'
+    >>> reciprocal.default.decode('latin-1')
+    u'abc'
+    >>> reciprocal.missing_value.decode('latin-1')
+    u'm'
     >>> reciprocal.min_length
     2
     >>> reciprocal.max_length
@@ -143,14 +144,14 @@ BytesLine
 ASCII
 -----
 
-    >>> field = schema.ASCII(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.ASCII(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default='abc', missing_value='m',
     ...     min_length=2, max_length=10)
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element))
     <field name="dummy" type="zope.schema.ASCII">
       <default>abc</default>
       <description>Test desc</description>
@@ -189,14 +190,14 @@ ASCII
 ASCIILine
 ---------
 
-    >>> field = schema.ASCIILine(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.ASCIILine(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default='abc', missing_value='m',
     ...     min_length=2, max_length=10)
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element))
     <field name="dummy" type="zope.schema.ASCIILine">
       <default>abc</default>
       <description>Test desc</description>
@@ -235,14 +236,14 @@ ASCIILine
 Text
 ----
 
-    >>> field = schema.Text(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.Text(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default=u'abc', missing_value=u'm',
     ...     min_length=2, max_length=10)
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element))
     <field name="dummy" type="zope.schema.Text">
       <default>abc</default>
       <description>Test desc</description>
@@ -281,14 +282,14 @@ Text
 TextLine
 --------
 
-    >>> field = schema.TextLine(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.TextLine(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default=u'abc', missing_value=u'm',
     ...     min_length=2, max_length=10)
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element))
     <field name="dummy" type="zope.schema.TextLine">
       <default>abc</default>
       <description>Test desc</description>
@@ -327,14 +328,14 @@ TextLine
 SourceText
 ----------
 
-    >>> field = schema.SourceText(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.SourceText(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default=u'abc', missing_value=u'm',
     ...     min_length=2, max_length=10)
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element))
     <field name="dummy" type="zope.schema.SourceText">
       <default>abc</default>
       <description>Test desc</description>
@@ -373,14 +374,14 @@ SourceText
 URI
 ---
 
-    >>> field = schema.URI(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.URI(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default='http://plone.org', missing_value='m',
     ...     min_length=2, max_length=100)
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element))
     <field name="dummy" type="zope.schema.URI">
       <default>http://plone.org</default>
       <description>Test desc</description>
@@ -419,14 +420,14 @@ URI
 Id
 --
 
-    >>> field = schema.Id(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.Id(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default='a.b.c', missing_value='m',
     ...     min_length=2, max_length=10)
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element))
     <field name="dummy" type="zope.schema.Id">
       <default>a.b.c</default>
       <description>Test desc</description>
@@ -465,14 +466,14 @@ Id
 DottedName
 -----------
 
-    >>> field = schema.DottedName(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.DottedName(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default='a.b.c', missing_value='m',
     ...     min_length=2, max_length=10, min_dots=2, max_dots=4)
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element))
     <field name="dummy" type="zope.schema.DottedName">
       <default>a.b.c</default>
       <description>Test desc</description>
@@ -517,14 +518,14 @@ DottedName
 Password
 --------
 
-    >>> field = schema.Password(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.Password(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default=u'abc', missing_value=u'm',
     ...     min_length=2, max_length=10)
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element))
     <field name="dummy" type="zope.schema.Password">
       <default>abc</default>
       <description>Test desc</description>
@@ -563,13 +564,13 @@ Password
 Bool
 ----
 
-    >>> field = schema.Bool(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.Bool(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default=False, missing_value=True)
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element))
     <field name="dummy" type="zope.schema.Bool">
       <default>False</default>
       <description>Test desc</description>
@@ -602,14 +603,14 @@ Bool
 Int
 ---
 
-    >>> field = schema.Int(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.Int(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default=12, missing_value=-1,
     ...     min=1, max=99)
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element))
     <field name="dummy" type="zope.schema.Int">
       <default>12</default>
       <description>Test desc</description>
@@ -648,14 +649,14 @@ Int
 Float
 -----
 
-    >>> field = schema.Float(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.Float(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default=12.1, missing_value=-1.0,
     ...     min=1.123, max=99.5)
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element))
     <field name="dummy" type="zope.schema.Float">
       <default>12.1</default>
       <description>Test desc</description>
@@ -695,14 +696,14 @@ Decimal
 -------
 
     >>> import decimal
-    >>> field = schema.Decimal(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.Decimal(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default=decimal.Decimal("12.1"), missing_value=decimal.Decimal("-1.0"),
     ...     min=decimal.Decimal("1.123"), max=decimal.Decimal("99.5"))
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element))
     <field name="dummy" type="zope.schema.Decimal">
       <default>12.1</default>
       <description>Test desc</description>
@@ -741,14 +742,14 @@ Decimal
 Date
 ----
 
-    >>> field = schema.Date(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.Date(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default=datetime.date(2001,1,2), missing_value=datetime.date(2000,1,1),
     ...     min=datetime.date(2000,10,12), max=datetime.date(2099,12,31))
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element))
     <field name="dummy" type="zope.schema.Date">
       <default>2001-01-02</default>
       <description>Test desc</description>
@@ -787,14 +788,14 @@ Date
 Datetime
 ---------
 
-    >>> field = schema.Datetime(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.Datetime(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default=datetime.datetime(2001,1,2,1,2,3), missing_value=datetime.datetime(2000,1,1,2,3,4),
     ...     min=datetime.datetime(2000,10,12,0,0,2), max=datetime.datetime(2099,12,31,1,2,2))
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element))
     <field name="dummy" type="zope.schema.Datetime">
       <default>2001-01-02 01:02:03</default>
       <description>Test desc</description>
@@ -833,14 +834,14 @@ Datetime
 InterfaceField
 ---------------
 
-    >>> field = schema.InterfaceField(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.InterfaceField(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default=plone.supermodel.tests.IDummy,
     ...     missing_value=plone.supermodel.tests.IDummy)
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element))
     <field name="dummy" type="zope.schema.InterfaceField">
       <default>plone.supermodel.tests.IDummy</default>
       <description>Test desc</description>
@@ -873,15 +874,15 @@ InterfaceField
 Tuple
 -----
 
-    >>> field = schema.Tuple(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.Tuple(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default=(1,2), missing_value=(),
     ...     min_length=2, max_length=10,
     ...     value_type=schema.Int(title=u"Val"))
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element))
     <field name="dummy" type="zope.schema.Tuple">
       <default>
         <element>1</element>
@@ -922,23 +923,23 @@ Tuple
     10
     >>> reciprocal.value_type.__class__
     <class 'zope.schema._bootstrapfields.Int'>
-    >>> reciprocal.value_type.title
-    u'Val'
+    >>> reciprocal.value_type.title == u'Val'
+    True
     >>> reciprocal._init_field
     False
 
 List
 ----
 
-    >>> field = schema.List(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.List(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default=[1,2], missing_value=[],
     ...     min_length=2, max_length=10,
     ...     value_type=schema.Int(title=u"Val"))
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element))
     <field name="dummy" type="zope.schema.List">
       <default>
         <element>1</element>
@@ -961,10 +962,10 @@ List
     <class 'zope.schema._field.List'>
     >>> reciprocal.__name__
     'dummy'
-    >>> reciprocal.title
-    u'Test'
-    >>> reciprocal.description
-    u'Test desc'
+    >>> reciprocal.title == u'Test'
+    True
+    >>> reciprocal.description == u'Test desc'
+    True
     >>> reciprocal.required
     False
     >>> reciprocal.readonly
@@ -987,15 +988,15 @@ List
 Set
 ---
 
-    >>> field = schema.Set(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.Set(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default=set((1,2)), missing_value=set(),
     ...     min_length=2, max_length=10,
     ...     value_type=schema.Int(title=u"Val"))
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element))
     <field name="dummy" type="zope.schema.Set">
       <default>
         <element>1</element>
@@ -1026,10 +1027,10 @@ Set
     False
     >>> reciprocal.readonly
     True
-    >>> reciprocal.default
-    set([1, 2])
-    >>> reciprocal.missing_value
-    set([])
+    >>> reciprocal.default == {1, 2}
+    True
+    >>> reciprocal.missing_value == set()
+    True
     >>> reciprocal.min_length
     2
     >>> reciprocal.max_length
@@ -1044,15 +1045,15 @@ Set
 FrozenSet
 ---------
 
-    >>> field = schema.FrozenSet(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.FrozenSet(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default=frozenset((1,2)), missing_value=frozenset(),
     ...     min_length=2, max_length=10,
     ...     value_type=schema.Int(title=u"Val"))
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element))
     <field name="dummy" type="zope.schema.FrozenSet">
       <default>
         <element>1</element>
@@ -1083,10 +1084,14 @@ FrozenSet
     False
     >>> reciprocal.readonly
     True
-    >>> reciprocal.default
-    frozenset([1, 2])
-    >>> reciprocal.missing_value
-    frozenset([])
+    >>> isinstance(reciprocal.default, frozenset)
+    True
+    >>> list(reciprocal.default)
+    [1, 2]
+    >>> isinstance(reciprocal.missing_value, frozenset)
+    True
+    >>> len(reciprocal.missing_value)
+    0
     >>> reciprocal.min_length
     2
     >>> reciprocal.max_length
@@ -1101,16 +1106,16 @@ FrozenSet
 Dict
 ----
 
-    >>> field = schema.Dict(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.Dict(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default={'a':1, 'b':2}, missing_value={},
     ...     min_length=2, max_length=10,
-    ...     key_type=schema.ASCIILine(title=u"Key"),
-    ...     value_type=schema.Int(title=u"Val"))
+    ...     key_type=schema.ASCIILine(title=u'Key'),
+    ...     value_type=schema.Int(title=u'Val'))
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element))
     <field name="dummy" type="zope.schema.Dict">
       <default>
         <element key="a">1</element>
@@ -1144,8 +1149,12 @@ Dict
     False
     >>> reciprocal.readonly
     True
-    >>> reciprocal.default
-    {'a': 1, 'b': 2}
+    >>> reciprocal.default['a']
+    1
+    >>> reciprocal.default['b']
+    2
+    >>> sorted(reciprocal.default.keys())
+    ['a', 'b']
     >>> reciprocal.missing_value
     {}
     >>> reciprocal.min_length
@@ -1172,14 +1181,14 @@ fields will be omitted, as there is no way to write these reliably.
     >>> dummy1 = plone.supermodel.tests.Dummy()
     >>> dummy2 = plone.supermodel.tests.Dummy()
 
-    >>> field = schema.Object(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.Object(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default=dummy1, missing_value=dummy2,
     ...     schema=plone.supermodel.tests.IDummy)
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType) #doctest: +ELLIPSIS
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element))
     <field name="dummy" type="zope.schema.Object">
       <description>Test desc</description>
       <readonly>True</readonly>
@@ -1204,8 +1213,8 @@ object field that references a particular dotted name.
     ... """)
 
     >>> reciprocal = handler.read(element)
-    >>> reciprocal.__class__
-    <class 'zope.schema._field.Object'>
+    >>> isinstance(reciprocal, schema._field.Object)
+    True
     >>> reciprocal.__name__
     'dummy'
     >>> reciprocal.title
@@ -1237,14 +1246,14 @@ dotted name.
 
 These can be both exported and imported.
 
-    >>> field = schema.Choice(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.Choice(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default='a', missing_value='', vocabulary=u'dummy.vocab')
 
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element))
     <field name="dummy" type="zope.schema.Choice">
       <default>a</default>
       <description>Test desc</description>
@@ -1284,14 +1293,14 @@ These can be both exported and imported.
 These can be both imported and exported, but note that the value is always
 a unicode string when importing.
 
-    >>> field = schema.Choice(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.Choice(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default='a', missing_value='', values=['a', 'b', 'c'])
 
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element))
     <field name="dummy" type="zope.schema.Choice">
       <default>a</default>
       <description>Test desc</description>
@@ -1323,8 +1332,8 @@ a unicode string when importing.
     'a'
     >>> reciprocal.missing_value
     ''
-    >>> [t.value for t in reciprocal.vocabulary]
-    [u'a', u'b', u'c']
+    >>> [t.value for t in reciprocal.vocabulary] == [u'a', u'b', u'c']
+    True
     >>> reciprocal.vocabularyName is None
     True
 
@@ -1333,27 +1342,28 @@ sure it hasn't regressed.
 
     >>> from plone.supermodel.interfaces import XML_NAMESPACE
     >>> element.set('xmlns', XML_NAMESPACE)
-    >>> element = etree.parse(StringIO(prettyXML(element))).getroot()
+    >>> from io import BytesIO
+    >>> element = etree.parse(BytesIO(prettyXML(element).encode())).getroot()
     >>> reciprocal = handler.read(element)
-    >>> [t.value for t in reciprocal.vocabulary]
-    [u'a', u'b', u'c']
+    >>> [t.value for t in reciprocal.vocabulary] == [u'a', u'b', u'c']
+    True
 
 Also, make sure we can handle terms with unicode values (as long as their
 tokens are the utf8-encoded values).
 
     >>> from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
     >>> vocab = SimpleVocabulary([
-    ...     SimpleTerm(token='a', value=u'a', title=u'a'),
+    ...     SimpleTerm(token=b'a', value=u'a', title=u'a'),
     ...     SimpleTerm(token=r'\xe7', value=u'\xe7', title=u'\xe7'), # c with cedilla
     ...     ])
-    >>> field = schema.Choice(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.Choice(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     default='a', missing_value='', vocabulary=vocab)
 
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element))
     <field name="dummy" type="zope.schema.Choice">
       <default>a</default>
       <description>Test desc</description>
@@ -1368,8 +1378,8 @@ tokens are the utf8-encoded values).
     </field>
 
     >>> reciprocal = handler.read(element)
-    >>> [t.value for t in reciprocal.vocabulary]
-    [u'a', u'\xe7']
+    >>> [t.value for t in reciprocal.vocabulary] == [u'a', u'\xe7']
+    True
 
 
 Additionally, it is possible for Choice fields with a values vocabulary
@@ -1384,13 +1394,13 @@ with how Dict fields are output, only for Choices, order is guaranteed).
     ...     SimpleTerm(value=u'b', title=u'B'),
     ...     ])
     >>> field = schema.Choice(
-    ...     __name__="dummy",
-    ...     title=u"Test",
+    ...     __name__='dummy',
+    ...     title=u'Test',
     ...     vocabulary=vocab,
     ...     )
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
     >>> element = handler.write(field, 'dummy', fieldType)
-    >>> print prettyXML(element)
+    >>> print(prettyXML(element))
     <field name="dummy" type="zope.schema.Choice">
       <title>Test</title>
       <values>
@@ -1403,8 +1413,8 @@ with how Dict fields are output, only for Choices, order is guaranteed).
 
 We cannot export choice fields with a source or context source binder:
 
-    >>> field = schema.Choice(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.Choice(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     vocabulary=plone.supermodel.tests.dummy_vocabulary_instance)
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
@@ -1413,8 +1423,8 @@ We cannot export choice fields with a source or context source binder:
     ...
     NotImplementedError: Cannot export a vocabulary that is not based on a simple list of values
 
-    >>> field = schema.Choice(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.Choice(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     source=plone.supermodel.tests.dummy_vocabulary_instance)
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)
@@ -1423,8 +1433,8 @@ We cannot export choice fields with a source or context source binder:
     ...
     NotImplementedError: Cannot export a vocabulary that is not based on a simple list of values
 
-    >>> field = schema.Choice(__name__="dummy", title=u"Test",
-    ...     description=u"Test desc", required=False, readonly=True,
+    >>> field = schema.Choice(__name__='dummy', title=u'Test',
+    ...     description=u'Test desc', required=False, readonly=True,
     ...     source=plone.supermodel.tests.dummy_binder)
     >>> fieldType = IFieldNameExtractor(field)()
     >>> handler = getUtility(IFieldExportImportHandler, name=fieldType)

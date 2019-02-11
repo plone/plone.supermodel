@@ -24,27 +24,27 @@ from zope.schema import getFields
 import linecache
 import six
 import sys
+import traceback
 
 
 # Exception
-
-
 class SupermodelParseError(Exception):
 
-    def __init__(self, orig_exc, fname, element):
+    def __init__(self, orig_exc, fname, element, tb):
         msg = str(orig_exc)
-
         lineno = None
         if hasattr(orig_exc, 'lineno'):
             lineno = orig_exc.lineno
         elif element is not None:
             lineno = getattr(element, 'sourceline', 'unknown')
-
         if fname or lineno != 'unknown':
             msg += '\n  File "%s", line %s' % (fname or '<unknown>', lineno)
         if fname and lineno:
             line = linecache.getline(fname, lineno).strip()
             msg += '\n    %s' % line
+        msg += '\n'
+        msg += ''.join(traceback.format_tb(tb))
+        msg += '\n'
         self.args = [msg]
 
 
@@ -75,11 +75,8 @@ def parse(source, policy=u""):
         # the filename and line number of the element that caused the problem.
         # Keep the original traceback so the developer can debug where the
         # problem happened.
-        six.reraise(SupermodelParseError(
-            e,
-            fname,
-            parseinfo.stack[-1]
-        ), None, sys.exc_info()[2])
+        raise SupermodelParseError(
+            e, fname, parseinfo.stack[-1], sys.exc_info()[2])
 
 
 def _parse(source, policy):
@@ -110,7 +107,7 @@ def _parse(source, policy):
                 '<field /> element'
             )
 
-        handler = handlers.get(fieldType, None)
+        handler = handlers.get(fieldType)
         if handler is None:
             handler = handlers[fieldType] = queryUtility(
                 IFieldExportImportHandler,
@@ -126,7 +123,7 @@ def _parse(source, policy):
 
         # Preserve order from base interfaces if this field is an override
         # of a field with the same name in a base interface
-        base_field = baseFields.get(fieldName, None)
+        base_field = baseFields.get(fieldName)
         if base_field is not None:
             field.order = base_field.order
 
@@ -180,6 +177,7 @@ def _parse(source, policy):
                     fieldElements,
                     baseFields
                 )
+
             elif subelement.tag == ns('fieldset'):
 
                 fieldset_name = subelement.get('name')
@@ -190,7 +188,7 @@ def _parse(source, policy):
                         )
                     )
 
-                fieldset = fieldsets_by_name.get(fieldset_name, None)
+                fieldset = fieldsets_by_name.get(fieldset_name)
                 if fieldset is None:
                     fieldset_label = subelement.get('label')
                     fieldset_description = subelement.get('description')
@@ -219,6 +217,7 @@ def _parse(source, policy):
                     if parsed_fieldName:
                         fieldset.fields.append(parsed_fieldName)
                     parseinfo.stack.pop()
+
             elif subelement.tag == ns('invariant'):
                 dotted = subelement.text
                 invariant = resolve(dotted)

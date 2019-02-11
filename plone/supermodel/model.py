@@ -89,6 +89,7 @@ class SchemaClass(InterfaceClass):
         for order, name, adapter in adapters:
             adapter()
 
+
 Schema = SchemaClass(
     'Schema',
     (Interface,),
@@ -113,7 +114,7 @@ def finalizeSchemas(parent=Schema):
                     yield s
 
     schemas = set(walk(parent))
-    for schema in schemas:
+    for schema in sorted(schemas):
         if hasattr(schema, '_SchemaClass_finalize'):
             schema._SchemaClass_finalize()
         elif isinstance(schema, InterfaceClass):

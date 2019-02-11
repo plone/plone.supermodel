@@ -14,7 +14,7 @@ Before we can begin, we must register the field handlers that know how to
 import and export fields from/to XML. These are registered as named utilities,
 and can be loaded from the configure.zcml file of plone.supermodel.
 
-    >>> configuration = """\
+    >>> configuration = b"""\
     ... <configure
     ...      xmlns="http://namespaces.zope.org/zope"
     ...      i18n_domain="plone.supermodel.tests">
@@ -26,9 +26,9 @@ and can be loaded from the configure.zcml file of plone.supermodel.
     ... </configure>
     ... """
 
-    >>> from StringIO import StringIO
+    >>> from io import BytesIO
     >>> from zope.configuration import xmlconfig
-    >>> xmlconfig.xmlconfig(StringIO(configuration))
+    >>> xmlconfig.xmlconfig(BytesIO(configuration))
 
 Next, let's define a sample model with a single, unnamed schema.
 
@@ -58,27 +58,27 @@ We can parse this model using the loadString() function:
 
 This will load one schema, with the default name u"":
 
-    >>> model.schemata.keys()
-    [u'']
+    >>> list(model.schemata.keys()) == [u'']
+    True
 
 We can inspect this schema and see that it contains zope.schema fields with
 attributes corresponding to the values set in XML.
 
-    >>> schema = model.schema # shortcut to model.schemata[u""]
+    >>> schema = model.schema  # shortcut to model.schemata[u""]
 
     >>> from zope.schema import getFieldNamesInOrder
     >>> getFieldNamesInOrder(schema)
     ['title', 'description']
 
-    >>> schema['title'].title
-    u'Title'
+    >>> schema['title'].title == u'Title'
+    True
     >>> schema['title'].required
     True
 
-    >>> schema['description'].title
-    u'Description'
-    >>> schema['description'].description
-    u'A short summary'
+    >>> schema['description'].title == u'Description'
+    True
+    >>> schema['description'].description == u'A short summary'
+    True
     >>> schema['description'].required
     False
     >>> schema['description'].min_length
@@ -106,7 +106,8 @@ lxml.)
 In addition to parsing, we can serialize a model to an XML representation:
 
     >>> from plone.supermodel import serializeModel
-    >>> print serializeModel(model) # doctest: +NORMALIZE_WHITESPACE
+    >>> from __future__ import print_function
+    >>> print(serializeModel(model)) # doctest: +NORMALIZE_WHITESPACE
     <model xmlns:i18n="http://xml.zope.org/namespaces/i18n" xmlns="http://namespaces.plone.org/supermodel/schema">
       <schema>
         <field name="title" type="zope.schema.TextLine">
@@ -164,10 +165,9 @@ directory.
 
     >>> import tempfile, os.path, shutil
     >>> tmpdir = tempfile.mkdtemp()
-    >>> schema_filename = os.path.join(tmpdir, "schema.xml")
-    >>> schema_file = open(schema_filename, "w")
-    >>> schema_file.write(schema)
-    >>> schema_file.close()
+    >>> schema_filename = os.path.join(tmpdir, 'schema.xml')
+    >>> with open(schema_filename, 'w') as fd:
+    ...     _ = fd.write(schema)  # On Py3 write resturns the schema len
 
 We can define interfaces from this using a helper function:
 
@@ -185,7 +185,7 @@ After being loaded, the interface should have the fields of the default
 
 We can also use a different, named schema:
 
-    >>> ITestMetadata = xmlSchema(schema_filename, schema=u"metadata")
+    >>> ITestMetadata = xmlSchema(schema_filename, schema=u'metadata')
     >>> getFieldNamesInOrder(ITestMetadata)
     ['created', 'creator']
 
@@ -194,7 +194,7 @@ dict as per the serializeModel() method seen above, or you can write a model
 of just a single schema using serializeSchema():
 
     >>> from plone.supermodel import serializeSchema
-    >>> print serializeSchema(ITestContent) # doctest: +NORMALIZE_WHITESPACE
+    >>> print(serializeSchema(ITestContent)) # doctest: +NORMALIZE_WHITESPACE
     <model xmlns:i18n="http://xml.zope.org/namespaces/i18n" xmlns="http://namespaces.plone.org/supermodel/schema">
       <schema>
         <field name="title" type="zope.schema.TextLine">
@@ -207,7 +207,7 @@ of just a single schema using serializeSchema():
       </schema>
     </model>
 
-    >>> print serializeSchema(ITestMetadata, name=u"metadata") # doctest: +NORMALIZE_WHITESPACE
+    >>> print(serializeSchema(ITestMetadata, name=u"metadata")) # doctest: +NORMALIZE_WHITESPACE
     <model xmlns:i18n="http://xml.zope.org/namespaces/i18n" xmlns="http://namespaces.plone.org/supermodel/schema">
       <schema name="metadata">
         <field name="created" type="zope.schema.Datetime">
@@ -238,9 +238,9 @@ resolver needs to have a proper module path. The interface looks like this
 though:
 
     class IBase(Interface):
-        title = zope.schema.TextLine(title=u"Title")
-        description = zope.schema.TextLine(title=u"Description")
-        name = zope.schema.TextLine(title=u"Name")
+        title = zope.schema.TextLine(title=u'Title')
+        description = zope.schema.TextLine(title=u'Description')
+        name = zope.schema.TextLine(title=u'Name')
 
 In real life, you'd more likely have a dotted name like
 my.package.interfaces.IBase, of course.
@@ -265,7 +265,7 @@ Then, let's define a schema that is based on this interface.
 Here, notice the use of the 'based-on' attribute, which specifies a dotted
 name to the base interface. It is possible to specify multiple interfaces
 as a space-separated list. However, if you find that you need this, you
-may want to ask yourself why. :) Inside the schema proper, we override the
+may want to ask yourself why. :) Inside the proper schema, we override the
 'description' field and add a new field, 'age'.
 
 When we load this model, we should find that the __bases__ list of the
@@ -290,7 +290,7 @@ We should also verify that the description field was indeed overridden:
 
 Finally, let's verify that bases are preserved upon serialisation:
 
-    >>> print serializeSchema(model.schema) # doctest: +NORMALIZE_WHITESPACE
+    >>> print(serializeSchema(model.schema)) # doctest: +NORMALIZE_WHITESPACE
     <model xmlns:i18n="http://xml.zope.org/namespaces/i18n" xmlns="http://namespaces.plone.org/supermodel/schema">
       <schema based-on="plone.supermodel.tests.IBase">
         <field name="description" type="zope.schema.Text">
@@ -397,13 +397,12 @@ default schema above is unrelated to the one in the metadata schema.
     >>> model.schema.getTaggedValue(FIELDSETS_KEY)
     [<Fieldset 'dates' order 1 of publication_date, expiry_date, notification_date>]
 
-    >>> model.schemata[u"metadata"].getTaggedValue(FIELDSETS_KEY)
+    >>> model.schemata[u'metadata'].getTaggedValue(FIELDSETS_KEY)
     [<Fieldset 'standard' order 9999 of creator>, <Fieldset 'dates' order 9999 of created>, <Fieldset 'author' order 9999 of >]
 
-When we serialise a schema with fieldsets, fields will be grouped by
-fieldset.
+When we serialise a schema with fieldsets, fields will be grouped by fieldset.
 
-    >>> print serializeModel(model) # doctest: +NORMALIZE_WHITESPACE
+    >>> print(serializeModel(model)) # doctest: +NORMALIZE_WHITESPACE
     <model xmlns:i18n="http://xml.zope.org/namespaces/i18n" xmlns="http://namespaces.plone.org/supermodel/schema">
       <schema>
         <field name="title" type="zope.schema.TextLine">
@@ -472,8 +471,8 @@ a dotted name for the invariant function.
     >>> model.schema.getTaggedValue('invariants')
     [<function dummy_invariant at ...>, <function dummy_invariant_prime at ...>]
 
-When invariants are checked for our model.schema, we'll see our invariant
-in action.
+When invariants are checked for our model.schema, we'll see our invariant in
+action.
 
     >>> model.schema.validateInvariants(object())
     Traceback (most recent call last):
@@ -482,7 +481,7 @@ in action.
 
 The model's serialization should include the invariant.
 
-    >>> print serializeModel(model) # doctest: +NORMALIZE_WHITESPACE
+    >>> print(serializeModel(model)) # doctest: +NORMALIZE_WHITESPACE
     <model xmlns:i18n="http://xml.zope.org/namespaces/i18n" xmlns="http://namespaces.plone.org/supermodel/schema">
       <schema>
         <invariant>plone.supermodel.tests.dummy_invariant</invariant>
@@ -526,9 +525,9 @@ or we won't accept them.
 Internationalization
 --------------------
 
-Translation domains and message ids can be specified for text
-that is interpreted as unicode. This will result in deserialization
-as a zope.i18nmessageid message id rather than a basic Unicode string::
+Translation domains and message ids can be specified for text that is
+interpreted as unicode. This will result in deserialization as a
+zope.i18nmessageid message id rather than a basic Unicode string::
 
     >>> schema = """\
     ... <?xml version="1.0" encoding="UTF-8"?>
@@ -555,13 +554,13 @@ as a zope.i18nmessageid message id rather than a basic Unicode string::
     ... """
     >>> model = loadString(schema)
     >>> msgid = model.schema['title'].title
-    >>> msgid
-    u'supermodel_test_title'
+    >>> msgid == u'supermodel_test_title'
+    True
     >>> type(msgid)
     <... 'zope.i18nmessageid.message.Message'>
-    >>> msgid.default
-    u'Title'
-    >>> print serializeModel(model) # doctest: +NORMALIZE_WHITESPACE
+    >>> msgid.default == u'Title'
+    True
+    >>> print(serializeModel(model)) # doctest: +NORMALIZE_WHITESPACE
     <model xmlns:i18n="http://xml.zope.org/namespaces/i18n" xmlns="http://namespaces.plone.org/supermodel/schema" i18n:domain="plone.supermodel">
       <schema>
         <field name="title" type="zope.schema.TextLine">
@@ -610,17 +609,17 @@ may expect to be able to parse a format like this:
 We can register schema and field metadata handlers as named utilities.
 Metadata handlers should be able to reciprocally read and write metadata.
 
-    >>> from zope.interface import implements
+    >>> from zope.interface import implementer
     >>> from zope.component import provideUtility
 
     >>> from plone.supermodel.interfaces import ISchemaMetadataHandler
     >>> from plone.supermodel.utils import ns
 
-    >>> class FormLayoutMetadata(object):
-    ...     implements(ISchemaMetadataHandler)
+    >>> @implementer(ISchemaMetadataHandler)
+    ... class FormLayoutMetadata(object):
     ...
-    ...     namespace = "http://namespaces.acme.com/ui"
-    ...     prefix = "ui"
+    ...     namespace = 'http://namespaces.acme.com/ui'
+    ...     prefix = 'ui'
     ...
     ...     def read(self, schemaNode, schema):
     ...         layout = schemaNode.get(ns('layout', self.namespace))
@@ -635,11 +634,11 @@ Metadata handlers should be able to reciprocally read and write metadata.
     >>> provideUtility(component=FormLayoutMetadata(), name='acme.ui.schema')
 
     >>> from plone.supermodel.interfaces import IFieldMetadataHandler
-    >>> class FieldWidgetMetadata(object):
-    ...     implements(IFieldMetadataHandler)
+    >>> @implementer(IFieldMetadataHandler)
+    ... class FieldWidgetMetadata(object):
     ...
-    ...     namespace = "http://namespaces.acme.com/ui"
-    ...     prefix = "ui"
+    ...     namespace = 'http://namespaces.acme.com/ui'
+    ...     prefix = 'ui'
     ...
     ...     def read(self, fieldNode, schema, field):
     ...         name = field.__name__
@@ -671,7 +670,7 @@ and each field, respectively.
 Of course, we can also serialize the schema back to XML. Here, the 'prefix'
 set in the utility (if any) will be used by default.
 
-    >>> print serializeModel(model) # doctest: +NORMALIZE_WHITESPACE
+    >>> print(serializeModel(model)) # doctest: +NORMALIZE_WHITESPACE
     <model xmlns:i18n="http://xml.zope.org/namespaces/i18n" xmlns:ui="http://namespaces.acme.com/ui" xmlns="http://namespaces.plone.org/supermodel/schema">
       <schema ui:layout="horizontal">
         <field name="title" type="zope.schema.TextLine" ui:widget="largetype">

@@ -40,6 +40,7 @@
 
     <adapter factory=".converters.ObjectFromUnicode" />
 
+    <adapter factory=".converters.BytesToUnicode" />
 
     <!-- Field handlers for all of zope.schema -->
 

@@ -7,7 +7,7 @@ import os
 def read(*rnames):
     return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
 
-version = '1.3.5.dev0'
+version = '1.4.1.dev0'
 
 long_description = (
     read('README.rst') + '\n' +
@@ -20,13 +20,17 @@ setup(
     description="Serialize Zope schema definitions to and from XML",
     long_description=long_description,
     # Get more strings from
-    # https://pypi.python.org/pypi?%3Aaction=list_classifiers
+    # https://pypi.org/classifiers/
     classifiers=[
         "Framework :: Plone",
         "Framework :: Plone :: 5.0",
         "Framework :: Plone :: 5.1",
+        "Framework :: Plone :: 5.2",
         "Programming Language :: Python",
         "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
         "Topic :: Software Development :: Libraries :: Python Modules",
         "License :: OSI Approved :: BSD License",
     ],
@@ -35,7 +39,7 @@ setup(
     author_email='optilude@gmail.com',
     url='https://github.com/plone/plone.supermodel',
     license='BSD',
-    packages=find_packages(exclude=['ez_setup']),
+    packages=find_packages(),
     namespace_packages=['plone'],
     include_package_data=True,
     zip_safe=False,

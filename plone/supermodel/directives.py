@@ -81,8 +81,8 @@ class CheckerPlugin(object):
         for fieldName in self.fieldNames():
             if fieldName not in schema:
                 raise ValueError(
-                    u"The directive {0} applied to interface {1} "
-                    u"refers to unknown field name {2}".format(
+                    u'The directive {0} applied to interface {1} '
+                    u'refers to unknown field name {2}'.format(
                         self.key,
                         schema.__identifier__,
                         fieldName
@@ -130,10 +130,10 @@ class load(Directive):
     """
 
     def store(self, tags, value):
-        tags[FILENAME_KEY] = value["filename"]
-        tags[SCHEMA_NAME_KEY] = value["schema"]
+        tags[FILENAME_KEY] = value['filename']
+        tags[SCHEMA_NAME_KEY] = value['schema']
 
-    def factory(self, filename, schema=u""):
+    def factory(self, filename, schema=u''):
         return dict(filename=filename, schema=schema)
 
 
@@ -151,7 +151,7 @@ class SupermodelSchemaPlugin(object):
         filename = interface.queryTaggedValue(FILENAME_KEY, None)
         if filename is None:
             return
-        schema = interface.queryTaggedValue(SCHEMA_NAME_KEY, u"")
+        schema = interface.queryTaggedValue(SCHEMA_NAME_KEY, u'')
 
         moduleName = interface.__module__
         module = sys.modules.get(moduleName, None)
@@ -161,7 +161,7 @@ class SupermodelSchemaPlugin(object):
         if hasattr(module, '__path__'):
             directory = module.__path__[0]
         else:
-            while "." in moduleName:
+            while '.' in moduleName:
                 moduleName, _ = moduleName.rsplit('.', 1)
                 module = sys.modules.get(moduleName, None)
                 if hasattr(module, '__path__'):
@@ -176,8 +176,8 @@ class SupermodelSchemaPlugin(object):
         model = loadFile(filename)
         if schema not in model.schemata:
             raise ValueError(
-                u"Schema '{0}' specified for interface {1} does not exist "
-                "in {2}.".format(
+                'Schema "{0}" specified for interface {1} does not exist '
+                'in {2}.'.format(
                     schema,
                     interface.__identifier__,
                     filename,
