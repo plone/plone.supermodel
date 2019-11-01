@@ -369,6 +369,34 @@ class TestValueToElement(unittest.TestCase):
             b'</value>'
         )
 
+    def test_sets(self):
+        field = schema.Set(value_type=schema.Int(),
+        )
+        value = set([])
+        self._assertSerialized(field, value, b'<value/>')
+        value = set([3, 4, 2, 1])
+        # Sets should be sorted to ensure nice diffs
+        self._assertSerialized(
+            field, value,
+            b'<value>'
+            b'<element>1</element>'
+            b'<element>2</element>'
+            b'<element>3</element>'
+            b'<element>4</element>'
+            b'</value>'
+        )
+
+        field = schema.Set(value_type=schema.Choice(['a','b','c']),)
+        value = set(['b', 'a'])
+        # Sets should be sorted to ensure nice diffs
+        self._assertSerialized(
+            field, value,
+            b'<value>'
+            b'<element>a</element>'
+            b'<element>b</element>'
+            b'</value>'
+        )
+
     def test_nested_lists(self):
         field = schema.List(value_type=schema.List(value_type=schema.Int()))
         value = []
@@ -411,6 +439,9 @@ class TestValueToElement(unittest.TestCase):
             b'<element key="6"/>'
             b'</value>'
         )
+
+
+
 
 
 class TestChoiceHandling(unittest.TestCase):
