@@ -386,7 +386,7 @@ class TestValueToElement(unittest.TestCase):
             b'</value>'
         )
 
-        field = schema.Set(value_type=schema.Text(),)
+        field = schema.Set(value_type=schema.Choice(['a','b','c']),)
         value = set(['b', 'a'])
         # Sets should be sorted to ensure nice diffs
         self._assertSerialized(

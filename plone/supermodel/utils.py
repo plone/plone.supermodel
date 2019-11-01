@@ -13,6 +13,7 @@ from zope.schema.interfaces import ICollection
 from zope.schema.interfaces import IDict
 from zope.schema.interfaces import IField
 from zope.schema.interfaces import IFromUnicode
+from zope.schema.interfaces import ISet
 
 import os.path
 import re
@@ -203,6 +204,9 @@ def valueToElement(field, value, name=None, force=False):
                 child.append(list_element)
 
         elif ICollection.providedBy(field):
+            if ISet.providedBy(field):
+                # Serliazation should be consistent even if value was not really a set
+                value = sorted(value)
             for v in value:
                 list_element = valueToElement(
                     field.value_type, v, 'element', force)
