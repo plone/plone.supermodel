@@ -8,6 +8,15 @@ Changelog
 
 .. towncrier release notes start
 
+1.4.1 (2019-11-25)
+------------------
+
+Bug fixes:
+
+
+- tests to ensure schema.Set is serialized consistently (#30)
+
+
 1.4.0 (2018-09-28)
 ------------------
 
