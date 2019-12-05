@@ -398,17 +398,21 @@ class ChoiceHandler(BaseHandler):
             value = []
             for term in field.vocabulary:
                 if (
-                    not isinstance(term.value, six.string_types) or
-                    six.b(term.token) != term.value.encode('unicode_escape')
+                    isinstance(term.value, six.integer_types)
+                    or (
+                        isinstance(term.value, six.string_types)
+                        and six.b(term.token) == term.value.encode('unicode_escape')
+                    )
                 ):
+                    if term.title and term.title != term.value:
+                        value.append((term.value, term.title))
+                    else:
+                        value.append(term.value)
+                else:
                     raise NotImplementedError(
                         u"Cannot export a vocabulary that is not "
                         u"based on a simple list of values"
                     )
-                if term.title and term.title != term.value:
-                    value.append((term.value, term.title))
-                else:
-                    value.append(term.value)
 
             attributeField = self.fieldAttributes['values']
             if any(map(lambda v: isinstance(v, tuple), value)):

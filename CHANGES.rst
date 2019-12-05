@@ -16,6 +16,9 @@ Bug fixes:
 
 - tests to ensure schema.Set is serialized consistently (#30)
 
+- Add support for choices of integers for improved registry.xml export.
+  [jone]
+
 
 1.4.0 (2018-09-28)
 ------------------

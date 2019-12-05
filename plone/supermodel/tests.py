@@ -503,6 +503,15 @@ class TestChoiceHandling(unittest.TestCase):
             '</field>'
         return (schema.Choice(vocabulary=vocab), expected)
 
+    def _choice_with_integers(self):
+        vocab = SimpleVocabulary([SimpleTerm(1, title=u'One')])
+        expected = '<field name="myfield" type="zope.schema.Choice">'\
+            '<values>'\
+            '<element key="1">One</element>'\
+            '</values>'\
+            '</field>'
+        return (schema.Choice(vocabulary=vocab), expected)
+
     def test_choice_serialized(self):
         """ Tests a regular choice, one with empty string term in vocab,
         and another with terms that have titles
@@ -510,7 +519,8 @@ class TestChoiceHandling(unittest.TestCase):
         choice = self._choice()
         choice_with_empty = self._choice_with_empty()
         choice_with_term_titles = self._choice_with_term_titles()
-        for case in (choice, choice_with_empty, choice_with_term_titles):
+        choice_with_integers = self._choice_with_integers()
+        for case in (choice, choice_with_empty, choice_with_term_titles, choice_with_integers):
             field, expected = case
             expected = six.binary_type(expected) if six.PY2 \
                 else six.binary_type(expected, encoding='latin-1')
