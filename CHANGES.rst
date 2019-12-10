@@ -8,6 +8,16 @@ Changelog
 
 .. towncrier release notes start
 
+1.5.0 (2019-12-11)
+------------------
+
+New features:
+
+
+- Add support for choices of integers for improved registry.xml export.
+  [jone] (#32)
+
+
 1.4.1 (2019-11-25)
 ------------------
 
