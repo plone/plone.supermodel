@@ -369,6 +369,34 @@ class TestValueToElement(unittest.TestCase):
             b'</value>'
         )
 
+    def test_sets(self):
+        field = schema.Set(value_type=schema.Int(),
+        )
+        value = set([])
+        self._assertSerialized(field, value, b'<value/>')
+        value = set([3, 4, 2, 1])
+        # Sets should be sorted to ensure nice diffs
+        self._assertSerialized(
+            field, value,
+            b'<value>'
+            b'<element>1</element>'
+            b'<element>2</element>'
+            b'<element>3</element>'
+            b'<element>4</element>'
+            b'</value>'
+        )
+
+        field = schema.Set(value_type=schema.Choice(['a','b','c']),)
+        value = set(['b', 'a'])
+        # Sets should be sorted to ensure nice diffs
+        self._assertSerialized(
+            field, value,
+            b'<value>'
+            b'<element>a</element>'
+            b'<element>b</element>'
+            b'</value>'
+        )
+
     def test_nested_lists(self):
         field = schema.List(value_type=schema.List(value_type=schema.Int()))
         value = []
@@ -411,6 +439,9 @@ class TestValueToElement(unittest.TestCase):
             b'<element key="6"/>'
             b'</value>'
         )
+
+
+
 
 
 class TestChoiceHandling(unittest.TestCase):
@@ -472,6 +503,15 @@ class TestChoiceHandling(unittest.TestCase):
             '</field>'
         return (schema.Choice(vocabulary=vocab), expected)
 
+    def _choice_with_integers(self):
+        vocab = SimpleVocabulary([SimpleTerm(1, title=u'One')])
+        expected = '<field name="myfield" type="zope.schema.Choice">'\
+            '<values>'\
+            '<element key="1">One</element>'\
+            '</values>'\
+            '</field>'
+        return (schema.Choice(vocabulary=vocab), expected)
+
     def test_choice_serialized(self):
         """ Tests a regular choice, one with empty string term in vocab,
         and another with terms that have titles
@@ -479,7 +519,8 @@ class TestChoiceHandling(unittest.TestCase):
         choice = self._choice()
         choice_with_empty = self._choice_with_empty()
         choice_with_term_titles = self._choice_with_term_titles()
-        for case in (choice, choice_with_empty, choice_with_term_titles):
+        choice_with_integers = self._choice_with_integers()
+        for case in (choice, choice_with_empty, choice_with_term_titles, choice_with_integers):
             field, expected = case
             expected = six.binary_type(expected) if six.PY2 \
                 else six.binary_type(expected, encoding='latin-1')
