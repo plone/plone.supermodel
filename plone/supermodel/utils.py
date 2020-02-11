@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from collections import OrderedDict
 from lxml import etree
 from plone.supermodel.debug import parseinfo
 from plone.supermodel.interfaces import I18N_NAMESPACE
@@ -8,6 +9,7 @@ from zope.component import getUtility
 from zope.i18nmessageid import Message
 from zope.interface import directlyProvidedBy
 from zope.interface import directlyProvides
+from zope.interface.interface import Element
 from zope.schema.interfaces import IChoice
 from zope.schema.interfaces import ICollection
 from zope.schema.interfaces import IDict
@@ -19,12 +21,6 @@ import os.path
 import re
 import six
 import sys
-
-
-try:
-    from collections import OrderedDict
-except ImportError:
-    from zope.schema.vocabulary import OrderedDict  # <py27
 
 
 _marker = object()
@@ -269,7 +265,7 @@ def mergedTaggedValueDict(schema, name):
     """
     tv = {}
     for iface in reversed(schema.__iro__):
-        tv.update(iface.queryTaggedValue(name, {}))
+        tv.update(Element.queryTaggedValue(iface, name, default={}))
     return tv
 
 
@@ -281,7 +277,7 @@ def mergedTaggedValueList(schema, name):
     """
     tv = []
     for iface in reversed(schema.__iro__):
-        tv.extend(iface.queryTaggedValue(name, []))
+        tv.extend(Element.queryTaggedValue(iface, name, default=[]))
     return tv
 
 
