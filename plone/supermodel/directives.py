@@ -12,6 +12,7 @@ from plone.supermodel.utils import syncSchema
 from zope.component import adapter
 from zope.interface import alsoProvides
 from zope.interface import implementer
+from zope.interface.interface import Element
 from zope.interface.interface import TAGGED_DATA
 
 import os.path
@@ -71,7 +72,7 @@ class CheckerPlugin(object):
 
     def __init__(self, schema):
         self.schema = schema
-        self.value = schema.queryTaggedValue(self.key, None)
+        self.value = Element.queryTaggedValue(schema, self.key, default=None)
 
     def fieldNames(self):
         raise NotImplementedError()
@@ -148,10 +149,18 @@ class SupermodelSchemaPlugin(object):
 
     def __call__(self):
         interface = self.interface
-        filename = interface.queryTaggedValue(FILENAME_KEY, None)
+        filename = Element.queryTaggedValue(
+            interface,
+            FILENAME_KEY,
+            default=None,
+        )
         if filename is None:
             return
-        schema = interface.queryTaggedValue(SCHEMA_NAME_KEY, u'')
+        schema = Element.queryTaggedValue(
+            interface,
+            SCHEMA_NAME_KEY,
+            default=u'',
+        )
 
         moduleName = interface.__module__
         module = sys.modules.get(moduleName, None)
