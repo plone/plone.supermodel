@@ -298,7 +298,7 @@ def syncSchema(source, dest, overwrite=False, sync_bases=False):
         for name in to_delete:
             # delattr(dest, name)
             del dest._InterfaceClass__attrs[name]
-            if hasattr(dest, '_v_attrs'):
+            if hasattr(dest, '_v_attrs') and dest._v_attrs is not None:
                 del dest._v_attrs[name]
 
     # Add fields that are in source, but not in dest
@@ -317,6 +317,8 @@ def syncSchema(source, dest, overwrite=False, sync_bases=False):
             # setattr(dest, name, clone)
             dest._InterfaceClass__attrs[name] = clone
             if hasattr(dest, '_v_attrs'):
+                if dest._v_attrs is None:
+                    dest._v_attrs = {}
                 dest._v_attrs[name] = clone
 
     # Copy tagged values
