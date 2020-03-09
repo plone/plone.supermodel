@@ -1,1 +1,0 @@
-Support for zope.interface 4.7+ [jensens]
