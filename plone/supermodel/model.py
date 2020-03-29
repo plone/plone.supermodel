@@ -107,11 +107,10 @@ def finalizeSchemas(parent=Schema):
         )
 
     def walk(schema):
-        if isinstance(schema, SchemaClass):
-            yield schema
-            for child in schema.dependents.keys():
-                for s in walk(child):
-                    yield s
+        yield schema
+        for child in schema.dependents.keys():
+            for s in walk(child):
+                yield s
 
     schemas = set(walk(parent))
     for schema in sorted(schemas):
