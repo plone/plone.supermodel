@@ -1,0 +1,2 @@
+Decimal field moved in zope.schema, do not depend on specific dotted name in test b/c it does not matter. 
+[jensens]

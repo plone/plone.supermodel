@@ -18,6 +18,8 @@ limitations:
 
 First, let's wire up the package.
 
+::
+
     >>> configuration = b"""\
     ... <configure
     ...      xmlns="http://namespaces.zope.org/zope"
@@ -35,6 +37,8 @@ First, let's wire up the package.
     >>> xmlconfig.xmlconfig(BytesIO(configuration))
 
 Then, let's test each field in turn.
+
+::
 
     >>> from lxml import etree
     >>> from plone.supermodel.interfaces import IFieldExportImportHandler
@@ -717,7 +721,7 @@ Decimal
 
     >>> reciprocal = handler.read(element)
     >>> reciprocal.__class__
-    <class 'zope.schema._field.Decimal'>
+    <class 'zope.schema...Decimal'>
     >>> reciprocal.__name__
     'dummy'
     >>> reciprocal.title

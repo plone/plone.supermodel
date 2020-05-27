@@ -24,7 +24,7 @@ import sys
 
 
 _marker = object()
-noNS_re = re.compile('^{\S+}')
+noNS_re = re.compile(r'^{\S+}')
 
 
 def ns(name, prefix=XML_NAMESPACE):
