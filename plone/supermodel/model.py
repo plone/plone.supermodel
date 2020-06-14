@@ -110,7 +110,11 @@ def finalizeSchemas(parent=Schema):
         if isinstance(schema, SchemaClass):
             yield schema
         else:
-            logger.error("Got non-SchemaClass {}.", schema)
+            logger.exception(f"Got non-SchemaClass {schema}.")
+            # logger.error("Got non-SchemaClass {}.", schema)
+            # On startup I got:
+            # Message: 'Got non-SchemaClass {}.'
+            # Arguments: (<implementedBy plone.app.contenttypes.behaviors.richtext.RichText>,)
 
         # This try..except is to handle AttributeError:
         # 'VerifyingAdapterLookup' object has no attribute 'dependents'.
@@ -120,7 +124,7 @@ def finalizeSchemas(parent=Schema):
         try:
             children = schema.dependents.keys()
         except AttributeError:
-            logger.exception("Got {} which has no .dependents.", schema)
+            logger.exception(f"Got {schema} which has no .dependents(.keys)")
             children = ()
 
         for child in children:
