@@ -8,6 +8,17 @@ Changelog
 
 .. towncrier release notes start
 
+1.6.2 (2020-06-24)
+------------------
+
+Bug fixes:
+
+
+- Decimal field moved in zope.schema, do not depend on specific dotted name in test b/c it does not matter. 
+  [jensens] (#37)
+- Fix a deprecation warning on a regular expression [ale-rt] (#38)
+
+
 1.6.1 (2020-04-22)
 ------------------
 
