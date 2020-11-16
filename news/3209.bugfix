@@ -1,0 +1,2 @@
+For increased security, in the xml parser do not resolve entities, and remove processing instructions.
+[maurits]
