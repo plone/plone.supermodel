@@ -8,6 +8,16 @@ Changelog
 
 .. towncrier release notes start
 
+1.6.3 (2020-11-17)
+------------------
+
+Bug fixes:
+
+
+- For increased security, in the xml parser do not resolve entities, and remove processing instructions.
+  [maurits] (#3209)
+
+
 1.6.2 (2020-06-24)
 ------------------
 
