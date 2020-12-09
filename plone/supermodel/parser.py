@@ -80,7 +80,11 @@ def parse(source, policy=u""):
 
 
 def _parse(source, policy):
-    tree = etree.parse(source)
+    # Some safety measures.
+    # We do not want to load entities, especially file:/// entities.
+    # Also discard processing instructions.
+    parser = etree.XMLParser(resolve_entities=False, remove_pis=True)
+    tree = etree.parse(source, parser=parser)
     root = tree.getroot()
 
     parseinfo.i18n_domain = root.attrib.get(
