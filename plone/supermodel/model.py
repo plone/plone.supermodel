@@ -107,14 +107,12 @@ def finalizeSchemas(parent=Schema):
         )
 
     def walk(schema):
+        # When we have behaviors on the Plone site root we got some shcmeas that 
+        # are not SchemaClasses
         if isinstance(schema, SchemaClass):
             yield schema
         else:
-            logger.exception(f"Got non-SchemaClass {schema}.")
-            # logger.error("Got non-SchemaClass {}.", schema)
-            # On startup I got:
-            # Message: 'Got non-SchemaClass {}.'
-            # Arguments: (<implementedBy plone.app.contenttypes.behaviors.richtext.RichText>,)
+            logger.warning("Got non-SchemaClass %r", schema)
 
         # This try..except is to handle AttributeError:
         # 'VerifyingAdapterLookup' object has no attribute 'dependents'.
@@ -124,7 +122,7 @@ def finalizeSchemas(parent=Schema):
         try:
             children = schema.dependents.keys()
         except AttributeError:
-            logger.exception(f"Got {schema} which has no .dependents(.keys)")
+            logger.warning("Got %r which has no .dependents.keys())", schema)
             children = ()
 
         for child in children:
