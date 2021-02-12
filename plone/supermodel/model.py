@@ -111,8 +111,6 @@ def finalizeSchemas(parent=Schema):
         # are not SchemaClasses
         if isinstance(schema, SchemaClass):
             yield schema
-        else:
-            logger.warning("Got non-SchemaClass %r", schema)
 
         # This try..except is to handle AttributeError:
         # 'VerifyingAdapterLookup' object has no attribute 'dependents'.
@@ -122,7 +120,6 @@ def finalizeSchemas(parent=Schema):
         try:
             children = schema.dependents.keys()
         except AttributeError:
-            logger.warning("Got %r which has no .dependents.keys())", schema)
             children = ()
 
         for child in children:
