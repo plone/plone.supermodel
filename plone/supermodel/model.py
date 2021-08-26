@@ -107,8 +107,22 @@ def finalizeSchemas(parent=Schema):
         )
 
     def walk(schema):
-        yield schema
-        for child in schema.dependents.keys():
+        # When we have behaviors on the Plone site root we got some shcmeas that 
+        # are not SchemaClasses
+        if isinstance(schema, SchemaClass):
+            yield schema
+
+        # This try..except is to handle AttributeError:
+        # 'VerifyingAdapterLookup' object has no attribute 'dependents'.
+        # afaik this happens in tests only.
+        # We have issue https://github.com/plone/plone.supermodel/issues/14
+        # to find out why this is happening in the first place.
+        try:
+            children = schema.dependents.keys()
+        except AttributeError:
+            children = ()
+
+        for child in children:
             for s in walk(child):
                 yield s
 

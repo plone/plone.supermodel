@@ -1,0 +1,1 @@
+Make finalizeSchema more robust by not handling behavior schema classes
