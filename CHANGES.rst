@@ -8,6 +8,15 @@ Changelog
 
 .. towncrier release notes start
 
+1.6.4 (2021-09-01)
+------------------
+
+Breaking changes:
+
+
+- Make finalizeSchema more robust by not handling behavior schema classes (#27)
+
+
 1.6.3 (2020-11-17)
 ------------------
 
