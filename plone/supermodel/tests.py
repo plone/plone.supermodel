@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 from lxml import etree
+from plone.dexterity.fti import DexterityFTI
 from plone.supermodel import utils
 from plone.supermodel.exportimport import ChoiceHandler
 from plone.supermodel.interfaces import IDefaultFactory
 from plone.supermodel.interfaces import IInvariant
+from Products.CMFCore.utils import getToolByName
 from six import BytesIO
 from six import StringIO
 from zope import schema
@@ -319,6 +321,17 @@ class TestUtils(unittest.TestCase):
         ISchema.setTaggedValue(u"foo", [4, 5])  # most specific
 
         self.assertEqual([3, 4, 1, 2, 4, 5], utils.mergedTaggedValueList(ISchema, u"foo"))
+
+    def test_mergedTaggedValueListFieldUnicity(self):
+
+        class IBase2(IBase):
+            description = schema.TextLine(title=u"Description")
+
+        IBase.setTaggedValue(u'searchable', [IBase[u'description']])
+        IBase2.setTaggedValue(u'searchable', [IBase2[u'description']])
+        self.assertEqual(
+            [IBase['description'], IBase2['description']],
+            utils.mergedTaggedValueList(IBase2, u"searchable"))
 
     def test_mergedTaggedValueDict(self):
 
