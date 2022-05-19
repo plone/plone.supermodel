@@ -2,6 +2,7 @@
 from plone.supermodel import loadFile
 from plone.supermodel.interfaces import DEFAULT_ORDER
 from plone.supermodel.interfaces import FIELDSETS_KEY
+from plone.supermodel.interfaces import DEPENDENCIES_KEY
 from plone.supermodel.interfaces import FILENAME_KEY
 from plone.supermodel.interfaces import ISchema
 from plone.supermodel.interfaces import ISchemaPlugin
@@ -15,8 +16,12 @@ from zope.interface import implementer
 from zope.interface.interface import Element
 from zope.interface.interface import TAGGED_DATA
 
+import collections
 import os.path
 import sys
+
+
+Dependency = collections.namedtuple("Dependency", "name field op value action")
 
 
 # Directive
@@ -136,6 +141,19 @@ class load(Directive):
 
     def factory(self, filename, schema=u''):
         return dict(filename=filename, schema=schema)
+
+
+class depends(MetadataListDirective):
+    """Directive used to declare a dependency on other field values."""
+
+    key = DEPENDENCIES_KEY
+
+    def factory(self, field, name, op="on", value=None, action="show"):
+        if op not in ["on", "off", "==", "!="]:
+            raise ValueError("Invalid operand given")
+        if action not in ["show", "enable"]:
+            raise ValueError("Invalid action given")
+        return [Dependency(field, name, op, value, action)]
 
 
 @adapter(ISchema)

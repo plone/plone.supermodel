@@ -16,6 +16,9 @@ SCHEMA_NAME_KEY = 'plone.supermodel.schemaname'
 # list of fieldsets
 FIELDSETS_KEY = 'plone.supermodel.fieldsets'
 
+# list of field dependendencies
+DEPENDENCIES_KEY = 'plone.supermodel.dependencies'
+
 # Primary fields (requires plone.rfc822)
 PRIMARY_FIELDS_KEY = 'plone.supermodel.primary'
 
