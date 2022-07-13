@@ -8,6 +8,18 @@ Changelog
 
 .. towncrier release notes start
 
+1.6.5 (2022-07-13)
+------------------
+
+Bug fixes:
+
+
+- Release 1.6.3 as 1.6.5.
+  The 1.6.4 release in between was meant as a major release.
+  I will rerelease that one as 2.0.0.
+  [maurits] (#27)
+
+
 1.6.4 (2021-09-01)
 ------------------
 
