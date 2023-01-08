@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from collections import OrderedDict
 from lxml import etree
 from plone.supermodel.debug import parseinfo
@@ -24,34 +23,32 @@ import sys
 
 
 _marker = object()
-noNS_re = re.compile(r'^{\S+}')
+noNS_re = re.compile(r"^{\S+}")
 
 
 def ns(name, prefix=XML_NAMESPACE):
-    """Return the element or attribute name with the given prefix
-    """
+    """Return the element or attribute name with the given prefix"""
 
-    return u'{%s}%s' % (prefix, name)
+    return f"{{{prefix}}}{name}"
 
 
 def noNS(name):
-    """Return the tag with no namespace
-    """
-    return noNS_re.sub('', name)
+    """Return the tag with no namespace"""
+    return noNS_re.sub("", name)
 
 
 def indent(node, level=0):
 
     INDENT_SIZE = 2
-    node_indent = level * (' ' * INDENT_SIZE)
-    child_indent = (level + 1) * (' ' * INDENT_SIZE)
+    node_indent = level * (" " * INDENT_SIZE)
+    child_indent = (level + 1) * (" " * INDENT_SIZE)
 
     # node has childen
     if len(node):
 
         # add indent before first child node
         if not node.text or not node.text.strip():
-            node.text = '\n' + child_indent
+            node.text = "\n" + child_indent
 
         # let each child indent itself
         last_idx = len(node) - 1
@@ -61,11 +58,11 @@ def indent(node, level=0):
             # add a tail for the next child node...
             if idx != last_idx:
                 if not child.tail or not child.tail.strip():
-                    child.tail = '\n' + child_indent
+                    child.tail = "\n" + child_indent
             # ... or for the closing element of this node
             else:
                 if not child.tail or not child.tail.strip():
-                    child.tail = '\n' + node_indent
+                    child.tail = "\n" + node_indent
 
 
 def prettyXML(tree):
@@ -77,10 +74,10 @@ def prettyXML(tree):
 
 
 def fieldTypecast(field, value):
-    typecast = getattr(field, '_type', None)
+    typecast = getattr(field, "_type", None)
     if typecast is not None:
         if not isinstance(typecast, (list, tuple)):
-            typecast = (typecast, )
+            typecast = (typecast,)
         for tc in reversed(typecast):
             if callable(tc):
                 try:
@@ -104,15 +101,15 @@ def elementToValue(field, element, default=_marker):
         key_converter = IFromUnicode(field.key_type)
         value = OrderedDict()
         for child in element.iterchildren(tag=etree.Element):
-            if noNS(child.tag.lower()) != 'element':
+            if noNS(child.tag.lower()) != "element":
                 continue
             parseinfo.stack.append(child)
 
-            key_text = child.attrib.get('key')
+            key_text = child.attrib.get("key")
             if key_text is None:
                 k = None
             else:
-                k = key_converter.fromUnicode(six.text_type(key_text))
+                k = key_converter.fromUnicode(str(key_text))
 
             value[k] = elementToValue(field.value_type, child)
             parseinfo.stack.pop()
@@ -121,7 +118,7 @@ def elementToValue(field, element, default=_marker):
     elif ICollection.providedBy(field):
         value = []
         for child in element.iterchildren(tag=etree.Element):
-            if noNS(child.tag.lower()) != 'element':
+            if noNS(child.tag.lower()) != "element":
                 continue
             parseinfo.stack.append(child)
             v = elementToValue(field.value_type, child)
@@ -137,7 +134,7 @@ def elementToValue(field, element, default=_marker):
         except:
             pass
 
-        if vocabulary and hasattr(vocabulary, 'by_value'):
+        if vocabulary and hasattr(vocabulary, "by_value"):
             try:
                 field._type = type(list(vocabulary.by_value.keys())[0])
             except:
@@ -152,17 +149,16 @@ def elementToValue(field, element, default=_marker):
             value = field.missing_value
         else:
             converter = IFromUnicode(field)
-            if isinstance(text, six.binary_type):
+            if isinstance(text, bytes):
                 text = text.decode()
             else:
-                text = six.text_type(text)
+                text = str(text)
             value = converter.fromUnicode(text)
 
         # handle i18n
-        if isinstance(value, six.string_types) and \
-                parseinfo.i18n_domain is not None:
-            translate_attr = ns('translate', I18N_NAMESPACE)
-            domain_attr = ns('domain', I18N_NAMESPACE)
+        if isinstance(value, str) and parseinfo.i18n_domain is not None:
+            translate_attr = ns("translate", I18N_NAMESPACE)
+            domain_attr = ns("domain", I18N_NAMESPACE)
             msgid = element.attrib.get(translate_attr)
             domain = element.attrib.get(domain_attr, parseinfo.i18n_domain)
             if msgid:
@@ -194,9 +190,8 @@ def valueToElement(field, value, name=None, force=False):
         if IDict.providedBy(field):
             key_converter = IToUnicode(field.key_type)
             for k, v in sorted(value.items()):
-                list_element = valueToElement(
-                    field.value_type, v, 'element', force)
-                list_element.attrib['key'] = key_converter.toUnicode(k)
+                list_element = valueToElement(field.value_type, v, "element", force)
+                list_element.attrib["key"] = key_converter.toUnicode(k)
                 child.append(list_element)
 
         elif ICollection.providedBy(field):
@@ -204,8 +199,7 @@ def valueToElement(field, value, name=None, force=False):
                 # Serliazation should be consistent even if value was not really a set
                 value = sorted(value)
             for v in value:
-                list_element = valueToElement(
-                    field.value_type, v, 'element', force)
+                list_element = valueToElement(field.value_type, v, "element", force)
                 child.append(list_element)
 
         else:
@@ -214,11 +208,11 @@ def valueToElement(field, value, name=None, force=False):
 
             # handle i18n
             if isinstance(value, Message):
-                child.set(ns('domain', I18N_NAMESPACE), value.domain)
+                child.set(ns("domain", I18N_NAMESPACE), value.domain)
                 if not value.default:
-                    child.set(ns('translate', I18N_NAMESPACE), '')
+                    child.set(ns("translate", I18N_NAMESPACE), "")
                 else:
-                    child.set(ns('translate', I18N_NAMESPACE), child.text)
+                    child.set(ns("translate", I18N_NAMESPACE), child.text)
                     child.text = converter.toUnicode(value.default)
 
     return child
@@ -232,12 +226,12 @@ def relativeToCallingPackage(filename, callingFrame=2):
     if os.path.isabs(filename):
         return filename
     else:
-        name = sys._getframe(callingFrame).f_globals['__name__']
+        name = sys._getframe(callingFrame).f_globals["__name__"]
         module = sys.modules[name]
-        if hasattr(module, '__path__'):
+        if hasattr(module, "__path__"):
             directory = module.__path__[0]
         elif "." in name:
-            parent_module = name[:name.rfind('.')]
+            parent_module = name[: name.rfind(".")]
             directory = sys.modules[parent_module].__path__[0]
         else:
             directory = name
@@ -246,13 +240,17 @@ def relativeToCallingPackage(filename, callingFrame=2):
 
 
 def sortedFields(schema):
-    """Like getFieldsInOrder, but does not include fields from bases
-    """
+    """Like getFieldsInOrder, but does not include fields from bases"""
     fields = []
     for name in schema.names(all=False):
         field = schema[name]
         if IField.providedBy(field):
-            fields.append((name, field, ))
+            fields.append(
+                (
+                    name,
+                    field,
+                )
+            )
     fields.sort(key=lambda item: item[1].order)
     return fields
 
@@ -298,7 +296,7 @@ def syncSchema(source, dest, overwrite=False, sync_bases=False):
         for name in to_delete:
             # delattr(dest, name)
             del dest._InterfaceClass__attrs[name]
-            if hasattr(dest, '_v_attrs') and dest._v_attrs is not None:
+            if hasattr(dest, "_v_attrs") and dest._v_attrs is not None:
                 del dest._v_attrs[name]
 
     # Add fields that are in source, but not in dest
@@ -316,7 +314,7 @@ def syncSchema(source, dest, overwrite=False, sync_bases=False):
 
             # setattr(dest, name, clone)
             dest._InterfaceClass__attrs[name] = clone
-            if hasattr(dest, '_v_attrs'):
+            if hasattr(dest, "_v_attrs"):
                 if dest._v_attrs is None:
                     dest._v_attrs = {}
                 dest._v_attrs[name] = clone
