@@ -15,6 +15,7 @@ from zope.schema.interfaces import IDict
 from zope.schema.interfaces import IField
 from zope.schema.interfaces import IFromUnicode
 from zope.schema.interfaces import ISet
+from zope.schema.interfaces import IVocabularyFactory
 
 import os.path
 import re
@@ -83,7 +84,7 @@ def fieldTypecast(field, value):
                 try:
                     value = tc(value)
                     break
-                except:
+                except Exception:
                     pass
     return value
 
@@ -131,13 +132,13 @@ def elementToValue(field, element, default=_marker):
         try:
             vcf = getUtility(IVocabularyFactory, field.vocabularyName)
             vocabulary = vcf(None)
-        except:
+        except Exception:
             pass
 
         if vocabulary and hasattr(vocabulary, "by_value"):
             try:
                 field._type = type(list(vocabulary.by_value.keys())[0])
-            except:
+            except Exception:
                 pass
 
         value = fieldTypecast(field, element.text)

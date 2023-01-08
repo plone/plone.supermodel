@@ -21,7 +21,6 @@ from zope.interface import implementer
 from zope.schema import getFields
 
 import linecache
-import six
 import sys
 import traceback
 

@@ -12,7 +12,6 @@ from zope.schema.interfaces import IInterfaceField
 from zope.schema.interfaces import IObject
 
 import datetime
-import six
 import time
 
 
