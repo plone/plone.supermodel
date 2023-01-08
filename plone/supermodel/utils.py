@@ -44,7 +44,7 @@ def indent(node, level=0):
     node_indent = level * (" " * INDENT_SIZE)
     child_indent = (level + 1) * (" " * INDENT_SIZE)
 
-    # node has childen
+    # node has children
     if len(node):
 
         # add indent before first child node

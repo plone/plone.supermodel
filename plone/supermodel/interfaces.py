@@ -150,7 +150,7 @@ class ISchemaPolicy(Interface):
 class IFieldExportImportHandler(Interface):
     """Named utilities corresponding to node names should be registered for
     this interface. They will be called upon to build a schema fields out of
-    DOM ndoes.
+    DOM nodes.
     """
 
     def read(node):
