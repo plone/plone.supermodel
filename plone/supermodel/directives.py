@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from plone.supermodel import loadFile
 from plone.supermodel.interfaces import DEFAULT_ORDER
 from plone.supermodel.interfaces import FIELDSETS_KEY
@@ -21,14 +20,14 @@ import sys
 
 # Directive
 
+
 class DirectiveClass(type):
-    """A Directive is used to apply tagged values to a Schema
-    """
+    """A Directive is used to apply tagged values to a Schema"""
 
     def __init__(self, name, bases, attrs):
-        attrs.setdefault('finalize', None)
-        super(DirectiveClass, self).__init__(name, bases, attrs)
-        self.__instance = super(DirectiveClass, self).__call__()
+        attrs.setdefault("finalize", None)
+        super().__init__(name, bases, attrs)
+        self.__instance = super().__call__()
 
     def __call__(self, *args, **kw):
         instance = self.__instance
@@ -37,16 +36,19 @@ class DirectiveClass(type):
         value = instance.factory(*args, **kw)
         instance.store(tags, value)
 
+
 Directive = DirectiveClass(
-    'Directive',
+    "Directive",
     (),
-    dict(__module__='plone.supermodel.directives',),
+    dict(
+        __module__="plone.supermodel.directives",
+    ),
 )
 
 
 class MetadataListDirective(Directive):
-    """Store a list value in the tagged value under the key.
-    """
+    """Store a list value in the tagged value under the key."""
+
     key = None
 
     def store(self, tags, value):
@@ -54,8 +56,8 @@ class MetadataListDirective(Directive):
 
 
 class MetadataDictDirective(Directive):
-    """Store a dict value in the tagged value under the key.
-    """
+    """Store a dict value in the tagged value under the key."""
+
     key = None
 
     def store(self, tags, value):
@@ -64,9 +66,10 @@ class MetadataDictDirective(Directive):
 
 # Plugin
 
+
 @adapter(ISchema)
 @implementer(ISchemaPlugin)
-class CheckerPlugin(object):
+class CheckerPlugin:
 
     key = None
 
@@ -82,11 +85,9 @@ class CheckerPlugin(object):
         for fieldName in self.fieldNames():
             if fieldName not in schema:
                 raise ValueError(
-                    u'The directive {0} applied to interface {1} '
-                    u'refers to unknown field name {2}'.format(
-                        self.key,
-                        schema.__identifier__,
-                        fieldName
+                    "The directive {} applied to interface {} "
+                    "refers to unknown field name {}".format(
+                        self.key, schema.__identifier__, fieldName
                     )
                 )
             yield fieldName
@@ -97,7 +98,6 @@ class CheckerPlugin(object):
 
 
 class DictCheckerPlugin(CheckerPlugin):
-
     def fieldNames(self):
         if self.value is None:
             return []
@@ -105,12 +105,10 @@ class DictCheckerPlugin(CheckerPlugin):
 
 
 class ListCheckerPlugin(CheckerPlugin):
-
     def fieldNames(self):
         if self.value is None:
             return
-        for fieldName in self.value:
-            yield fieldName
+        yield from self.value
 
 
 class ListPositionCheckerPlugin(CheckerPlugin):
@@ -126,21 +124,21 @@ class ListPositionCheckerPlugin(CheckerPlugin):
 
 # Implementations
 
+
 class load(Directive):
-    """Directive used to specify the XML model file
-    """
+    """Directive used to specify the XML model file"""
 
     def store(self, tags, value):
-        tags[FILENAME_KEY] = value['filename']
-        tags[SCHEMA_NAME_KEY] = value['schema']
+        tags[FILENAME_KEY] = value["filename"]
+        tags[SCHEMA_NAME_KEY] = value["schema"]
 
-    def factory(self, filename, schema=u''):
+    def factory(self, filename, schema=""):
         return dict(filename=filename, schema=schema)
 
 
 @adapter(ISchema)
 @implementer(ISchemaPlugin)
-class SupermodelSchemaPlugin(object):
+class SupermodelSchemaPlugin:
 
     order = -1000
 
@@ -159,7 +157,7 @@ class SupermodelSchemaPlugin(object):
         schema = Element.queryTaggedValue(
             interface,
             SCHEMA_NAME_KEY,
-            default=u'',
+            default="",
         )
 
         moduleName = interface.__module__
@@ -167,26 +165,26 @@ class SupermodelSchemaPlugin(object):
 
         directory = moduleName
 
-        if hasattr(module, '__path__'):
+        if hasattr(module, "__path__"):
             directory = module.__path__[0]
         else:
-            while '.' in moduleName:
-                moduleName, _ = moduleName.rsplit('.', 1)
+            while "." in moduleName:
+                moduleName, _ = moduleName.rsplit(".", 1)
                 module = sys.modules.get(moduleName, None)
-                if hasattr(module, '__path__'):
+                if hasattr(module, "__path__"):
                     directory = module.__path__[0]
                     break
 
         directory = os.path.abspath(directory)
         # Let / act as path separator on all platforms
-        filename = filename.replace('/', os.path.sep)
+        filename = filename.replace("/", os.path.sep)
         filename = os.path.abspath(os.path.join(directory, filename))
 
         model = loadFile(filename)
         if schema not in model.schemata:
             raise ValueError(
-                'Schema "{0}" specified for interface {1} does not exist '
-                'in {2}.'.format(
+                'Schema "{}" specified for interface {} does not exist '
+                "in {}.".format(
                     schema,
                     interface.__identifier__,
                     filename,
@@ -197,18 +195,12 @@ class SupermodelSchemaPlugin(object):
 
 
 class fieldset(MetadataListDirective):
-    """Directive used to create fieldsets
-    """
+    """Directive used to create fieldsets"""
+
     key = FIELDSETS_KEY
 
     def factory(
-        self,
-        name,
-        label=None,
-        description=None,
-        fields=None,
-        order=DEFAULT_ORDER,
-        **kw
+        self, name, label=None, description=None, fields=None, order=DEFAULT_ORDER, **kw
     ):
         fieldset = Fieldset(
             name,
@@ -230,8 +222,7 @@ class FieldsetCheckerPlugin(CheckerPlugin):
         if self.value is None:
             return
         for fieldset in self.value:
-            for fieldName in fieldset.fields:
-                yield fieldName
+            yield from fieldset.fields
 
 
 try:
@@ -239,16 +230,15 @@ try:
 except ImportError:
     pass
 else:
+
     class primary(MetadataListDirective):
-        """Directive used to mark one or more fields as 'primary'
-        """
+        """Directive used to mark one or more fields as 'primary'"""
+
         key = PRIMARY_FIELDS_KEY
 
         def factory(self, *args):
             if not args:
-                raise TypeError(
-                    'The primary directive expects at least one argument.'
-                )
+                raise TypeError("The primary directive expects at least one argument.")
             return args
 
     class PrimaryFieldsPlugin(ListCheckerPlugin):

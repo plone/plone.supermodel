@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from plone.supermodel.interfaces import IToUnicode
 from plone.supermodel.utils import fieldTypecast
 from zope.component import adapter
@@ -13,16 +12,15 @@ from zope.schema.interfaces import IInterfaceField
 from zope.schema.interfaces import IObject
 
 import datetime
-import six
 import time
 
 
 # Defaults
 
+
 @implementer(IFromUnicode)
 @adapter(IField)
-class DefaultFromUnicode(object):
-
+class DefaultFromUnicode:
     def __init__(self, context):
         self.context = context
 
@@ -32,22 +30,22 @@ class DefaultFromUnicode(object):
 
 @implementer(IToUnicode)
 @adapter(IField)
-class DefaultToUnicode(object):
-
+class DefaultToUnicode:
     def __init__(self, context):
         self.context = context
 
     def toUnicode(self, value):
-        if isinstance(value, six.binary_type):
+        if isinstance(value, bytes):
             return value.decode()
-        return six.text_type(value)
+        return str(value)
 
 
 # Date/time fields
 
+
 @implementer(IFromUnicode)
 @adapter(IDate)
-class DateFromUnicode(object):
+class DateFromUnicode:
 
     format = "%Y-%m-%d"
 
@@ -63,7 +61,7 @@ class DateFromUnicode(object):
 
 @implementer(IFromUnicode)
 @adapter(IDatetime)
-class DatetimeFromUnicode(object):
+class DatetimeFromUnicode:
 
     format = "%Y-%m-%d %H:%M:%S"
 
@@ -79,10 +77,10 @@ class DatetimeFromUnicode(object):
 
 # Interface fields
 
+
 @implementer(IFromUnicode)
 @adapter(IInterfaceField)
-class InterfaceFieldFromUnicode(object):
-
+class InterfaceFieldFromUnicode:
     def __init__(self, context):
         self.context = context
 
@@ -94,13 +92,12 @@ class InterfaceFieldFromUnicode(object):
 
 @implementer(IToUnicode)
 @adapter(IInterfaceField)
-class InterfaceFieldToUnicode(object):
-
+class InterfaceFieldToUnicode:
     def __init__(self, context):
         self.context = context
 
     def toUnicode(self, value):
-        return six.text_type(value.__identifier__)
+        return str(value.__identifier__)
 
 
 # Object fields - we can read, but not write, as there is no way to know
@@ -110,8 +107,7 @@ class InterfaceFieldToUnicode(object):
 
 @implementer(IFromUnicode)
 @adapter(IObject)
-class ObjectFromUnicode(object):
-
+class ObjectFromUnicode:
     def __init__(self, context):
         self.context = context
 
@@ -123,12 +119,11 @@ class ObjectFromUnicode(object):
 
 @implementer(IToUnicode)
 @adapter(IBytes)
-class BytesToUnicode(object):
-
+class BytesToUnicode:
     def __init__(self, context):
         self.context = context
 
     def toUnicode(self, value):
-        if isinstance(value, six.binary_type):
+        if isinstance(value, bytes):
             return value.decode()
-        return six.text_type(value)
+        return str(value)

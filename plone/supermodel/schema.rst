@@ -167,7 +167,7 @@ directory.
     >>> tmpdir = tempfile.mkdtemp()
     >>> schema_filename = os.path.join(tmpdir, 'schema.xml')
     >>> with open(schema_filename, 'w') as fd:
-    ...     _ = fd.write(schema)  # On Py3 write resturns the schema len
+    ...     _ = fd.write(schema)  # On Py3 write returns the schema len
 
 We can define interfaces from this using a helper function:
 
