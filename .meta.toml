@@ -3,3 +3,6 @@
 [meta]
 template = "default"
 commit-id = "78307cdf"
+
+[dependencies]
+ignores = "['plone.rfc822']"
