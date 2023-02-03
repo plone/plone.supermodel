@@ -49,7 +49,6 @@ Then, let's test each field in turn.
 
     >>> import datetime
     >>> import plone.supermodel.tests
-    >>> import six
 
 
 Bytes

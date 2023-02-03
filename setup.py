@@ -44,7 +44,6 @@ setup(
     python_requires=">=3.8",
     install_requires=[
         "setuptools",
-        "six",
         "lxml",
         "zope.component",
         "zope.i18nmessageid",

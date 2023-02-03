@@ -19,7 +19,6 @@ from zope.schema.vocabulary import SimpleVocabulary
 
 import doctest
 import re
-import six
 import unittest
 import zope.component.testing
 
@@ -358,7 +357,7 @@ class TestValueToElement(unittest.TestCase):
 
     def _assertSerialized(self, field, value, expected):
         element = utils.valueToElement(field, value, b"value")
-        sio = StringIO() if six.PY2 else BytesIO()
+        sio = BytesIO()
         etree.ElementTree(element).write(sio)
         self.assertEqual(sio.getvalue(), expected)
         unserialized = utils.elementToValue(field, element)
@@ -546,9 +545,7 @@ class TestChoiceHandling(unittest.TestCase):
             choice_with_integers,
         ):
             field, expected = case
-            expected = (
-                bytes(expected) if six.PY2 else bytes(expected, encoding="latin-1")
-            )
+            expected = bytes(expected, encoding="latin-1")
             el = self.handler.write(field, "myfield", "zope.schema.Choice")
             self.assertEqual(etree.tostring(el), expected)
 
