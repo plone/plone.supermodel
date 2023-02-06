@@ -42,20 +42,19 @@ resolved.
 Somehow the issue got solved when using python 3, so we need to check python
 version to get expected results here.
 
-    >>> import six
     >>> class ISomeInterface(Interface):
     ...     pass
 
     >>> adapter_calls = []
     >>> class IB(ISomeInterface, IA):
     ...     pass
-    >>> adapter_calls == ([] if six.PY2 else [('TestPlugin', 'IB')])
+    >>> adapter_calls == [('TestPlugin', 'IB')]
     True
 
     >>> adapter_calls = []
     >>> class IC(IB):
     ...     pass
-    >>> adapter_calls == ([] if six.PY2 else [('TestPlugin', 'IC')])
+    >>> adapter_calls == ([('TestPlugin', 'IC')])
     True
 
 To support the registration of schema plugins in ZCML, plugins are
@@ -71,18 +70,13 @@ directly.
     >>> from plone.supermodel.model import finalizeSchemas
 
     >>> finalizeSchemas(IA)
-    >>> adapter_calls == (
-    ...     [
-    ...         ('TestPlugin2', 'IA'),
-    ...         ('TestPlugin', 'IA'),
-    ...     ] if six.PY2 else [
-    ...         ('TestPlugin2', 'IA'),
-    ...         ('TestPlugin', 'IA'),
-    ...         ('TestPlugin2', 'IB'),
-    ...         ('TestPlugin', 'IB'),
-    ...         ('TestPlugin2', 'IC'),
-    ...         ('TestPlugin', 'IC'),
-    ...     ]
-    ... )
+    >>> adapter_calls == [
+    ...     ('TestPlugin2', 'IA'),
+    ...     ('TestPlugin', 'IA'),
+    ...     ('TestPlugin2', 'IB'),
+    ...     ('TestPlugin', 'IB'),
+    ...     ('TestPlugin2', 'IC'),
+    ...     ('TestPlugin', 'IC'),
+    ... ]
     True
     >>> adapter_calls = []

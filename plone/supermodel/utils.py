@@ -19,7 +19,6 @@ from zope.schema.interfaces import IVocabularyFactory
 
 import os.path
 import re
-import six
 import sys
 
 
@@ -69,8 +68,6 @@ def indent(node, level=0):
 def prettyXML(tree):
     indent(tree)
     xml = etree.tostring(tree)
-    if six.PY2:
-        return xml
     return xml.decode()
 
 

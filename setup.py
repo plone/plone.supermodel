@@ -44,7 +44,6 @@ setup(
     python_requires=">=3.8",
     install_requires=[
         "setuptools",
-        "six",
         "lxml",
         "zope.component",
         "zope.i18nmessageid",
@@ -59,6 +58,7 @@ setup(
         "plone.rfc822": ["plone.rfc822"],
         "test": [
             "plone.rfc822",
+            "zope.configuration",
         ],
     },
     entry_points="""

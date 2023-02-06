@@ -16,7 +16,6 @@ from zope.schema.interfaces import IVocabularyTokenized
 from zope.schema.vocabulary import SimpleTerm
 from zope.schema.vocabulary import SimpleVocabulary
 
-import six
 import zope.schema
 
 
@@ -361,7 +360,7 @@ class ChoiceHandler(BaseHandler):
             for term in field.vocabulary:
                 if isinstance(term.value, int) or (
                     isinstance(term.value, str)
-                    and six.b(term.token) == term.value.encode("unicode_escape")
+                    and term.token.encode() == term.value.encode("unicode_escape")
                 ):
                     if term.title and term.title != term.value:
                         value.append((term.value, term.title))
