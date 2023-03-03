@@ -2,153 +2,157 @@
     xmlns="http://namespaces.zope.org/zope"
     xmlns:five="http://namespaces.zope.org/five"
     xmlns:zcml="http://namespaces.zope.org/zcml"
-    i18n_domain="plone.supermodel">
+    i18n_domain="plone.supermodel"
+    >
 
-    <include package="z3c.zcmlhook" file="meta.zcml" />
+  <include
+      package="z3c.zcmlhook"
+      file="meta.zcml"
+      />
 
-    <zcml:customAction
-        handler=".model.finalizeSchemas"
-        order="9999999"
-        />
+  <zcml:customAction
+      handler=".model.finalizeSchemas"
+      order="9999999"
+      />
 
-    <adapter
-        factory=".directives.FieldsetCheckerPlugin"
-        name="plone.supermodel.fieldset"
-        />
+  <adapter
+      factory=".directives.FieldsetCheckerPlugin"
+      name="plone.supermodel.fieldset"
+      />
 
-    <adapter
-        factory=".directives.SupermodelSchemaPlugin"
-        name="plone.supermodel.load"
-        />
+  <adapter
+      factory=".directives.SupermodelSchemaPlugin"
+      name="plone.supermodel.load"
+      />
 
-    <adapter
-        zcml:condition="installed plone.rfc822"
-        factory=".directives.PrimaryFieldsPlugin"
-        name="plone.supermodel.primary"
-        />
+  <adapter
+      factory=".directives.PrimaryFieldsPlugin"
+      name="plone.supermodel.primary"
+      zcml:condition="installed plone.rfc822"
+      />
 
-    <!-- Unicode converters -->
+  <!-- Unicode converters -->
 
-    <adapter factory=".converters.DefaultFromUnicode" />
-    <adapter factory=".converters.DefaultToUnicode" />
+  <adapter factory=".converters.DefaultFromUnicode" />
+  <adapter factory=".converters.DefaultToUnicode" />
 
-    <adapter factory=".converters.DateFromUnicode" />
-    <adapter factory=".converters.DatetimeFromUnicode" />
+  <adapter factory=".converters.DateFromUnicode" />
+  <adapter factory=".converters.DatetimeFromUnicode" />
 
-    <adapter factory=".converters.InterfaceFieldFromUnicode" />
-    <adapter factory=".converters.InterfaceFieldToUnicode" />
+  <adapter factory=".converters.InterfaceFieldFromUnicode" />
+  <adapter factory=".converters.InterfaceFieldToUnicode" />
 
-    <adapter factory=".converters.ObjectFromUnicode" />
+  <adapter factory=".converters.ObjectFromUnicode" />
 
-    <adapter factory=".converters.BytesToUnicode" />
+  <adapter factory=".converters.BytesToUnicode" />
 
-    <!-- Field handlers for all of zope.schema -->
+  <!-- Field handlers for all of zope.schema -->
 
-    <utility
-        component=".fields.BytesHandler"
-        name="zope.schema.Bytes"
-        />
-    <utility
-        component=".fields.ASCIIHandler"
-        name="zope.schema.ASCII"
-        />
-    <utility
-        component=".fields.BytesLineHandler"
-        name="zope.schema.BytesLine"
-        />
-    <utility
-        component=".fields.ASCIILineHandler"
-        name="zope.schema.ASCIILine"
-        />
-    <utility
-        component=".fields.TextHandler"
-        name="zope.schema.Text"
-        />
-    <utility
-        component=".fields.TextLineHandler"
-        name="zope.schema.TextLine"
-        />
-    <utility
-        component=".fields.BoolHandler"
-        name="zope.schema.Bool"
-        />
-    <utility
-        component=".fields.IntHandler"
-        name="zope.schema.Int"
-        />
-    <utility
-        component=".fields.FloatHandler"
-        name="zope.schema.Float"
-        />
-    <utility
-        component=".fields.DecimalHandler"
-        name="zope.schema.Decimal"
-        />
-    <utility
-        component=".fields.TupleHandler"
-        name="zope.schema.Tuple"
-        />
-    <utility
-        component=".fields.ListHandler"
-        name="zope.schema.List"
-        />
-    <utility
-        component=".fields.SetHandler"
-        name="zope.schema.Set"
-        />
-    <utility
-        component=".fields.FrozenSetHandler"
-        name="zope.schema.FrozenSet"
-        />
-    <utility
-        component=".fields.PasswordHandler"
-        name="zope.schema.Password"
-        />
-    <utility
-        component=".fields.DictHandler"
-        name="zope.schema.Dict"
-        />
-    <utility
-        component=".fields.DatetimeHandler"
-        name="zope.schema.Datetime"
-        />
-    <utility
-        component=".fields.DateHandler"
-        name="zope.schema.Date"
-        />
-    <utility
-        component=".fields.SourceTextHandler"
-        name="zope.schema.SourceText"
-        />
-    <utility
-        component=".fields.URIHandler"
-        name="zope.schema.URI"
-        />
-    <utility
-        component=".fields.IdHandler"
-        name="zope.schema.Id"
-        />
-    <utility
-        component=".fields.DottedNameHandler"
-        name="zope.schema.DottedName"
-        />
-    <utility
-        component=".fields.InterfaceFieldHandler"
-        name="zope.schema.InterfaceField"
-        />
-    <utility
-        component=".fields.ObjectHandler"
-        name="zope.schema.Object"
-        />
-    <utility
-        component=".fields.ChoiceHandler"
-        name="zope.schema.Choice"
-        />
+  <utility
+      name="zope.schema.Bytes"
+      component=".fields.BytesHandler"
+      />
+  <utility
+      name="zope.schema.ASCII"
+      component=".fields.ASCIIHandler"
+      />
+  <utility
+      name="zope.schema.BytesLine"
+      component=".fields.BytesLineHandler"
+      />
+  <utility
+      name="zope.schema.ASCIILine"
+      component=".fields.ASCIILineHandler"
+      />
+  <utility
+      name="zope.schema.Text"
+      component=".fields.TextHandler"
+      />
+  <utility
+      name="zope.schema.TextLine"
+      component=".fields.TextLineHandler"
+      />
+  <utility
+      name="zope.schema.Bool"
+      component=".fields.BoolHandler"
+      />
+  <utility
+      name="zope.schema.Int"
+      component=".fields.IntHandler"
+      />
+  <utility
+      name="zope.schema.Float"
+      component=".fields.FloatHandler"
+      />
+  <utility
+      name="zope.schema.Decimal"
+      component=".fields.DecimalHandler"
+      />
+  <utility
+      name="zope.schema.Tuple"
+      component=".fields.TupleHandler"
+      />
+  <utility
+      name="zope.schema.List"
+      component=".fields.ListHandler"
+      />
+  <utility
+      name="zope.schema.Set"
+      component=".fields.SetHandler"
+      />
+  <utility
+      name="zope.schema.FrozenSet"
+      component=".fields.FrozenSetHandler"
+      />
+  <utility
+      name="zope.schema.Password"
+      component=".fields.PasswordHandler"
+      />
+  <utility
+      name="zope.schema.Dict"
+      component=".fields.DictHandler"
+      />
+  <utility
+      name="zope.schema.Datetime"
+      component=".fields.DatetimeHandler"
+      />
+  <utility
+      name="zope.schema.Date"
+      component=".fields.DateHandler"
+      />
+  <utility
+      name="zope.schema.SourceText"
+      component=".fields.SourceTextHandler"
+      />
+  <utility
+      name="zope.schema.URI"
+      component=".fields.URIHandler"
+      />
+  <utility
+      name="zope.schema.Id"
+      component=".fields.IdHandler"
+      />
+  <utility
+      name="zope.schema.DottedName"
+      component=".fields.DottedNameHandler"
+      />
+  <utility
+      name="zope.schema.InterfaceField"
+      component=".fields.InterfaceFieldHandler"
+      />
+  <utility
+      name="zope.schema.Object"
+      component=".fields.ObjectHandler"
+      />
+  <utility
+      name="zope.schema.Choice"
+      component=".fields.ChoiceHandler"
+      />
 
-    <!-- Field name extractors -->
-    <adapter factory=".serializer.DefaultFieldNameExtractor" />
+  <!-- Field name extractors -->
+  <adapter factory=".serializer.DefaultFieldNameExtractor" />
 
-    <!-- Parsing policy -->
-    <utility factory=".parser.DefaultSchemaPolicy" />
+  <!-- Parsing policy -->
+  <utility factory=".parser.DefaultSchemaPolicy" />
 
 </configure>
