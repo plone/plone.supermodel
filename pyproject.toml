@@ -43,4 +43,21 @@ profile = "plone"
 target-version = ["py38"]
 
 [tool.dependencychecker]
+Zope = [
+  # Zope own provided namespaces
+  'App', 'OFS', 'Products.Five', 'Products.OFSP', 'Products.PageTemplates',
+  'Products.SiteAccess', 'Shared', 'Testing', 'ZPublisher', 'ZTUtils',
+  'Zope2', 'webdav', 'zmi',
+  # Zope dependencies
+  'Acquisition', 'DateTime', 'transaction', 'zExceptions', 'ZODB', 'zope.component',
+  'zope.configuration', 'zope.container', 'zope.deferredimport', 'zope.event',
+  'zope.exceptions', 'zope.globalrequest', 'zope.i18n', 'zope.i18nmessageid',
+  'zope.interface', 'zope.lifecycleevent', 'zope.location', 'zope.publisher',
+  'zope.schema', 'zope.security', 'zope.site', 'zope.traversing', 'AccessControl',
+]
+'plone.base' = [
+  'setuptools', 'AccessControl', 'Products.BTreeFolder2', 'Products.CMFCore',
+  'Products.CMFDynamicViewFTI', 'zope.deprecation',
+]
+python-dateutil = ['dateutil']
 ignore-packages = ['plone.rfc822']
