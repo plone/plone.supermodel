@@ -43,7 +43,6 @@ class DefaultFieldNameExtractor:
 
 
 def serialize(model):
-
     handlers = {}
     schema_metadata_handlers = tuple(getUtilitiesFor(ISchemaMetadataHandler))
     field_metadata_handlers = tuple(getUtilitiesFor(IFieldMetadataHandler))
@@ -77,7 +76,6 @@ def serialize(model):
                 metadata_handler.write(fieldElement, schema, field)
 
     for schemaName, schema in model.schemata.items():
-
         fieldsets = schema.queryTaggedValue(FIELDSETS_KEY, [])
 
         fieldset_fields = set()
@@ -106,7 +104,6 @@ def serialize(model):
             writeField(field, schema_element)
 
         for fieldset in fieldsets:
-
             fieldset_element = etree.Element("fieldset")
             fieldset_element.set("name", fieldset.__name__)
             if fieldset.label:

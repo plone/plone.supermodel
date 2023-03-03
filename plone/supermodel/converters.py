@@ -46,7 +46,6 @@ class DefaultToUnicode:
 @implementer(IFromUnicode)
 @adapter(IDate)
 class DateFromUnicode:
-
     format = "%Y-%m-%d"
 
     def __init__(self, context):
@@ -62,7 +61,6 @@ class DateFromUnicode:
 @implementer(IFromUnicode)
 @adapter(IDatetime)
 class DatetimeFromUnicode:
-
     format = "%Y-%m-%d %H:%M:%S"
 
     def __init__(self, context):

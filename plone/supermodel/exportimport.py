@@ -98,7 +98,6 @@ class BaseHandler:
 
             attributeField = self.fieldAttributes.get(attribute_name, None)
             if attributeField is not None:
-
                 if attribute_name in self.fieldTypeAttributes:
                     deferred[attribute_name] = attribute_element
 
@@ -106,7 +105,6 @@ class BaseHandler:
                     deferred_nonvalidated[attribute_name] = attribute_element
 
                 elif attribute_name in self.fieldInstanceAttributes:
-
                     attributeField_type = attribute_element.get("type")
                     handler = queryUtility(
                         IFieldExportImportHandler, name=attributeField_type
@@ -148,7 +146,6 @@ class BaseHandler:
 
         for attribute_name in self.nonValidatedfieldTypeAttributes:
             if attribute_name in deferred_nonvalidated:
-
                 # this is pretty nasty: we need the field's fromUnicode(),
                 # but this always validates. The missing_value field may by
                 # definition be invalid. Therefore, we need to fake it.
@@ -339,7 +336,6 @@ class ChoiceHandler(BaseHandler):
         return super()._constructField(attributes)
 
     def write(self, field, name, type, elementName="field"):
-
         element = super().write(field, name, type, elementName)
 
         # write vocabulary or values list

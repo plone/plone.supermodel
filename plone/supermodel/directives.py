@@ -70,7 +70,6 @@ class MetadataDictDirective(Directive):
 @adapter(ISchema)
 @implementer(ISchemaPlugin)
 class CheckerPlugin:
-
     key = None
 
     def __init__(self, schema):
@@ -112,7 +111,6 @@ class ListCheckerPlugin(CheckerPlugin):
 
 
 class ListPositionCheckerPlugin(CheckerPlugin):
-
     position = None
 
     def fieldNames(self):
@@ -139,7 +137,6 @@ class load(Directive):
 @adapter(ISchema)
 @implementer(ISchemaPlugin)
 class SupermodelSchemaPlugin:
-
     order = -1000
 
     def __init__(self, interface):
@@ -209,13 +206,12 @@ class fieldset(MetadataListDirective):
             fields=fields,
             order=order,
         )
-        for (key, value) in kw.items():
+        for key, value in kw.items():
             setattr(fieldset, key, value)
         return [fieldset]
 
 
 class FieldsetCheckerPlugin(CheckerPlugin):
-
     key = FIELDSETS_KEY
 
     def fieldNames(self):
@@ -242,7 +238,6 @@ else:
             return args
 
     class PrimaryFieldsPlugin(ListCheckerPlugin):
-
         key = PRIMARY_FIELDS_KEY
 
         def __call__(self):

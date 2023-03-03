@@ -93,7 +93,6 @@ def _parse(source, policy):
     policy_util = getUtility(ISchemaPolicy, name=policy)
 
     def readField(fieldElement, schemaAttributes, fieldElements, baseFields):
-
         # Parse field attributes
         fieldName = fieldElement.get("name")
         fieldType = fieldElement.get("type")
@@ -165,7 +164,6 @@ def _parse(source, policy):
                 readField(subelement, schemaAttributes, fieldElements, baseFields)
 
             elif subelement.tag == ns("fieldset"):
-
                 fieldset_name = subelement.get("name")
                 if fieldset_name is None:
                     raise ValueError(f"Fieldset in schema {schemaName} has no name")
