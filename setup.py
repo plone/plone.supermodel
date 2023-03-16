@@ -58,7 +58,7 @@ setup(
         "plone.rfc822": ["plone.rfc822"],
         "test": [
             "plone.rfc822",
-            "zope.configuration",
+            "zope.configuration[test]",
         ],
     },
     entry_points="""

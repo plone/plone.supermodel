@@ -38,14 +38,12 @@ def noNS(name):
 
 
 def indent(node, level=0):
-
     INDENT_SIZE = 2
     node_indent = level * (" " * INDENT_SIZE)
     child_indent = (level + 1) * (" " * INDENT_SIZE)
 
     # node has children
     if len(node):
-
         # add indent before first child node
         if not node.text or not node.text.strip():
             node.text = "\n" + child_indent
@@ -184,7 +182,6 @@ def valueToElement(field, value, name=None, force=False):
     child = etree.Element(name)
 
     if value is not None and (force or value != field.missing_value):
-
         if IDict.providedBy(field):
             key_converter = IToUnicode(field.key_type)
             for k, v in sorted(value.items()):
@@ -301,7 +298,6 @@ def syncSchema(source, dest, overwrite=False, sync_bases=False):
 
     for name, field in sortedFields(source):
         if overwrite or name not in dest or dest[name].interface is not dest:
-
             clone = field.__class__.__new__(field.__class__)
             clone.__dict__.update(field.__dict__)
             clone.interface = dest
