@@ -1,22 +1,20 @@
+from pathlib import Path
 from setuptools import find_packages
 from setuptools import setup
-
-import os
-
-
-def read(*rnames):
-    return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
 
 
 version = "2.0.4.dev0"
 
-long_description = read("README.rst") + "\n" + read("CHANGES.rst") + "\n"
+long_description = (
+    f"{Path('README.rst').read_text()}\n{Path('CHANGES.rst').read_text()}"
+)
 
 setup(
     name="plone.supermodel",
     version=version,
     description="Serialize Zope schema definitions to and from XML",
     long_description=long_description,
+    long_description_content_type="text/x-rst",
     # Get more strings from
     # https://pypi.org/classifiers/
     classifiers=[
