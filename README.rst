@@ -61,6 +61,6 @@ Some of the key differences between the two packages are:
  - plone.supermodel's XML schema is intended to support more schema metadata,
    including widget hints.
 
-In the future, it may be possible to make userschema re-use part of
+In the future, it may be possible to make userschema reuse part of
 plone.supermodel or vice-a-versa, with more refactoring.
 
