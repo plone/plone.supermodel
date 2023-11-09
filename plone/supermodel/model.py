@@ -107,8 +107,28 @@ def finalizeSchemas(parent=Schema):
         )
 
     def walk(schema):
-        yield schema
-        for child in schema.dependents.keys():
+        # When we have behaviors on the Plone site root we got some schemas that
+        # are not SchemaClasses.  Same is true on Plone 5.2 if we use a backported
+        # fix for plone.dexterity to use 'Provides' instead of 'Implements', which
+        # should fix a memory leak:
+        # https://github.com/plone/plone.dexterity/pull/189
+        # If we yield such a schema, then 'sorted(schemas)' below will fail on
+        # Python 3 with: TypeError: '<' not supported between instances of
+        # 'Provides' and 'InterfaceClass'.
+        if isinstance(schema, SchemaClass):
+            yield schema
+
+        # This try..except is to handle AttributeError:
+        # 'VerifyingAdapterLookup' object has no attribute 'dependents'.
+        # afaik this happens in tests only.
+        # We have issue https://github.com/plone/plone.supermodel/issues/14
+        # to find out why this is happening in the first place.
+        try:
+            children = schema.dependents.keys()
+        except AttributeError:
+            children = ()
+
+        for child in children:
             for s in walk(child):
                 yield s
 
