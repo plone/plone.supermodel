@@ -18,7 +18,6 @@ def xmlSchema(filename, schema="", policy="", _frame=2):
 
 
 def loadFile(filename, reload=False, policy="", _frame=2):
-    global _model_cache
     path = utils.relativeToCallingPackage(filename, _frame)
     if reload or path not in _model_cache:
         parsed_model = parser.parse(path, policy=policy)
