@@ -1,9 +1,8 @@
 from pathlib import Path
-from setuptools import find_packages
 from setuptools import setup
 
 
-version = "2.0.6.dev0"
+version = "3.0.0.dev0"
 
 long_description = (
     f"{Path('README.rst').read_text()}\n{Path('CHANGES.rst').read_text()}"
@@ -20,11 +19,9 @@ setup(
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Framework :: Plone",
-        "Framework :: Plone :: 6.0",
+        "Framework :: Plone :: 6.2",
         "Framework :: Plone :: Core",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
         "Topic :: Software Development :: Libraries :: Python Modules",
@@ -35,14 +32,10 @@ setup(
     author_email="optilude@gmail.com",
     url="https://github.com/plone/plone.supermodel",
     license="BSD",
-    packages=find_packages("src"),
-    namespace_packages=["plone"],
-    package_dir={"": "src"},
     include_package_data=True,
     zip_safe=False,
-    python_requires=">=3.8",
+    python_requires=">=3.10",
     install_requires=[
-        "setuptools",
         "lxml",
         "zope.component",
         "zope.i18nmessageid",
