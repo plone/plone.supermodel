@@ -11,7 +11,6 @@ from zope.interface.interface import InterfaceClass
 import logging
 import zope.deferredimport
 
-
 zope.deferredimport.defineFrom(
     "plone.supermodel.directives",
     "load",

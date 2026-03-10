@@ -7,7 +7,6 @@ from plone.supermodel.interfaces import FILENAME_KEY
 from plone.supermodel.interfaces import IXMLToSchema
 from zope.interface import moduleProvides
 
-
 # Cache models by absolute filename
 _model_cache = {}
 

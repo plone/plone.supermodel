@@ -21,7 +21,6 @@ import os.path
 import re
 import sys
 
-
 _marker = object()
 noNS_re = re.compile(r"^{\S+}")
 
