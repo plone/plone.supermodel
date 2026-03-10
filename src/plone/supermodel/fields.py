@@ -1,7 +1,6 @@
 import plone.supermodel.exportimport
 import zope.schema
 
-
 # Field import/export handlers
 
 BytesHandler = plone.supermodel.exportimport.BaseHandler(zope.schema.Bytes)

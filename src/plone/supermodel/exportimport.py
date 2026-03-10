@@ -18,7 +18,6 @@ from zope.schema.vocabulary import SimpleVocabulary
 
 import zope.schema
 
-
 try:
     from collections import OrderedDict
 except ImportError:

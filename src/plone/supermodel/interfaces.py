@@ -3,7 +3,6 @@ from zope.interface.interfaces import IInterface
 
 import zope.schema
 
-
 # Keys for tagged values on interfaces
 
 # absolute file name of model file
