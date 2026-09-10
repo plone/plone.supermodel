@@ -4,7 +4,64 @@
 [build-system]
 requires = ["setuptools>=68.2,<83", "wheel"]
 
+# START-MARKER-MANUAL-CONFIG
+# Anything from here until END-MARKER-MANUAL-CONFIG
+# will be kept by plone.meta
 
+[project]
+name = "plone.supermodel"
+version = "3.0.1.dev0"
+description = "Serialize Zope schema definitions to and from XML"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Framework :: Plone",
+    "Framework :: Plone :: 6.2",
+    "Framework :: Plone :: Core",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+license = "BSD-3-Clause"
+dynamic = ["readme"]
+requires-python = ">=3.10"
+authors = [
+    {name = "Martin Aspeli",email = "optilude@gmail.com"},
+]
+maintainers = [
+    {name = "Plone Foundation and contributors",email = "plone-developers@lists.sourceforge.net"},
+]
+dependencies = [
+    "lxml",
+    "z3c.zcmlhook",
+    "zope.component",
+    "zope.deferredimport",
+    "zope.dottedname",
+    "zope.i18nmessageid",
+    "zope.interface",
+    "zope.schema",
+]
+keywords = ["Plone", "XML", "schema"]
+
+[project.optional-dependencies]
+lxml = []
+"plone.rfc822" = ["plone.rfc822"]
+test = [
+    "plone.rfc822",
+    "zope.configuration[test]",
+]
+
+[project.urls]
+Source = "https://github.com/plone/plone.supermodel"
+Issues = "https://github.com/plone/Products.CMFPlone/issues"
+Changelog = "https://github.com/plone/plone.supermodel/blob/master/CHANGES.rst"
+
+[tool.setuptools.dynamic]
+readme = {file = ["README.rst", "CHANGES.rst"]}
+# END-MARKER-MANUAL-CONFIG
 
 [tool.towncrier]
 directory = "news/"
